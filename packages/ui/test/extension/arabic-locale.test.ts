@@ -55,6 +55,38 @@ describe("Arabic, a partial locale", () => {
   });
 });
 
+/**
+ * The shell is in Arabic (docs/extension/design/b0-vertical-slice.md §9
+ * criterion 1): every navigation label, the group headings, the role names
+ * and the two buttons of the top bar. A key listed here that reads the same
+ * as the English is one nobody translated.
+ */
+describe("the shell, in Arabic", () => {
+  const SHELL_KEYS = Object.keys(CATALOGUES.en).filter(
+    (key) =>
+      key.startsWith("nav.item.") ||
+      key.startsWith("nav.group.") ||
+      key.startsWith("role.builtin.") ||
+      key === "okrList.newInTopbar" ||
+      key === "copilot.copilotPanel.ask",
+  );
+
+  /** Product and protocol names Arabic writes as they are. */
+  const SAME_IN_ARABIC: ReadonlySet<string> = new Set(["nav.group.okr"]);
+
+  test("has more than a handful of keys to speak for", () => {
+    expect(SHELL_KEYS.length).toBeGreaterThan(40);
+  });
+
+  test("translates every one of them", () => {
+    const untranslated = SHELL_KEYS.filter(
+      (key) =>
+        !SAME_IN_ARABIC.has(key) && CATALOGUES.ar[key] === CATALOGUES.en[key],
+    );
+    expect(untranslated).toEqual([]);
+  });
+});
+
 describe("the direction a locale is written in", () => {
   test("is right to left for Arabic and left to right for the others", () => {
     expect(directionOf("ar")).toBe("rtl");
