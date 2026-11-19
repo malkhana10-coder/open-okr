@@ -7,6 +7,7 @@
  * itself), never from a member's own written content, so there is nothing
  * here for the sanitising allow-list to do.
  */
+import { EXTENSION_ACTIVITY_RENDERERS } from "../actions/extension/activities.ts";
 import type { ActivityKind } from "./catalogue.ts";
 
 export type ActivityRenderer = (payload: Record<string, unknown>) => string;
@@ -689,6 +690,7 @@ export const ACTIVITY_RENDERERS: Record<ActivityKind, ActivityRenderer> = {
     p.duplicate
       ? `A ${p.provider} message was already queued`
       : `Queued a ${p.provider} message`,
+  ...EXTENSION_ACTIVITY_RENDERERS,
 };
 
 /** Renders any registered kind; a kind without one is a build-time bug, not a runtime one, since the catalogue is exhaustive. */

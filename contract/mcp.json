@@ -15087,6 +15087,53 @@
       }
     },
     {
+      "name": "strategy.listDomains",
+      "description": "The workspace's strategic domains, the areas gaps and sector objectives are filed under.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {}
+    },
+    {
+      "name": "strategy.createDomain",
+      "description": "Adds a strategic domain, an area of the strategy that gaps and sector objectives are filed under.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "A longer explanation, in plain words."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "name": "…"
+      }
+    },
+    {
       "name": "search",
       "description": "Searches everything in this workspace the caller may read. Each result carries an address that fetch resolves.",
       "inputSchema": {

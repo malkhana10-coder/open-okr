@@ -12439,6 +12439,39 @@
         }
       ],
       "pages": false
+    },
+    {
+      "name": "strategy listDomains",
+      "action": "strategy.listDomains",
+      "method": "GET",
+      "path": "/strategy/listDomains",
+      "scope": "read",
+      "summary": "The workspace's strategic domains, the areas gaps and sector objectives are filed under.",
+      "flags": [],
+      "pages": false
+    },
+    {
+      "name": "strategy createDomain",
+      "action": "strategy.createDomain",
+      "method": "POST",
+      "path": "/strategy/createDomain",
+      "scope": "write",
+      "summary": "Adds a strategic domain, an area of the strategy that gaps and sector objectives are filed under.",
+      "flags": [
+        {
+          "name": "name",
+          "field": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "description",
+          "field": "description",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
     }
   ]
 }

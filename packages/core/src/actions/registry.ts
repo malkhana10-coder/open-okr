@@ -261,6 +261,7 @@ import {
   updateDocument,
 } from "./documents.ts";
 import { exportList, listMyExports } from "./exports.ts";
+import { EXTENSION_ACTION_MAP } from "./extension/index.ts";
 import { parseListFilter } from "./filter-assist.ts";
 import {
   draftObjective,
@@ -1076,6 +1077,7 @@ export const ACTION_MAP = {
   "sessions.monthlyRecord": readMonthlyRecord,
   "decisions.forGoal": decisionsForGoal,
   "decisions.forCycle": decisionsForCycle,
+  ...EXTENSION_ACTION_MAP,
 } as const;
 
 export type ActionName = keyof typeof ACTION_MAP;

@@ -349,6 +349,7 @@ export {
   type ExportRunState,
   exportRuns,
 } from "./schema/exports.ts";
+export * from "./schema/extension/index.ts";
 export {
   CAPACITY_VERDICTS,
   type CapacityVerdict,

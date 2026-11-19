@@ -42,3 +42,29 @@
 | `packages/db/src/extension/migrate.ts` | `runExtensionMigrations` و`EXTENSION_LEDGER` و`EXTENSION_MIGRATIONS_DIR` |
 | `packages/db/migrations-ext/` | مجلد ترحيلات الامتداد. فيه ملف README فقط حتى الآن |
 | `packages/db/test/extension/migrate-ledger.test.ts` | اختبارات السجل الثاني |
+
+## 2. إجراءات الامتداد ومخططاته وأنواع نشاطه
+
+التصميم: [`design/b0-vertical-slice.md`](design/b0-vertical-slice.md) القسمان 4 و6.1.
+
+**السبب:** سجل الإجراءات وفهرس أنواع النشاط في الأصل خرائط ثابتة وقت الترجمة. نضيف خرائط الامتداد إليها بسطر نشر (spread) واحد عند كل نقطة.
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `packages/core/src/actions/registry.ts` | سطر استيراد، وسطر `...EXTENSION_ACTION_MAP` في آخر `ACTION_MAP` | متوسط: آخر الخريطة هو حيث يضيف الأصل إجراءاته الجديدة. الحل دائماً إبقاء سطرنا الأخير |
+| `packages/core/src/activities/catalogue.ts` | سطر استيراد، وسطر `...EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS` في آخر الخريطة | متوسط، للسبب نفسه |
+| `packages/core/src/activities/renderers.ts` | سطر استيراد، وسطر `...EXTENSION_ACTIVITY_RENDERERS` في آخر الخريطة | متوسط، للسبب نفسه |
+| `packages/db/src/index.ts` | سطر `export * from "./schema/extension/index.ts"` | منخفض |
+| `packages/test-support/src/db-harness.ts` | تفريغ الجداول بين الاختبارات يستثني `_migrations_ext` كما يستثني `_migrations` | منخفض |
+| `contract/openapi.json`، `contract/cli.json`، `contract/mcp.json`، `docs/api/reference.md` | مولَّدة آلياً من السجل. تُعاد بـ`pnpm gen:contract` و`pnpm gen:docs` بعد كل جلب، ولا تُحل تعارضاتها يدوياً | مرتفع، وحلّه إعادة التوليد |
+
+ملفات جديدة في مجلدات `extension/`:
+
+| الملف | المحتوى |
+|---|---|
+| `packages/db/migrations-ext/0001_strategy_domains.sql` | جدول `strategy_domains` بسياسة العزل والحذف الناعم |
+| `packages/db/src/schema/extension/strategy.ts`، `index.ts` | مخطط الجدول |
+| `packages/core/src/actions/extension/index.ts` | `EXTENSION_ACTION_MAP` |
+| `packages/core/src/actions/extension/strategy.ts` | `strategy.listDomains` و`strategy.createDomain` |
+| `packages/core/src/actions/extension/activities.ts` | أنواع نشاط الامتداد وجملها |
+| `packages/core/test/extension/strategy-domains.test.ts` | اختباراتها |

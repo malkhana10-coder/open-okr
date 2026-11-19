@@ -16,6 +16,7 @@
  * real one: `workspace.provisioned` and `test.bind` cannot collide.
  */
 import { z } from "zod";
+import { EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS } from "../actions/extension/activities.ts";
 
 const TEST_SCAFFOLD_KIND = /^test\./;
 
@@ -867,6 +868,7 @@ export const ACTIVITY_PAYLOAD_SCHEMAS = {
     name: z.string(),
     failures: z.number().int(),
   }),
+  ...EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS,
 } as const satisfies Record<string, z.ZodType>;
 
 export type ActivityKind = keyof typeof ACTIVITY_PAYLOAD_SCHEMAS;

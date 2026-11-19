@@ -395,7 +395,7 @@ export const workerDb = async (): Promise<WorkerDb> => {
     pooledDb: drizzle(pooledAppPool),
     async truncateAllTables() {
       const tables = await admin.query<{ tablename: string }>(
-        `select tablename from pg_tables where schemaname = 'public' and tablename <> '_migrations'`,
+        `select tablename from pg_tables where schemaname = 'public' and tablename not in ('_migrations', '_migrations_ext')`,
       );
       if (tables.rows.length === 0) {
         return;
