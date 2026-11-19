@@ -13,8 +13,8 @@ import { join } from "node:path";
 import { loadEnv } from "@openokr/config";
 import pg from "pg";
 import { registeredDataChanges } from "../data-changes/registry.ts";
+import { runExtensionMigrations } from "../extension/migrate.ts";
 import { runMigrations } from "../migrate.ts";
-import { runExtensionMigrations } from "../migrate-extension.ts";
 
 const env = loadEnv();
 const url = env.DATABASE_ADMIN_URL ?? env.DATABASE_URL;

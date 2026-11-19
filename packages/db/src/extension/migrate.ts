@@ -14,13 +14,13 @@ import {
   type MigrationClient,
   type RunMigrationsOptions,
   runMigrations,
-} from "./migrate.ts";
+} from "../migrate.ts";
 
 export const EXTENSION_LEDGER = "_migrations_ext";
 
 export const EXTENSION_MIGRATIONS_DIR = join(
   import.meta.dirname,
-  "../migrations-ext",
+  "../../migrations-ext",
 );
 
 /**

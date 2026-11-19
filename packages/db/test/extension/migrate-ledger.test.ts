@@ -4,11 +4,11 @@ import { join } from "node:path";
 import { workerDb } from "@openokr/test-support/db";
 import pg from "pg";
 import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
-import { runMigrations } from "../src/migrate.ts";
 import {
   EXTENSION_LEDGER,
   runExtensionMigrations,
-} from "../src/migrate-extension.ts";
+} from "../../src/extension/migrate.ts";
+import { runMigrations } from "../../src/migrate.ts";
 
 /**
  * A second, independent stream of migrations with its own ledger
@@ -122,6 +122,9 @@ describe("a second migration ledger", () => {
     await expect(
       runMigrations(client, { dirs: [extension], ledger: "_migrations_ext" }),
     ).rejects.toThrow(/sorts before already applied/);
+    // Refused by its own history, which the default ledger never saw.
+    expect(await names("_migrations_ext")).toEqual(["0002_ext.sql"]);
+    await expect(names("_migrations")).rejects.toThrow(/does not exist/);
   });
 
   it("refuses a ledger name that is not a plain identifier", async () => {
@@ -152,5 +155,7 @@ describe("runExtensionMigrations", () => {
       dir: join(extension, "absent"),
     });
     expect(applied).toEqual([]);
+    // The stream ran against its own ledger, which now exists and is empty.
+    expect(await names(EXTENSION_LEDGER)).toEqual([]);
   });
 });

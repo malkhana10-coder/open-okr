@@ -22,7 +22,7 @@ import pg from "pg";
 import { registeredDataChanges } from "../../packages/db/src/data-changes/registry.ts";
 import { grantAppPrivileges } from "../../packages/db/src/grants.ts";
 import { runMigrations } from "../../packages/db/src/migrate.ts";
-import { runExtensionMigrations } from "../../packages/db/src/migrate-extension.ts";
+import { runExtensionMigrations } from "../../packages/db/src/extension/migrate.ts";
 import { ensureLoginRole } from "../../packages/db/src/roles.ts";
 
 const adminUrl = process.env.DATABASE_ADMIN_URL;
