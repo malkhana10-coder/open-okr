@@ -8,12 +8,23 @@
  * cannot find its input must not report success: a renamed directory would
  * otherwise turn this into a permanent pass.
  */
+import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { lintMigrationDirs } from "../migration-lint.ts";
 import { checkShippedMigrations } from "../shipped-migrations.ts";
 
 const migrations = join(import.meta.dirname, "../../migrations");
-const dirs = [migrations, ...process.argv.slice(2)];
+// The extension stream is linted once it holds a file. Until then it is a
+// directory with a README, and an empty directory is not a pass.
+const extension = join(import.meta.dirname, "../../migrations-ext");
+const extensionHasSql = (await readdir(extension).catch(() => [])).some(
+  (entry) => entry.endsWith(".sql"),
+);
+const dirs = [
+  migrations,
+  ...(extensionHasSql ? [extension] : []),
+  ...process.argv.slice(2),
+];
 
 const { results, filesChecked, emptyDirs } = await lintMigrationDirs(dirs);
 

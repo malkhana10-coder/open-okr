@@ -32,6 +32,11 @@ export {
   runMigrations,
 } from "./migrate.ts";
 export {
+  EXTENSION_LEDGER,
+  EXTENSION_MIGRATIONS_DIR,
+  runExtensionMigrations,
+} from "./migrate-extension.ts";
+export {
   lintMigrationDirs,
   lintMigrationSql,
   type MigrationLintResult,

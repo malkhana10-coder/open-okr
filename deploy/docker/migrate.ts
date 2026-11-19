@@ -22,6 +22,7 @@ import pg from "pg";
 import { registeredDataChanges } from "../../packages/db/src/data-changes/registry.ts";
 import { grantAppPrivileges } from "../../packages/db/src/grants.ts";
 import { runMigrations } from "../../packages/db/src/migrate.ts";
+import { runExtensionMigrations } from "../../packages/db/src/migrate-extension.ts";
 import { ensureLoginRole } from "../../packages/db/src/roles.ts";
 
 const adminUrl = process.env.DATABASE_ADMIN_URL;
@@ -70,11 +71,15 @@ try {
   // A migration may name a data change it needs first (plan 0.8.0 C1). The
   // migrator runs it here, in its own batches, and the start log says which
   // and how long it took: the one backfill that holds a start open.
+  const dataChanges = registeredDataChanges(process.env.OPENOKR_ENCRYPTION_KEY);
+  const log = (line: string) => process.stdout.write(`openokr: ${line}\n`);
   const applied = await runMigrations(client, {
     dirs: [join(import.meta.dirname, "../../packages/db/migrations")],
-    dataChanges: registeredDataChanges(process.env.OPENOKR_ENCRYPTION_KEY),
-    log: (line) => process.stdout.write(`openokr: ${line}\n`),
+    dataChanges,
+    log,
   });
+  // The planning extension's stream, in its own ledger, after the shipped one.
+  applied.push(...(await runExtensionMigrations(client, { dataChanges, log })));
 
   process.stdout.write(
     applied.length === 0

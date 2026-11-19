@@ -14,6 +14,7 @@ import { loadEnv } from "@openokr/config";
 import pg from "pg";
 import { registeredDataChanges } from "../data-changes/registry.ts";
 import { runMigrations } from "../migrate.ts";
+import { runExtensionMigrations } from "../migrate-extension.ts";
 
 const env = loadEnv();
 const url = env.DATABASE_ADMIN_URL ?? env.DATABASE_URL;
@@ -21,11 +22,15 @@ const url = env.DATABASE_ADMIN_URL ?? env.DATABASE_URL;
 const client = new pg.Client({ connectionString: url });
 await client.connect();
 try {
+  const dataChanges = registeredDataChanges(process.env.OPENOKR_ENCRYPTION_KEY);
+  const log = (line: string) => process.stdout.write(`${line}\n`);
   const applied = await runMigrations(client, {
     dirs: [join(import.meta.dirname, "../../migrations")],
-    dataChanges: registeredDataChanges(process.env.OPENOKR_ENCRYPTION_KEY),
-    log: (line) => process.stdout.write(`${line}\n`),
+    dataChanges,
+    log,
   });
+  // The planning extension's stream, in its own ledger, after the shipped one.
+  applied.push(...(await runExtensionMigrations(client, { dataChanges, log })));
   process.stdout.write(
     applied.length === 0
       ? "Nothing to apply. The database is up to date.\n"

@@ -126,6 +126,7 @@ RUN set -e; \
 # nothing else. A separate production install for this was 400MB of the
 # workspace's packages to run a few hundred lines of SQL.
 COPY --from=build --chown=openokr:openokr /repo/packages/db/migrations ./migrator/packages/db/migrations
+COPY --from=build --chown=openokr:openokr /repo/packages/db/migrations-ext ./migrator/packages/db/migrations-ext
 COPY --from=build --chown=openokr:openokr /repo/packages/db/src ./migrator/packages/db/src
 
 # Key rotation runs from this layer too, and unlike the migration runner it
