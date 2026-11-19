@@ -68,3 +68,24 @@
 | `packages/core/src/actions/extension/strategy.ts` | `strategy.listDomains` و`strategy.createDomain` |
 | `packages/core/src/actions/extension/activities.ts` | أنواع نشاط الامتداد وجملها |
 | `packages/core/test/extension/strategy-domains.test.ts` | اختباراتها |
+
+## 3. العربية لغة جزئية، واتجاه الصفحة
+
+التصميم: [`design/b0-vertical-slice.md`](design/b0-vertical-slice.md) القسم 6، البند 5.
+
+**السبب:** `translate` يرمي خطأ عند أي مفتاح ناقص، والشريحة تترجم الهيكل العام وشاشاتها فقط. اللغة الجزئية تُكمَّل من الإنجليزية عند بناء الكتالوجات، فالشاشة غير المترجمة تظهر بالإنجليزية بدل أن تنكسر.
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `packages/ui/src/i18n/catalogue.ts` | `ar` في نوع `Locale`، و`PARTIAL_LOCALES`، وكتالوج `ar` مبني من الإنجليزية مع ملفنا، والدالة `directionOf` | منخفض إلى متوسط |
+| `apps/web/app/layout.tsx` | `dir={directionOf(locale)}` على `<html>`، واستيراد الدالة | منخفض |
+
+ملفات جديدة:
+
+| الملف | المحتوى |
+|---|---|
+| `packages/ui/src/i18n/messages/ar.partial.json` | المفاتيح المترجمة للعربية. يكبر مع كل شاشة |
+| `packages/ui/test/extension/arabic-locale.test.ts` | اكتمال الكتالوج، الرجوع للإنجليزية، لا مفاتيح قديمة، تطابق الثغرات، الاتجاه |
+| `apps/web/test/extension/page-direction.test.ts` | `dir` على العنصر الجذر |
+
+لم يُنجز بعد من هذا البند: خيار العربية في قوائم اللغة، و`ar` في مخططات الإعدادات داخل `core` (أربعة مواضع)، والخط العربي، والأصناف المنطقية في الهيكل العام.

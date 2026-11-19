@@ -1,6 +1,7 @@
 import { loadEnv } from "@openokr/config";
 import {
   CATALOGUES,
+  directionOf,
   QueryProvider,
   ThemeProvider,
   ToastProvider,
@@ -113,6 +114,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
+      dir={directionOf(locale)}
       className={geistSans.variable}
       data-theme="light"
       data-density="comfortable"
