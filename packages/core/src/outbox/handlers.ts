@@ -33,6 +33,8 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
 import { CHANNEL_MESSAGE_TOPIC } from "../actions/channels.ts";
+import type { ExtractPages } from "../actions/extension/knowledge-extraction.ts";
+import { EXTENSION_OUTBOX_HANDLERS } from "../actions/extension/outbox.ts";
 import {
   COACH_MENTION_TOPIC,
   parseCoachMentionJob,
@@ -249,6 +251,13 @@ export interface OutboxHandlerDeps {
    * for reading it.
    */
   readonly scanner?: () => Promise<ScanFile | null>;
+  /**
+   * Reads an uploaded source document page by page, for the planning
+   * extension (docs/extension/design/b0-vertical-slice.md §5). A function,
+   * for the reason every other dependency here is one: the reader lives in
+   * `packages/adapters`.
+   */
+  readonly extractPages?: ExtractPages;
   /**
    * The workspace's AI drafter (P4-T14b-b).
    *
@@ -1760,6 +1769,8 @@ export const OUTBOX_HANDLERS: Readonly<Record<string, OutboxHandler>> = {
   // Outbound webhooks (docs/design/outbound-webhooks.md W8, W9).
   [WEBHOOK_DELIVER_TOPIC]: deliverWebhookEvent,
   [WEBHOOK_TURNED_OFF_TOPIC]: sendWebhookTurnedOff,
+  // The planning extension's topics, declared in its own folder.
+  ...EXTENSION_OUTBOX_HANDLERS,
 };
 
 /**

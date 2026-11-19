@@ -20,4 +20,16 @@ export const EXTENSION_TABLE_POLICY = [
     reason:
       "The areas of the strategy that gaps and sector objectives are filed under.",
   },
+  {
+    table: "source_documents",
+    decision: "export",
+    reason:
+      "Which uploaded file a sector plans from, and what kind of document it is. The file itself is a blob.",
+  },
+  {
+    table: "source_document_pages",
+    decision: "export",
+    reason:
+      "The text of each page, which the quotations of a workspace's gaps and objectives are checked against.",
+  },
 ] as const;

@@ -9,9 +9,17 @@
  * folder that is the extension's alone, rather than registered from a package
  * above this one.
  */
+import {
+  listSourceDocuments,
+  readSourceDocumentPage,
+  registerSourceDocument,
+} from "./knowledge.ts";
 import { createStrategyDomain, listStrategyDomains } from "./strategy.ts";
 
 export const EXTENSION_ACTION_MAP = {
   "strategy.listDomains": listStrategyDomains,
   "strategy.createDomain": createStrategyDomain,
+  "knowledge.registerDocument": registerSourceDocument,
+  "knowledge.listDocuments": listSourceDocuments,
+  "knowledge.readPage": readSourceDocumentPage,
 } as const;

@@ -453,6 +453,9 @@ importers:
       '@openokr/formats':
         specifier: workspace:*
         version: link:../formats
+      '@openokr/knowledge':
+        specifier: workspace:*
+        version: link:../knowledge
       '@openokr/method':
         specifier: workspace:*
         version: link:../method

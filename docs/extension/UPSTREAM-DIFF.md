@@ -136,6 +136,29 @@
 
 لو أعاد المشروع الأصلي كتابة القيد نفسه (لإضافة لغة مثلاً)، فترحيله سيُسقط `ar`، وسيفشل على خادم فيه عضو لغته عربية. **الاختبار الحارس يقرأ القيد بعد كل الترحيلات ويشترط القيم الثلاث بالضبط**، فيفشل عند أول جلب يُدخل ذلك الترحيل. العلاج حينها: ترحيل جديد في مجرى الامتداد يعيد `ar` إلى القيد بقيم الأصل الجديدة، وتحديث الاختبار.
 
+## 4أ. وثائق المصدر وقراءتها في الخلفية
+
+التصميم: [`design/b0-vertical-slice.md`](design/b0-vertical-slice.md) القسمان 4 و5.
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `packages/core/src/outbox/handlers.ts` | سطرا استيراد، وحقل `extractPages` في اعتماديات المعالجات، وسطر `...EXTENSION_OUTBOX_HANDLERS` في آخر جدول المعالجات | متوسط: آخر الجدول هو حيث يضيف الأصل مواضيعه |
+| `packages/core/package.json` | الاعتماد على `@openokr/knowledge` | منخفض |
+| `packages/core/test/write-floor-classification.test.ts`، `apps/web/test/action-coverage.test.ts` | تصنيف الإجراءات الثلاثة الجديدة | منخفض |
+
+ملفات جديدة في مجلدات `extension/`:
+
+| الملف | المحتوى |
+|---|---|
+| `packages/db/migrations-ext/0003_source_documents.sql` | الجدولان `source_documents` و`source_document_pages` |
+| `packages/db/src/schema/extension/knowledge.ts` | مخططهما |
+| `packages/core/src/actions/extension/knowledge.ts` | `knowledge.registerDocument` و`knowledge.listDocuments` و`knowledge.readPage` |
+| `packages/core/src/actions/extension/knowledge-extraction.ts` | مهمة القراءة في الخلفية وتسجيل نتيجتها |
+| `packages/core/src/actions/extension/outbox.ts` | معالج الموضوع `knowledge.extract` |
+| `packages/core/src/actions/extension/acting-member.ts` | تحديد العضو المنفِّذ |
+
+**قرار صلاحيات يستحق الذكر:** قراءة وثائق القطاع وصفحاتها تطلب مستوى «تعديل» على القطاع، لا «عرض». في الأصل كل عضو في مساحة العمل يملك «عرض» على كل القطاعات (لا خصوصية للقطاع)، و«تعديل» لأعضاء القطاع ولمسؤول النظام والمالك. الطلب يمر عبر `getAccessScoped` نفسها بمستوى أعلى، لا بفحص خاص.
+
 ## 5. حزم الامتداد المستقلة
 
 حزم جديدة كلياً لا تعدّل شيئاً في الأصل. تُسجَّل هنا للحصر فقط.

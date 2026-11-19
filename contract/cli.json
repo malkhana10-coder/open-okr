@@ -12472,6 +12472,93 @@
         }
       ],
       "pages": false
+    },
+    {
+      "name": "knowledge registerDocument",
+      "action": "knowledge.registerDocument",
+      "method": "POST",
+      "path": "/knowledge/registerDocument",
+      "scope": "write",
+      "summary": "Files an uploaded PDF under a sector as a source document, and asks for it to be read page by page.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "blob-id",
+          "field": "blobId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "field": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "field": "kind",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "strategy",
+            "sub_strategy",
+            "previous_plan",
+            "report"
+          ]
+        },
+        {
+          "name": "year",
+          "field": "year",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge listDocuments",
+      "action": "knowledge.listDocuments",
+      "method": "GET",
+      "path": "/knowledge/listDocuments",
+      "scope": "read",
+      "summary": "A sector's source documents, with how far reading each one has got.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge readPage",
+      "action": "knowledge.readPage",
+      "method": "GET",
+      "path": "/knowledge/readPage",
+      "scope": "read",
+      "summary": "The text of one page of a source document.",
+      "flags": [
+        {
+          "name": "document-id",
+          "field": "documentId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "page",
+          "field": "page",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "pages": false
     }
   ]
 }

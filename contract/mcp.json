@@ -15135,6 +15135,123 @@
       }
     },
     {
+      "name": "knowledge.registerDocument",
+      "description": "Files an uploaded PDF under a sector as a source document, and asks for it to be read page by page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "blobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "A short title, as a person would read it in a list."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "strategy",
+              "sub_strategy",
+              "previous_plan",
+              "report"
+            ],
+            "description": "The kind, from the listed values."
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 2200
+          }
+        },
+        "required": [
+          "spaceId",
+          "blobId",
+          "title",
+          "kind",
+          "year"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000",
+        "blobId": "00000000-0000-4000-8000-000000000000",
+        "title": "…",
+        "kind": "strategy",
+        "year": 0
+      }
+    },
+    {
+      "name": "knowledge.listDocuments",
+      "description": "A sector's source documents, with how far reading each one has got.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "knowledge.readPage",
+      "description": "The text of one page of a source document.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "documentId",
+          "page"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "documentId": "00000000-0000-4000-8000-000000000000",
+        "page": 0
+      }
+    },
+    {
       "name": "search",
       "description": "Searches everything in this workspace the caller may read. Each result carries an address that fetch resolves.",
       "inputSchema": {

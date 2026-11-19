@@ -53,6 +53,9 @@ const SELF_SERVICE = new Set([
  * document or the author's own row, where the role already applies.
  */
 const OWN_CHECK = new Set([
+  // Measured on the sector the document is filed under, at `edit`
+  // (docs/extension/design/b0-vertical-slice.md §5).
+  "knowledge.registerDocument",
   "blockers.raise",
   "alignment.applyFinding",
   "alignment.dismissFinding",
