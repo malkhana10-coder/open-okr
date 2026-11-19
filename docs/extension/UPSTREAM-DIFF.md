@@ -56,6 +56,7 @@
 | `packages/core/src/activities/renderers.ts` | سطر استيراد، وسطر `...EXTENSION_ACTIVITY_RENDERERS` في آخر الخريطة | متوسط، للسبب نفسه |
 | `packages/db/src/index.ts` | سطر `export * from "./schema/extension/index.ts"` | منخفض |
 | `packages/core/src/api/mcp/toolset-data.ts` | مجموعة أدوات سابعة للوكلاء باسم `planning`: سطر في `TOOLSET_NAMES`، وسطر `planning: PLANNING_TOOLSET`، وسطر استيراد. كل أداة للوكلاء يجب أن تنتمي لمجموعة واحدة بالضبط | متوسط |
+| `packages/core/src/portability/policy.ts` | سطر استيراد، وسطر `...EXTENSION_TABLE_POLICY` في آخر قائمة سياسة النقل. كل جدول في القاعدة يجب أن يُصنَّف: يُصدَّر مع مساحة العمل أو يُستثنى بسبب | متوسط: آخر القائمة هو حيث يضيف الأصل جداوله |
 | `packages/core/test/mcp-toolsets.test.ts`، `e2e/s41-mcp-transport.spec.ts`، `docs/design/mcp-toolsets.md` | قائمة أسماء المجموعات صارت تحوي `planning` | منخفض |
 | `packages/test-support/src/db-harness.ts` | تفريغ الجداول بين الاختبارات يستثني `_migrations_ext` كما يستثني `_migrations` | منخفض |
 | `contract/openapi.json`، `contract/cli.json`، `contract/mcp.json`، `docs/api/reference.md` | مولَّدة آلياً من السجل. تُعاد بـ`pnpm gen:contract` و`pnpm gen:docs` بعد كل جلب، ولا تُحل تعارضاتها يدوياً | مرتفع، وحلّه إعادة التوليد |
@@ -70,6 +71,7 @@
 | `packages/core/src/actions/extension/strategy.ts` | `strategy.listDomains` و`strategy.createDomain` |
 | `packages/core/src/actions/extension/activities.ts` | أنواع نشاط الامتداد وجملها |
 | `packages/core/src/actions/extension/toolset.ts` | أسماء أدوات مجموعة `planning` |
+| `packages/core/src/actions/extension/portability.ts` | تصنيف جداول الامتداد في أرشيف مساحة العمل: `strategy_domains` تُصدَّر، و`_migrations_ext` يُستثنى |
 | `packages/core/test/extension/strategy-domains.test.ts` | اختباراتها |
 
 ## 3. العربية لغة جزئية، واتجاه الصفحة
@@ -92,3 +94,7 @@
 | `apps/web/test/extension/page-direction.test.ts` | `dir` على العنصر الجذر |
 
 لم يُنجز بعد من هذا البند: خيار العربية في قوائم اللغة، و`ar` في مخططات الإعدادات داخل `core` (أربعة مواضع)، والخط العربي، والأصناف المنطقية في الهيكل العام.
+
+### قيد معروف: إصدار مخطط الامتداد في الأرشيف
+
+أرشيف مساحة العمل يسجّل إصدار المخطط من `_migrations` فقط، والاستيراد يرفض أرشيفاً من نسخة أحدث بناءً عليه. جداول الامتداد تُصدَّر الآن، لكن إصدار مجراها (`_migrations_ext`) لا يُسجَّل في الأرشيف، فأرشيف من نسخة امتداد أحدث لا يُرفض عند الاستيراد في نسخة أقدم. لا أثر له ما دام التصدير والاستيراد بين نسختين من البناء نفسه. يُعالج في مرحلة التصليب (ط) بإضافة إصدار مجرى الامتداد إلى بيان الأرشيف.

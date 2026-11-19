@@ -33,6 +33,8 @@
  * it, which is the only moment anybody knows what is in it.
  */
 
+import { EXTENSION_TABLE_POLICY } from "../actions/extension/portability.ts";
+
 /** Why a table is in or out, in the words a reader should get. */
 export interface TablePolicy {
   readonly table: string;
@@ -981,6 +983,8 @@ export const TABLE_POLICY: readonly TablePolicy[] = [
     decision: "export",
     reason: "What a cycle taught, recorded where the next one will read it.",
   },
+  // The planning extension's tables, classified in its own folder.
+  ...EXTENSION_TABLE_POLICY,
 ];
 
 /** The tables an archive carries, in the order an import may write them. */
