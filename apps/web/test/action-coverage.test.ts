@@ -50,6 +50,18 @@ type Reason =
   | { readonly apiOnly: true; readonly why: string };
 
 const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
+  // The planning extension's first actions. The sector screens that will call
+  // them are later changes of the same phase
+  // (docs/extension/design/b0-vertical-slice.md §8), and the staleness test
+  // below removes these two lines the moment one does.
+  "strategy.listDomains": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the sector screens that read domains are not built yet",
+  },
+  "strategy.createDomain": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the setup screen that adds a domain is not built yet",
+  },
   "kpis.deleteRecord": {
     apiOnly: true,
     why: "used only by the copilot's undo, which calls it through the server; no screen removes a KPI value",

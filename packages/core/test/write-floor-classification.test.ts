@@ -238,6 +238,9 @@ describe("writes below full", () => {
       "kpis.setFormula": "kpi",
       "kpis.update": "kpi",
       "reactions.add": "comment",
+      // Strategic domains are how a workspace is set up, so the write is the
+      // Owner's and an Admin's (docs/extension/design/b0-vertical-slice.md §5).
+      "strategy.createDomain": "workspace",
       "workflow.publish": "workspace",
     });
   });

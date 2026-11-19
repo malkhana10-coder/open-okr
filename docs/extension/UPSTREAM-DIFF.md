@@ -55,6 +55,8 @@
 | `packages/core/src/activities/catalogue.ts` | سطر استيراد، وسطر `...EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS` في آخر الخريطة | متوسط، للسبب نفسه |
 | `packages/core/src/activities/renderers.ts` | سطر استيراد، وسطر `...EXTENSION_ACTIVITY_RENDERERS` في آخر الخريطة | متوسط، للسبب نفسه |
 | `packages/db/src/index.ts` | سطر `export * from "./schema/extension/index.ts"` | منخفض |
+| `packages/core/src/api/mcp/toolset-data.ts` | مجموعة أدوات سابعة للوكلاء باسم `planning`: سطر في `TOOLSET_NAMES`، وسطر `planning: PLANNING_TOOLSET`، وسطر استيراد. كل أداة للوكلاء يجب أن تنتمي لمجموعة واحدة بالضبط | متوسط |
+| `packages/core/test/mcp-toolsets.test.ts`، `e2e/s41-mcp-transport.spec.ts`، `docs/design/mcp-toolsets.md` | قائمة أسماء المجموعات صارت تحوي `planning` | منخفض |
 | `packages/test-support/src/db-harness.ts` | تفريغ الجداول بين الاختبارات يستثني `_migrations_ext` كما يستثني `_migrations` | منخفض |
 | `contract/openapi.json`، `contract/cli.json`، `contract/mcp.json`، `docs/api/reference.md` | مولَّدة آلياً من السجل. تُعاد بـ`pnpm gen:contract` و`pnpm gen:docs` بعد كل جلب، ولا تُحل تعارضاتها يدوياً | مرتفع، وحلّه إعادة التوليد |
 
@@ -67,6 +69,7 @@
 | `packages/core/src/actions/extension/index.ts` | `EXTENSION_ACTION_MAP` |
 | `packages/core/src/actions/extension/strategy.ts` | `strategy.listDomains` و`strategy.createDomain` |
 | `packages/core/src/actions/extension/activities.ts` | أنواع نشاط الامتداد وجملها |
+| `packages/core/src/actions/extension/toolset.ts` | أسماء أدوات مجموعة `planning` |
 | `packages/core/test/extension/strategy-domains.test.ts` | اختباراتها |
 
 ## 3. العربية لغة جزئية، واتجاه الصفحة

@@ -86,6 +86,7 @@ A toolset is a named slice of the catalogue, cut by the job a person does.
 | `room` | The live room's own moves: private votes and their reveal, the mic, pulse, kudos, retro notes, anonymous process-health answers | 16 |
 | `admin` | Workspace, people, spaces, roles, invitations, settings, audit, agents, practice, nudges, exports | 83 |
 | `integrations` | AI providers, chat channels, single sign-on, spreadsheet imports | 53 |
+| `planning` | The planning extension: strategic domains today, and gaps, sector objectives and approvals as they arrive. Listed in `packages/core/src/actions/extension/toolset.ts` | 2 |
 | `all` | Every agent-surface tool | 380 |
 
 Chosen in the address the client is configured with, so it works with every
@@ -104,7 +105,7 @@ https://okr.example/api/mcp?toolsets=all
 | Toolsets compose with scopes: the list is the intersection | A read-only token on `admin` sees the admin reads only |
 | `search` and `fetch` are in every toolset | Research connectors need them, and they are permission-filtered already |
 | Every tool a prompt cites is in `core` | A prompt that tells the agent to call a tool it cannot see is broken |
-| Every agent-surface tool is in exactly one of `core`, `work`, `facilitation`, `room`, `admin`, `integrations` | A new action fails the build until somebody places it |
+| Every agent-surface tool is in exactly one of `core`, `work`, `facilitation`, `room`, `admin`, `integrations`, `planning` | A new action fails the build until somebody places it |
 | No toolset holds more than 128 tools | Several clients cap there and drop the rest silently |
 
 The token screen's configuration snippet gains one line explaining
@@ -174,7 +175,7 @@ Then it is refused, and the tool is not in tools/list for any toolset
 ```
 Given /api/mcp?toolsets=core,nonsense
 When the client connects
-Then the answer is 400 and lists core, work, facilitation, room, admin, integrations and all
+Then the answer is 400 and lists core, work, facilitation, room, admin, integrations, planning and all
 ```
 
 ```
