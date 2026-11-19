@@ -78,6 +78,12 @@ describe("the shell, in Arabic", () => {
     expect(SHELL_KEYS.length).toBeGreaterThan(40);
   });
 
+  test("calls the Admin role the system administrator", () => {
+    // The product owner's wording (docs/extension/GLOSSARY.md): "المدير" reads
+    // as a line manager, which this role is not.
+    expect(translate(CATALOGUES.ar, "role.builtin.admin")).toBe("مسؤول النظام");
+  });
+
   test("translates every one of them", () => {
     const untranslated = SHELL_KEYS.filter(
       (key) =>

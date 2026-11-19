@@ -69,6 +69,32 @@ describe("verifyCitation", () => {
     });
   });
 
+  it("takes the shortest quotation it accepts from its caller", () => {
+    const short = { quote: "قطاع التراخيص والامتثال", pageText: PAGE };
+    // Three words: refused by the default, accepted when the caller asks for
+    // three, refused again when it asks for more than the page can settle.
+    expect(verifyCitation(short)).toEqual({
+      status: "unverified",
+      reason: "too_short",
+    });
+    expect(verifyCitation({ ...short, minWords: 3 })).toEqual({
+      status: "verified",
+    });
+    expect(
+      verifyCitation({
+        quote: "رفع نسبة إنجاز طلبات التراخيص",
+        pageText: PAGE,
+        minWords: 6,
+      }),
+    ).toEqual({ status: "unverified", reason: "too_short" });
+  });
+
+  it("refuses a shortest length that would accept anything", () => {
+    expect(() =>
+      verifyCitation({ quote: "قطاع", pageText: PAGE, minWords: 0 }),
+    ).toThrow(/minWords/);
+  });
+
   it("does not let a quotation match across a word boundary", () => {
     // "عمل إلى" is on the page; "مل إلى ٩٠٪ بنهاية عام" starts inside a word.
     expect(

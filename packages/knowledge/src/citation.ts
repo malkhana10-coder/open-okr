@@ -11,8 +11,14 @@
 import { normaliseArabic } from "./arabic.ts";
 
 /**
- * A quotation of fewer words than this proves nothing: "the licensing sector"
- * is on nearly every page of a strategy that has one.
+ * The shortest quotation that is verified, in words, unless a caller says
+ * otherwise (docs/extension/design/b0-vertical-slice.md §9 criterion 5).
+ *
+ * A quotation of fewer words proves nothing: "the licensing sector" is on
+ * nearly every page of a strategy that has one. Four is the product owner's
+ * decision of 19 November 2026. It is a default, not a rule built into the
+ * check, so a workspace setting can carry another number here later without
+ * this function changing.
  */
 export const MIN_QUOTE_WORDS = 4;
 
@@ -42,9 +48,16 @@ function words(text: string): string[] {
 export function verifyCitation(input: {
   readonly quote: string;
   readonly pageText: string;
+  /** The shortest quotation to verify, in words. `MIN_QUOTE_WORDS` if omitted. */
+  readonly minWords?: number;
 }): CitationVerdict {
+  const minWords = input.minWords ?? MIN_QUOTE_WORDS;
+  if (!Number.isInteger(minWords) || minWords < 1) {
+    // Zero would verify an empty quotation against every page.
+    throw new RangeError("minWords must be a whole number of at least 1.");
+  }
   const quote = words(input.quote);
-  if (quote.length < MIN_QUOTE_WORDS) {
+  if (quote.length < minWords) {
     return { status: "unverified", reason: "too_short" };
   }
   // Spaces on both sides, so the quotation matches whole words only.
