@@ -93,7 +93,19 @@
 | `packages/ui/test/extension/arabic-locale.test.ts` | اكتمال الكتالوج، الرجوع للإنجليزية، لا مفاتيح قديمة، تطابق الثغرات، الاتجاه |
 | `apps/web/test/extension/page-direction.test.ts` | `dir` على العنصر الجذر |
 
-لم يُنجز بعد من هذا البند: الخط العربي، والأصناف المنطقية في الهيكل العام.
+### الخط العربي
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `apps/web/app/layout.tsx` | تعريف `plexArabic` بـ`next/font/local` (أربعة أوزان، دون تحميل مسبق، بنطاق `unicode-range` للعربية)، وإضافة متغيره إلى صنف `<html>` | منخفض |
+| `packages/ui/src/styles/tokens.css` | `var(--font-arabic-face)` أول سلسلة `--font-sans` | منخفض |
+| `apps/web/app/fonts/README.md` | قسم للخط الجديد: الإصدار والمصدر والمجاميع | منخفض |
+
+ملفات جديدة: أربعة ملفات `IBMPlexSansArabic-*.woff2` و`LICENSE-IBM-Plex.txt` في `apps/web/app/fonts/`، و`apps/web/test/extension/arabic-font.test.ts`.
+
+**لماذا الخط العربي أول السلسلة:** Next يوسّع متغير Geist إلى الخط وبدائله، وآخرها Arial، وArial فيه حروف عربية على ويندوز وماك. لو جاء الخط العربي بعد Geist لما وصل إليه المتصفح هناك. نطاق `unicode-range` يجعله يُسأل عن الحروف العربية فقط، فبقية النص يبقى بـGeist.
+
+لم يُنجز بعد من هذا البند: الأصناف المنطقية في الهيكل العام.
 
 ## 4. العربية لغة يختارها العضو، وقيد قاعدة البيانات
 

@@ -55,3 +55,32 @@ written down here instead.
   latin-only reader fetches roughly a fifth of this. This file is the whole
   character set in one 68 KB request. Worth revisiting if the font ever shows
   up in a performance budget, but not worth a build-time subsetting step now.
+
+## IBM Plex Sans Arabic
+
+Geist has no Arabic glyphs. IBM Plex Sans Arabic is vendored beside it for the
+Arabic interface, for the same reason Geist is: an air-gapped build has no
+network. It leads the font stack and its `@font-face` carries a
+`unicode-range` of the Arabic blocks, so Arabic text is Plex and everything
+else stays Geist. It is not preloaded: a browser fetches a face when a glyph
+needs it, so an English page downloads none of these files.
+
+|         |                                                                                      |
+| ------- | ------------------------------------------------------------------------------------ |
+| Files   | `IBMPlexSansArabic-Regular.woff2`, `-Medium`, `-SemiBold`, `-Bold`, about 74 KB each |
+| Weights | 400, 500, 600 and 700, the four the interface uses                                   |
+| Version | 1.1.0, the `@ibm/plex-sans-arabic` npm package's `fonts/complete/woff2/`             |
+| Source  | <https://github.com/IBM/plex>, published by IBM                                      |
+| Licence | SIL Open Font License 1.1, `LICENSE-IBM-Plex.txt` in this directory                  |
+
+| File                               | SHA-256                                                            |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| `IBMPlexSansArabic-Regular.woff2`  | `74112e1b7bf2e2c547989a4e947a60cba6cd1f9156e0065670134636e717199d` |
+| `IBMPlexSansArabic-Medium.woff2`   | `c72f6986f50ded745d06e71e508096209c52a55a6b3a81029954e33c52ba1dd2` |
+| `IBMPlexSansArabic-SemiBold.woff2` | `869b2acd0a9660607a2025f0fe1c640110bf23d33417509328f07722922b8063` |
+| `IBMPlexSansArabic-Bold.woff2`     | `db6650a05969c144ab5ab9bb6c3beca6ca4dbb3537bb5f2311c878dd293875b4` |
+
+`@ibm/plex-sans-arabic` is not a dependency of this repository. The files were
+extracted from the published package once. To update, `npm pack
+@ibm/plex-sans-arabic@<version>`, copy the four files here, and update the
+version and the checksums above and in `test/extension/arabic-font.test.ts`.

@@ -305,10 +305,16 @@
    * apps/web/app/fonts/Geist-Variable.woff2 into --font-sans-face.
    * The variable is named for the face rather than the role, because
    * --font-sans is the Tailwind theme key this maps it onto and a custom
-   * property cannot reference itself. */
+   * property cannot reference itself.
+   *
+   * IBM Plex Sans Arabic leads in --font-arabic-face. Its @font-face carries a
+   * unicode-range of the Arabic blocks, so the browser asks it for Arabic and
+   * for nothing else, and every other glyph is Geist's as before. It has to
+   * lead: Next expands the Geist variable into the face and its fallbacks,
+   * which end in Arial, and Arial has Arabic glyphs on Windows and macOS. */
   --font-sans:
-    var(--font-sans-face), -apple-system, "SF Pro Text", "Helvetica Neue",
-    Arial, sans-serif;
+    var(--font-arabic-face), var(--font-sans-face), -apple-system,
+    "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
 
   --color-brand: var(--brand);
   --color-brand-600: var(--brand-600);
