@@ -15,6 +15,8 @@
 | `packages/db/src/extension/` | مشغّل مجرى ترحيلات الامتداد |
 | `packages/db/migrations-ext/` | ترحيلات الامتداد |
 | `packages/core/test/extension/`، `packages/db/test/extension/` | اختباراتها |
+| `packages/adapters/src/extension/`، `packages/adapters/test/extension/` | منفذ الاستخراج ومشغّله واختباراتهما |
+| `apps/web/lib/extension/`، `apps/web/test/extension/` | ما يخص الامتداد في تطبيق الويب |
 
 المنطق الصرف يبقى في حزمنا (`packages/strategy`، `packages/knowledge`، `packages/governance`) التي لا تعتمد على `core`، والمشغّل في `packages/planning-agents` فوق `core`.
 
@@ -158,6 +160,33 @@
 | `packages/core/src/actions/extension/acting-member.ts` | تحديد العضو المنفِّذ |
 
 **قرار صلاحيات يستحق الذكر:** قراءة وثائق القطاع وصفحاتها تطلب مستوى «تعديل» على القطاع، لا «عرض». في الأصل كل عضو في مساحة العمل يملك «عرض» على كل القطاعات (لا خصوصية للقطاع)، و«تعديل» لأعضاء القطاع ولمسؤول النظام والمالك. الطلب يمر عبر `getAccessScoped` نفسها بمستوى أعلى، لا بفحص خاص.
+
+## 4ب. قارئ PDF
+
+التصميم والقياس: [`design/extraction-quality.md`](design/extraction-quality.md). التبعية: [`DEPENDENCIES.md`](DEPENDENCIES.md).
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `packages/adapters/src/index.ts` | تصدير `PdfjsTextExtractor` وأنواع المنفذ الثلاثة | منخفض |
+| `packages/adapters/package.json` | التبعية `pdfjs-dist` | منخفض |
+| `pnpm-workspace.yaml` | `ignoredOptionalDependencies` لاستبعاد `@napi-rs/canvas` | منخفض |
+| `apps/web/lib/relay.ts` | سطر استيراد، وسطر `extractPages` في اعتماديات المعالجات | منخفض إلى متوسط |
+
+ملفات جديدة في مجلدات `extension/`:
+
+| الملف | المحتوى |
+|---|---|
+| `packages/adapters/src/extension/extraction-port.ts` | المنفذ `TextExtractor`: نص الوثيقة صفحةً صفحة، أو «غير مقروءة» |
+| `packages/adapters/src/extension/pdfjs-extractor.ts` | المشغّل: يعيد تنفيذ تعليمات رسم الصفحة ويجمع كل حرف مرسوم بموضعه |
+| `packages/adapters/src/extension/page-layout.ts` | منطق صرف: من الحروف ومواضعها إلى نص بترتيب القراءة (التشكيل، الأسطر، الأعمدة، الاتجاهان، الأقواس) |
+| `packages/adapters/src/extension/pdfjs-worker.d.ts` | تعريف نوع لملف المحلِّل في المكتبة |
+| `packages/adapters/test/extension/` | اختبارات المنطق بحروف موضوعة يدوياً، واختبارات المشغّل على ملف تجريبي مؤلَّف |
+| `packages/adapters/test/fixtures/extension/` | `strategy-sample.html` و`strategy-sample.pdf` (أربع صفحات للجهة الخيالية) و`blank.pdf` |
+| `apps/web/lib/extension/document-reader.ts` | القارئ الذي يُعطى للمُرحِّل |
+
+**استثناء مسجَّل من عادة الحزمة:** منافذ `packages/adapters` في `ports/` ومشغّلاتها في `drivers/`. منفذ الامتداد ومشغّله في `src/extension/` التزاماً بقاعدة القسم 0.
+
+**كيف تُحمَّل المكتبة:** `pdfjs-dist` تحمّل محلِّلها بمسار ملف يُحسب وقت التشغيل، والخادم المبني لا يملك ذلك المسار. المشغّل يستورد الملفين استيراداً عادياً ويسلّم المحلِّل للمكتبة عبر `globalThis.pdfjsWorker`، وهي طريقتها الموثقة لذلك.
 
 ## 5. حزم الامتداد المستقلة
 

@@ -4,7 +4,7 @@
 
 | البند | النوع | الرخصة | الغرض | أين يعيش | القرار | الحالة |
 |---|---|---|---|---|---|---|
-| `pdfjs-dist` | حزمة npm | Apache-2.0 | استخراج نص PDF صفحةً صفحة | مشغّل خلف منفذ الاستخراج في `packages/adapters` | معتمد من صاحب المنتج، 2026-11-19 | لم يُضف بعد. يُضاف في المرحلة (ب-0) مع مشغّل الاستخراج. يُستخدم منه مستوى رسم الحروف لا واجهة النص، كما في [`design/extraction-quality.md`](design/extraction-quality.md) |
+| `pdfjs-dist` | حزمة npm | Apache-2.0 | استخراج نص PDF صفحةً صفحة | مشغّل خلف منفذ الاستخراج في `packages/adapters/src/extension` | معتمد من صاحب المنتج، 2026-11-19 | **أُضيف.** الإصدار 6.5.438. يُستخدم منه مستوى رسم الحروف لا واجهة النص، كما في [`design/extraction-quality.md`](design/extraction-quality.md). تبعيته الاختيارية `@napi-rs/canvas` مستبعدة (الجدول التالي) |
 | IBM Plex Sans Arabic | ملف خط داخل المستودع | SIL Open Font License 1.1 | الخط العربي للواجهة | `apps/web/app/fonts`، ومعه نص الرخصة | معتمد من صاحب المنتج، 2026-11-19 | **أُضيف.** الإصدار 1.1.0 من الحزمة `@ibm/plex-sans-arabic`، أربعة أوزان (400، 500، 600، 700)، ونص الرخصة في `apps/web/app/fonts/LICENSE-IBM-Plex.txt`، والمجاميع في `apps/web/app/fonts/README.md` |
 
 ## تبعيات قُيّمت ورُفضت، وتبعيات مستبعدة
