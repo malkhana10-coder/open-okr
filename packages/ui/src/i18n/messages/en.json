@@ -1497,6 +1497,7 @@
   "admin.webhooks.deliveries.newer": "Newer",
   "admin.webhooks.deliveries.older": "Older",
   "admin.webhooks.durationMs": "took {ms} ms",
+  "appearance.arabic": "العربية",
   "appearance.bahasaMelayu": "Bahasa Melayu",
   "appearance.bahasaMelayuNote": "Bahasa Melayu covers every screen. A native speaker has not reviewed the wording yet, and the method's own texts, such as phase names and coaching prompts, stay in English.",
   "appearance.comfortable": "Comfortable",

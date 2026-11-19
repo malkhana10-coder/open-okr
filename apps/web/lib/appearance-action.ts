@@ -24,7 +24,7 @@ export async function setAppearance(input: {
   /** Compact caps the content column at 1152 px, Full width does not. */
   width?: "compact" | "full";
   /** Which catalogue renders for this member (P6-G22a). */
-  language?: "en" | "ms";
+  language?: "en" | "ms" | "ar";
 }): Promise<{ error: string | null }> {
   const { session, workspace } = await requireWorkspace();
   try {

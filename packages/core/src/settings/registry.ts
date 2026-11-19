@@ -572,7 +572,7 @@ export const SETTINGS_REGISTRY: readonly SettingDefinition[] = [
       "organisation already gave. The workspace half of this setting has " +
       "existed since P2-T10 and was read by no renderer until P6-G22a.",
     resolve: () => null,
-    schema: z.enum(["en", "ms"]).nullable(),
+    schema: z.enum(["en", "ms", "ar"]).nullable(),
   },
   {
     key: "theme",

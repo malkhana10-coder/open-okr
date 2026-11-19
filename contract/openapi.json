@@ -2061,7 +2061,8 @@
                         "type": "string",
                         "enum": [
                           "en",
-                          "ms"
+                          "ms",
+                          "ar"
                         ]
                       },
                       {
@@ -3740,7 +3741,8 @@
                               "type": "string",
                               "enum": [
                                 "en",
-                                "ms"
+                                "ms",
+                                "ar"
                               ]
                             },
                             {

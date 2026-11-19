@@ -75,6 +75,7 @@ const SAME_IN_MALAY: ReadonlySet<string> = new Set([
   "search.exportButton.csv",
   "search.exportButton.excel",
   "appearance.english",
+  "appearance.arabic",
   "appearance.bahasaMelayu",
   "copilot.copilotPanel.copilot",
   // The name of an API style, which the glossary keeps as it is.
