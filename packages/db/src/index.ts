@@ -15,7 +15,7 @@ export {
 export { sealAccountTokens } from "./data-changes/0011_seal_account_tokens.ts";
 export {
   EXTENSION_LEDGER,
-  EXTENSION_MIGRATIONS_DIR,
+  extensionMigrationsDir,
   runExtensionMigrations,
 } from "./extension/migrate.ts";
 export {

@@ -15,8 +15,8 @@ import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
-  EXTENSION_MIGRATIONS_DIR,
   ensureRoles,
+  extensionMigrationsDir,
   grantAppPrivileges,
   runExtensionMigrations,
   runMigrations,
@@ -152,7 +152,7 @@ const withSuperuser = async <T>(
 /** Hash of everything that shapes the template, so edits force a rebuild. */
 const templateFingerprint = async (): Promise<string> => {
   const hash = createHash("sha256");
-  for (const dir of [...MIGRATION_DIRS, EXTENSION_MIGRATIONS_DIR]) {
+  for (const dir of [...MIGRATION_DIRS, extensionMigrationsDir()]) {
     const files = (await readdir(dir).catch(() => [] as string[]))
       .filter((file) => file.endsWith(".sql"))
       .sort();

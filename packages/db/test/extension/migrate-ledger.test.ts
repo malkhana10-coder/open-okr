@@ -159,3 +159,28 @@ describe("runExtensionMigrations", () => {
     expect(await names(EXTENSION_LEDGER)).toEqual([]);
   });
 });
+
+describe("the extension migrations directory", () => {
+  /**
+   * `@openokr/db` is bundled into the web application, where
+   * `import.meta.dirname` is undefined. A path joined when the module loads
+   * threw there and failed the build, so the path is worked out when it is
+   * asked for, which only the migrator and the test harness do.
+   */
+  it("is worked out when asked for, not when the module loads", async () => {
+    const module = await import("../../src/extension/migrate.ts");
+    expect("EXTENSION_MIGRATIONS_DIR" in module).toBe(false);
+    expect(module.extensionMigrationsDir()).toMatch(
+      /packages[\\/]db[\\/]migrations-ext$/,
+    );
+  });
+
+  it("joins no path at the top level of the module", async () => {
+    const { readFile } = await import("node:fs/promises");
+    const source = await readFile(
+      join(import.meta.dirname, "../../src/extension/migrate.ts"),
+      "utf8",
+    );
+    expect(source).not.toMatch(/^export const \w+ = join\(/m);
+  });
+});

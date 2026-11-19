@@ -39,7 +39,7 @@
 
 | الملف | المحتوى |
 |---|---|
-| `packages/db/src/extension/migrate.ts` | `runExtensionMigrations` و`EXTENSION_LEDGER` و`EXTENSION_MIGRATIONS_DIR` |
+| `packages/db/src/extension/migrate.ts` | `runExtensionMigrations` و`EXTENSION_LEDGER` و`extensionMigrationsDir()` |
 | `packages/db/migrations-ext/` | مجلد ترحيلات الامتداد. فيه ملف README فقط حتى الآن |
 | `packages/db/test/extension/migrate-ledger.test.ts` | اختبارات السجل الثاني |
 

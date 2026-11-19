@@ -18,10 +18,17 @@ import {
 
 export const EXTENSION_LEDGER = "_migrations_ext";
 
-export const EXTENSION_MIGRATIONS_DIR = join(
-  import.meta.dirname,
-  "../../migrations-ext",
-);
+/**
+ * Where the extension's SQL is on disk.
+ *
+ * A function, not a constant. This package is bundled into the web
+ * application, where `import.meta.dirname` is undefined, and a path joined
+ * when the module loads threw there and failed the build. Only the migrator
+ * and the test harness ask, and both run from source.
+ */
+export function extensionMigrationsDir(): string {
+  return join(import.meta.dirname, "../../migrations-ext");
+}
 
 /**
  * Applies the extension stream. Call it after `runMigrations` on the same
@@ -34,7 +41,7 @@ export function runExtensionMigrations(
   } = {},
 ): Promise<string[]> {
   return runMigrations(client, {
-    dirs: [options.dir ?? EXTENSION_MIGRATIONS_DIR],
+    dirs: [options.dir ?? extensionMigrationsDir()],
     ledger: EXTENSION_LEDGER,
     ...(options.dataChanges ? { dataChanges: options.dataChanges } : {}),
     ...(options.log ? { log: options.log } : {}),
