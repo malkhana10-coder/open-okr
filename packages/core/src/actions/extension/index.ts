@@ -9,6 +9,7 @@
  * folder that is the extension's alone, rather than registered from a package
  * above this one.
  */
+import { createGap, dismissGap, listGaps, updateGap } from "./gaps.ts";
 import {
   listSourceDocuments,
   readSourceDocumentPage,
@@ -20,6 +21,10 @@ import { createStrategyDomain, listStrategyDomains } from "./strategy.ts";
 export const EXTENSION_ACTION_MAP = {
   "strategy.listDomains": listStrategyDomains,
   "strategy.createDomain": createStrategyDomain,
+  "strategy.listGaps": listGaps,
+  "strategy.createGap": createGap,
+  "strategy.updateGap": updateGap,
+  "strategy.dismissGap": dismissGap,
   "strategy.listOrgUnits": listOrgUnits,
   "strategy.setSector": setSector,
   "strategy.setAgency": setAgency,

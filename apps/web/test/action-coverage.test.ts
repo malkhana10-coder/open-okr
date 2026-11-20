@@ -70,6 +70,22 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the source panel that opens a page is not built yet",
   },
+  "strategy.listGaps": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
+  },
+  "strategy.createGap": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
+  },
+  "strategy.updateGap": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
+  },
+  "strategy.dismissGap": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
+  },
   "strategy.listOrgUnits": {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the sector screens that read the structure are not built yet",

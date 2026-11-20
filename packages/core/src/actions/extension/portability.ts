@@ -32,6 +32,12 @@ export const EXTENSION_TABLE_POLICY = [
     reason: "Which spaces are agencies, and the sector each one is under.",
   },
   {
+    table: "strategic_gaps",
+    decision: "export",
+    reason:
+      "What each sector's strategy asks for that the sector is not yet doing, and where each gap stands.",
+  },
+  {
     table: "source_documents",
     decision: "export",
     reason:

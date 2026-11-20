@@ -56,6 +56,11 @@ const OWN_CHECK = new Set([
   // Measured on the sector the document is filed under, at `edit`
   // (docs/extension/design/b0-vertical-slice.md §5).
   "knowledge.registerDocument",
+  // A gap is the sector's, and each of these is measured on the sector at
+  // `edit` (docs/extension/design/b0-vertical-slice.md §5).
+  "strategy.createGap",
+  "strategy.updateGap",
+  "strategy.dismissGap",
   "blockers.raise",
   "alignment.applyFinding",
   "alignment.dismissFinding",

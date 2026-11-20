@@ -7,6 +7,9 @@ import { z } from "zod";
 
 export const EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS = {
   "strategy.domain_created": z.object({ name: z.string() }),
+  "strategy.gap_created": z.object({ title: z.string() }),
+  "strategy.gap_updated": z.object({ title: z.string() }),
+  "strategy.gap_dismissed": z.object({ title: z.string() }),
   "strategy.sector_set": z.object({ name: z.string() }),
   "strategy.agency_set": z.object({ name: z.string(), sector: z.string() }),
   "knowledge.document_registered": z.object({
@@ -28,6 +31,12 @@ export const EXTENSION_ACTIVITY_RENDERERS: Record<
 > = {
   "strategy.domain_created": (p) =>
     `A strategic domain "${String(p.name ?? "")}" was added`,
+  "strategy.gap_created": (p) =>
+    `A strategic gap "${String(p.title ?? "")}" was written`,
+  "strategy.gap_updated": (p) =>
+    `The strategic gap "${String(p.title ?? "")}" was changed`,
+  "strategy.gap_dismissed": (p) =>
+    `The strategic gap "${String(p.title ?? "")}" was set aside`,
   "strategy.sector_set": (p) => `"${String(p.name ?? "")}" was made a sector`,
   "strategy.agency_set": (p) =>
     `"${String(p.name ?? "")}" was placed under the sector "${String(p.sector ?? "")}"`,

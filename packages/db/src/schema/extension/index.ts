@@ -10,4 +10,4 @@ export {
   sourceDocuments,
 } from "./knowledge.ts";
 export { orgAgencies, orgSectors } from "./org-units.ts";
-export { strategyDomains } from "./strategy.ts";
+export { GAP_STATUSES, strategicGaps, strategyDomains } from "./strategy.ts";

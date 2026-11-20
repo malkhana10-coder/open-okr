@@ -78,6 +78,9 @@
 | `packages/db/migrations-ext/0005_org_units.sql`، `packages/db/src/schema/extension/org-units.ts` | `org_sectors` و`org_agencies`: أي مساحة قطاع وأي مساحة وكالة تحت أي قطاع، وزناد يمنع أن تكون المساحة الاثنين معاً. جدول `spaces` في الأصل لم يُمس |
 | `packages/core/src/actions/extension/org-units.ts` | `strategy.setSector` و`strategy.setAgency` و`strategy.listOrgUnits` |
 | `packages/core/test/extension/org-units.test.ts` | اختباراتها |
+| `packages/db/migrations-ext/0006_strategic_gaps.sql` | جدول `strategic_gaps` |
+| `packages/core/src/actions/extension/gaps.ts` | `strategy.createGap` و`strategy.updateGap` و`strategy.dismissGap` و`strategy.listGaps`، كلها تُقاس على القطاع بمستوى «تعديل» |
+| `packages/core/test/extension/gaps.test.ts` | اختباراتها |
 
 ## 3. العربية لغة جزئية، واتجاه الصفحة
 

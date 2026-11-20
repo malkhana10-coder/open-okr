@@ -12474,6 +12474,122 @@
       "pages": false
     },
     {
+      "name": "strategy listGaps",
+      "action": "strategy.listGaps",
+      "method": "GET",
+      "path": "/strategy/listGaps",
+      "scope": "read",
+      "summary": "A sector's strategic gaps, with where each one stands.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy createGap",
+      "action": "strategy.createGap",
+      "method": "POST",
+      "path": "/strategy/createGap",
+      "scope": "write",
+      "summary": "Writes a strategic gap for a sector: something its strategy asks for that the sector is not yet doing.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "field": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "description",
+          "field": "description",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rationale",
+          "field": "rationale",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "domain-id",
+          "field": "domainId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy updateGap",
+      "action": "strategy.updateGap",
+      "method": "POST",
+      "path": "/strategy/updateGap",
+      "scope": "write",
+      "summary": "Changes a strategic gap that has not been sent for approval, or that came back.",
+      "flags": [
+        {
+          "name": "id",
+          "field": "id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "field": "title",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "description",
+          "field": "description",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rationale",
+          "field": "rationale",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "domain-id",
+          "field": "domainId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy dismissGap",
+      "action": "strategy.dismissGap",
+      "method": "POST",
+      "path": "/strategy/dismissGap",
+      "scope": "write",
+      "summary": "Sets a strategic gap aside. It stays on record, so the same gap is not drafted again.",
+      "flags": [
+        {
+          "name": "id",
+          "field": "id",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
       "name": "strategy listOrgUnits",
       "action": "strategy.listOrgUnits",
       "method": "GET",
