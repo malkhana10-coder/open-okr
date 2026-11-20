@@ -86,7 +86,7 @@ async function domainOf(
 }
 
 /** The gap, once the caller is known to be in its sector. Not found otherwise. */
-async function gapForChange(
+export async function gapForChange(
   tx: OperationTx,
   workspaceId: string,
   memberId: string,
@@ -117,7 +117,7 @@ async function gapForChange(
   return gap;
 }
 
-function refuseUnlessOpen(status: GapStatus): void {
+export function refuseUnlessOpen(status: GapStatus): void {
   if (!OPEN_TO_CHANGE.has(status)) {
     throw new OperationError(
       "conflict",

@@ -15496,6 +15496,121 @@
       }
     },
     {
+      "name": "knowledge.listEvidence",
+      "description": "The quotations a gap rests on, each with its document, its page and whether it was found there.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subjectType": {
+            "type": "string",
+            "enum": [
+              "gap"
+            ],
+            "description": "What the item is attached to."
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the item it is attached to, matching subjectType."
+          }
+        },
+        "required": [
+          "subjectType",
+          "subjectId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "subjectType": "gap",
+        "subjectId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "knowledge.addEvidence",
+      "description": "Attaches a quotation from a page of a source document to a gap, and records whether the quotation is really on that page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subjectType": {
+            "type": "string",
+            "enum": [
+              "gap"
+            ],
+            "description": "What the item is attached to."
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the item it is attached to, matching subjectType."
+          },
+          "documentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "subjectType",
+          "subjectId",
+          "documentId",
+          "page",
+          "quote"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "subjectType": "gap",
+        "subjectId": "00000000-0000-4000-8000-000000000000",
+        "documentId": "00000000-0000-4000-8000-000000000000",
+        "page": 0,
+        "quote": "…"
+      }
+    },
+    {
+      "name": "knowledge.removeEvidence",
+      "description": "Removes a quotation from what it was attached to.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "scope": "destructive",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false
+      },
+      "example": {
+        "id": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
       "name": "search",
       "description": "Searches everything in this workspace the caller may read. Each result carries an address that fetch resolves.",
       "inputSchema": {

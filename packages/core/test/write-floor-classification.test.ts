@@ -58,6 +58,8 @@ const OWN_CHECK = new Set([
   "knowledge.registerDocument",
   // A gap is the sector's, and each of these is measured on the sector at
   // `edit` (docs/extension/design/b0-vertical-slice.md §5).
+  "knowledge.addEvidence",
+  "knowledge.removeEvidence",
   "strategy.createGap",
   "strategy.updateGap",
   "strategy.dismissGap",

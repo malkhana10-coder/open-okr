@@ -9,6 +9,7 @@
  * folder that is the extension's alone, rather than registered from a package
  * above this one.
  */
+import { addEvidence, listEvidence, removeEvidence } from "./evidence.ts";
 import { createGap, dismissGap, listGaps, updateGap } from "./gaps.ts";
 import {
   listSourceDocuments,
@@ -31,4 +32,7 @@ export const EXTENSION_ACTION_MAP = {
   "knowledge.registerDocument": registerSourceDocument,
   "knowledge.listDocuments": listSourceDocuments,
   "knowledge.readPage": readSourceDocumentPage,
+  "knowledge.listEvidence": listEvidence,
+  "knowledge.addEvidence": addEvidence,
+  "knowledge.removeEvidence": removeEvidence,
 } as const;

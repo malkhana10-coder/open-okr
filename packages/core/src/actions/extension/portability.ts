@@ -49,4 +49,10 @@ export const EXTENSION_TABLE_POLICY = [
     reason:
       "The text of each page, which the quotations of a workspace's gaps and objectives are checked against.",
   },
+  {
+    table: "evidence",
+    decision: "export",
+    reason:
+      "The quotations each gap rests on, with the page each is from and whether it was found there.",
+  },
 ] as const;

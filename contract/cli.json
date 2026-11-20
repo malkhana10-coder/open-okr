@@ -12731,6 +12731,93 @@
         }
       ],
       "pages": false
+    },
+    {
+      "name": "knowledge listEvidence",
+      "action": "knowledge.listEvidence",
+      "method": "GET",
+      "path": "/knowledge/listEvidence",
+      "scope": "read",
+      "summary": "The quotations a gap rests on, each with its document, its page and whether it was found there.",
+      "flags": [
+        {
+          "name": "subject-type",
+          "field": "subjectType",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "gap"
+          ]
+        },
+        {
+          "name": "subject-id",
+          "field": "subjectId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge addEvidence",
+      "action": "knowledge.addEvidence",
+      "method": "POST",
+      "path": "/knowledge/addEvidence",
+      "scope": "write",
+      "summary": "Attaches a quotation from a page of a source document to a gap, and records whether the quotation is really on that page.",
+      "flags": [
+        {
+          "name": "subject-type",
+          "field": "subjectType",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "gap"
+          ]
+        },
+        {
+          "name": "subject-id",
+          "field": "subjectId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "document-id",
+          "field": "documentId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "page",
+          "field": "page",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "quote",
+          "field": "quote",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge removeEvidence",
+      "action": "knowledge.removeEvidence",
+      "method": "POST",
+      "path": "/knowledge/removeEvidence",
+      "scope": "destructive",
+      "summary": "Removes a quotation from what it was attached to.",
+      "flags": [
+        {
+          "name": "id",
+          "field": "id",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
     }
   ]
 }

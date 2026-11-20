@@ -86,3 +86,45 @@ export const sourceDocumentPages = pgTable("source_document_pages", {
     .defaultNow(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
 });
+
+const EVIDENCE_SUBJECTS = ["gap", "goal"] as const;
+export const EVIDENCE_VERIFICATIONS = ["verified", "unverified"] as const;
+export const EVIDENCE_UNVERIFIED_REASONS = [
+  "too_short",
+  "not_on_page",
+] as const;
+
+/**
+ * A quotation, its document and its page (migration 0007 in the extension
+ * stream). `verification` is what the check found when the row was written.
+ */
+export const evidence = pgTable("evidence", {
+  id: uuid("id").primaryKey().$defaultFn(newId),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  /** What the evidence supports. No foreign key: a gap or a goal. */
+  subjectType: text("subject_type", { enum: EVIDENCE_SUBJECTS }).notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  documentId: uuid("document_id")
+    .notNull()
+    .references(() => sourceDocuments.id, { onDelete: "cascade" }),
+  page: integer("page").notNull(),
+  quote: text("quote").notNull(),
+  verification: text("verification", {
+    enum: EVIDENCE_VERIFICATIONS,
+  }).notNull(),
+  unverifiedReason: text("unverified_reason", {
+    enum: EVIDENCE_UNVERIFIED_REASONS,
+  }),
+  createdBy: uuid("created_by").references(() => workspaceMembers.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+});

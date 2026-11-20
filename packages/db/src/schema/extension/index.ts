@@ -3,6 +3,9 @@
  * line in the package index (docs/extension/UPSTREAM-DIFF.md).
  */
 export {
+  EVIDENCE_UNVERIFIED_REASONS,
+  EVIDENCE_VERIFICATIONS,
+  evidence,
   SOURCE_DOCUMENT_FAILURES,
   SOURCE_DOCUMENT_KINDS,
   SOURCE_DOCUMENT_STATUSES,

@@ -81,6 +81,9 @@
 | `packages/db/migrations-ext/0006_strategic_gaps.sql` | جدول `strategic_gaps` |
 | `packages/core/src/actions/extension/gaps.ts` | `strategy.createGap` و`strategy.updateGap` و`strategy.dismissGap` و`strategy.listGaps`، كلها تُقاس على القطاع بمستوى «تعديل» |
 | `packages/core/test/extension/gaps.test.ts` | اختباراتها |
+| `packages/db/migrations-ext/0007_evidence.sql` | جدول `evidence`: اقتباس ووثيقته وصفحته ونتيجة التحقق |
+| `packages/core/src/actions/extension/evidence.ts` | `knowledge.addEvidence` و`knowledge.removeEvidence` و`knowledge.listEvidence`. النتيجة تُحسب بـ`verifyCitation` عند الحفظ ولا تؤخذ من المستدعي |
+| `packages/core/test/extension/evidence.test.ts` | اختباراتها |
 
 ## 3. العربية لغة جزئية، واتجاه الصفحة
 
