@@ -1,0 +1,28 @@
+# Temporary. Copies the upstream project's release tags into this fork, which
+# the Helm chart checks read (docs/extension/UPSTREAM-DIFF.md). Runs once,
+# when this file itself is pushed to the session branch, and is deleted in
+# the commit after it succeeds.
+name: Sync upstream tags
+
+on:
+  push:
+    branches:
+      - claude/awesome-gates-rztn32
+    paths:
+      - .github/workflows/sync-upstream-tags.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Sync upstream tags
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Fetch the upstream tags
+        run: git fetch https://github.com/open-okr/open-okr 'refs/tags/*:refs/tags/*'
+      - name: Push them to this fork
+        run: git push origin --tags
