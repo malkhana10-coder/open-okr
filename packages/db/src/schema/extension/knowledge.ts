@@ -48,6 +48,9 @@ export const sourceDocuments = pgTable("source_documents", {
     .default("pending"),
   failureReason: text("failure_reason", { enum: SOURCE_DOCUMENT_FAILURES }),
   pageCount: integer("page_count"),
+  /** Counted when the file was read. Null until then, and on a failure. */
+  arabicWords: integer("arabic_words"),
+  suspectWords: integer("suspect_words"),
   uploadedBy: uuid("uploaded_by").references(() => workspaceMembers.id, {
     onDelete: "set null",
   }),
@@ -72,6 +75,9 @@ export const sourceDocumentPages = pgTable("source_document_pages", {
   page: integer("page").notNull(),
   text: text("text").notNull(),
   textNormalised: text("text_normalised").notNull(),
+  /** Null only on a page read before the counts existed. */
+  arabicWords: integer("arabic_words"),
+  suspectWords: integer("suspect_words"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

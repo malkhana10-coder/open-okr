@@ -25,7 +25,8 @@ import {
   sourceDocuments,
   withContext,
 } from "@openokr/db";
-import { asc, eq } from "drizzle-orm";
+import { isLowQuality } from "@openokr/knowledge";
+import { asc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { z } from "zod";
 import { ACCESS_LEVELS } from "../../access/levels.ts";
@@ -158,6 +159,20 @@ export const listSourceDocuments = defineReadAction({
         processingStatus: z.enum(SOURCE_DOCUMENT_STATUSES),
         failureReason: z.enum(SOURCE_DOCUMENT_FAILURES).nullable(),
         pageCount: z.number().int().nullable(),
+        /**
+         * How well the text came out of the file. Null until the document
+         * has been read, and when reading failed.
+         */
+        quality: z
+          .object({
+            arabicWords: z.number().int(),
+            suspectWords: z.number().int(),
+            /** The document as a whole is over the threshold. */
+            low: z.boolean(),
+            /** The pages that are over it, whatever the document is. */
+            lowPages: z.array(z.number().int()),
+          })
+          .nullable(),
       }),
     ),
   }),
@@ -182,6 +197,8 @@ export const listSourceDocuments = defineReadAction({
           processingStatus: sourceDocuments.processingStatus,
           failureReason: sourceDocuments.failureReason,
           pageCount: sourceDocuments.pageCount,
+          arabicWords: sourceDocuments.arabicWords,
+          suspectWords: sourceDocuments.suspectWords,
         })
         .from(sourceDocuments)
         .where(
@@ -192,7 +209,53 @@ export const listSourceDocuments = defineReadAction({
           ),
         )
         .orderBy(asc(sourceDocuments.createdAt), asc(sourceDocuments.id));
-      return { documents };
+      const read = documents.filter(
+        (document) => document.arabicWords !== null,
+      );
+      const pages =
+        read.length === 0
+          ? []
+          : await tx
+              .select({
+                documentId: sourceDocumentPages.documentId,
+                page: sourceDocumentPages.page,
+                arabicWords: sourceDocumentPages.arabicWords,
+                suspectWords: sourceDocumentPages.suspectWords,
+              })
+              .from(sourceDocumentPages)
+              .where(
+                activeOnly(
+                  sourceDocumentPages,
+                  eq(sourceDocumentPages.workspaceId, context.workspaceId),
+                  inArray(
+                    sourceDocumentPages.documentId,
+                    read.map((document) => document.id),
+                  ),
+                ),
+              )
+              .orderBy(asc(sourceDocumentPages.page));
+      return {
+        documents: documents.map(
+          ({ arabicWords, suspectWords, ...document }) => ({
+            ...document,
+            quality:
+              arabicWords === null || suspectWords === null
+                ? null
+                : {
+                    arabicWords,
+                    suspectWords,
+                    low: isLowQuality({ arabicWords, suspectWords }),
+                    lowPages: pages
+                      .filter(
+                        (page) =>
+                          page.documentId === document.id &&
+                          isLowPage(page.arabicWords, page.suspectWords),
+                      )
+                      .map((page) => page.page),
+                  },
+          }),
+        ),
+      };
     });
   },
 });
@@ -209,6 +272,12 @@ export const readSourceDocumentPage = defineReadAction({
     page: z.number().int(),
     pageCount: z.number().int(),
     text: z.string(),
+    /** What was counted on this page, and whether it is over the threshold. */
+    quality: z.object({
+      arabicWords: z.number().int(),
+      suspectWords: z.number().int(),
+      low: z.boolean(),
+    }),
   }),
   access: ACCESS_LEVELS.view,
   async handler(context, input) {
@@ -245,7 +314,11 @@ export const readSourceDocumentPage = defineReadAction({
         requires: ACCESS_LEVELS.edit,
       });
       const [page] = await tx
-        .select({ text: sourceDocumentPages.text })
+        .select({
+          text: sourceDocumentPages.text,
+          arabicWords: sourceDocumentPages.arabicWords,
+          suspectWords: sourceDocumentPages.suspectWords,
+        })
         .from(sourceDocumentPages)
         .where(
           activeOnly(
@@ -262,10 +335,27 @@ export const readSourceDocumentPage = defineReadAction({
         page: input.page,
         pageCount: document.pageCount,
         text: page.text,
+        quality: {
+          arabicWords: page.arabicWords ?? 0,
+          suspectWords: page.suspectWords ?? 0,
+          low: isLowPage(page.arabicWords, page.suspectWords),
+        },
       };
     });
   },
 });
+
+/** A page with no counts was read before they existed, and is not judged. */
+function isLowPage(
+  arabicWords: number | null,
+  suspectWords: number | null,
+): boolean {
+  return (
+    arabicWords !== null &&
+    suspectWords !== null &&
+    isLowQuality({ arabicWords, suspectWords })
+  );
+}
 
 /** Runs a read in the workspace, as the member the call was made as. */
 async function inSector<T>(

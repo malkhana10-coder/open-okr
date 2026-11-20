@@ -11,3 +11,10 @@ export {
   MIN_QUOTE_WORDS,
   verifyCitation,
 } from "./citation.ts";
+export {
+  type ExtractionQuality,
+  extractionQuality,
+  isLowQuality,
+  LOW_QUALITY_SHARE,
+  MIN_WORDS_TO_JUDGE,
+} from "./quality.ts";

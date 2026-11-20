@@ -162,6 +162,7 @@ describe("knowledge.registerDocument", () => {
         processingStatus: "pending",
         failureReason: null,
         pageCount: null,
+        quality: null,
       },
     ]);
   });
@@ -222,7 +223,12 @@ describe("reading a source document", () => {
       "knowledge.readPage",
       { documentId: registered.id, page: 2 },
     );
-    expect(page).toEqual({ page: 2, pageCount: 3, text: PAGES[1] });
+    expect(page).toEqual({
+      page: 2,
+      pageCount: 3,
+      text: PAGES[1],
+      quality: { arabicWords: 12, suspectWords: 0, low: false },
+    });
 
     // The comparable form is stored beside the text, not computed on read.
     const stored = await wb.admin.query<{ text_normalised: string }>(
@@ -317,6 +323,126 @@ describe("reading a source document", () => {
         },
       ),
     ).toEqual({ kind: "failed", reason: "missing" });
+  });
+});
+
+describe("the quality of what was read (criterion 19)", () => {
+  // Forty words, every fourth with a letter that lost its dots: a page out of
+  // a file whose character table is broken.
+  const WEAK = Array.from({ length: 40 }, (_, index) =>
+    index % 4 === 0 ? "ال\u066Eرخيص" : "الجهة",
+  ).join(" ");
+  const SOUND = Array.from({ length: 40 }, () => "الجهة").join(" ");
+  // Too few words to judge, though every one of them is damaged.
+  const SHORT = "ال\u066Eرخيص \u06A1ي";
+
+  const read = async (texts: readonly string[]) => {
+    const wb = await workerDb();
+    const storage = memoryStorage();
+    const registered = await register((await upload(storage)).blobId);
+    await runExtractionJob(
+      { workspaceId, documentId: registered.id },
+      {
+        pool: wb.appPool,
+        getFile: storage.getFile,
+        extractPages: async () => ({
+          kind: "pages",
+          pages: texts.map((text, index) => ({ page: index + 1, text })),
+        }),
+      },
+    );
+    const { documents } = await callAction(
+      { pool: wb.appPool, ...as(OWNER) },
+      "knowledge.listDocuments",
+      { spaceId },
+    );
+    return { wb, id: registered.id, document: documents[0] };
+  };
+
+  it("stores the counts for the document and for every page", async () => {
+    const { wb, id } = await read([SOUND, WEAK]);
+    const stored = await wb.admin.query(
+      `select d.arabic_words, d.suspect_words,
+              array(select p.arabic_words || '/' || p.suspect_words
+                      from source_document_pages p
+                     where p.document_id = d.id order by p.page) as pages
+         from source_documents d where d.id = $1`,
+      [id],
+    );
+    expect(stored.rows[0]).toEqual({
+      arabic_words: 80,
+      suspect_words: 10,
+      pages: ["40/0", "40/10"],
+    });
+  });
+
+  it("flags a document over the threshold, and names its weak pages", async () => {
+    const { document } = await read([SOUND, WEAK, SHORT]);
+    expect(document?.quality).toEqual({
+      arabicWords: 82,
+      suspectWords: 12,
+      low: true,
+      lowPages: [2],
+    });
+  });
+
+  it("does not flag a sound document, and still names one weak page in it", async () => {
+    const { document } = await read([
+      SOUND,
+      SOUND,
+      SOUND,
+      SOUND,
+      SOUND,
+      SOUND,
+      SOUND,
+      SOUND,
+      SOUND,
+      WEAK,
+    ]);
+    // 10 suspect words in 400 is under three in a hundred.
+    expect(document?.quality).toEqual({
+      arabicWords: 400,
+      suspectWords: 10,
+      low: false,
+      lowPages: [10],
+    });
+  });
+
+  it("says whether the page being read is a weak one", async () => {
+    const { wb, id } = await read([SOUND, WEAK]);
+    const weak = await callAction(
+      { pool: wb.appPool, ...as(OWNER) },
+      "knowledge.readPage",
+      { documentId: id, page: 2 },
+    );
+    expect(weak.quality).toEqual({
+      arabicWords: 40,
+      suspectWords: 10,
+      low: true,
+    });
+    const sound = await callAction(
+      { pool: wb.appPool, ...as(OWNER) },
+      "knowledge.readPage",
+      { documentId: id, page: 1 },
+    );
+    expect(sound.quality.low).toBe(false);
+  });
+
+  it("leaves a weak document ready and readable", async () => {
+    const { document } = await read([WEAK]);
+    expect(document).toMatchObject({ processingStatus: "ready", pageCount: 1 });
+  });
+
+  it("has no quality for a document that is not read yet, or that failed", async () => {
+    const wb = await workerDb();
+    const storage = memoryStorage();
+    await register((await upload(storage)).blobId);
+    const { documents } = await callAction(
+      { pool: wb.appPool, ...as(OWNER) },
+      "knowledge.listDocuments",
+      { spaceId },
+    );
+    expect(documents[0]?.quality).toBeNull();
   });
 });
 

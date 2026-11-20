@@ -26,7 +26,7 @@ import {
   sourceDocuments,
   withWorkspace,
 } from "@openokr/db";
-import { normaliseArabic } from "@openokr/knowledge";
+import { extractionQuality, normaliseArabic } from "@openokr/knowledge";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
@@ -202,6 +202,16 @@ async function record(
       workspaceId: job.workspaceId,
       actor: { kind: "system" },
       async execute({ tx, workspaceId }) {
+        // What was counted on each page, and their sum for the document
+        // (criterion 19). Counted here, once, so every reader of a page
+        // judges the same numbers.
+        const pages =
+          recorded.kind === "ready"
+            ? recorded.pages.map((page) => ({
+                ...page,
+                quality: extractionQuality(page.text),
+              }))
+            : [];
         // openokr:allow-mutation: this is the operation's own execute, on the
         // transaction runOperation opened. Guarded on `pending` so a document
         // is read once.
@@ -212,6 +222,14 @@ async function record(
               ? {
                   processingStatus: "ready" as const,
                   pageCount: recorded.pages.length,
+                  arabicWords: pages.reduce(
+                    (sum, page) => sum + page.quality.arabicWords,
+                    0,
+                  ),
+                  suspectWords: pages.reduce(
+                    (sum, page) => sum + page.quality.suspectWords,
+                    0,
+                  ),
                   updatedAt: new Date(),
                 }
               : {
@@ -239,13 +257,15 @@ async function record(
         if (recorded.kind === "ready") {
           // openokr:allow-mutation: the same operation's transaction.
           await tx.insert(sourceDocumentPages).values(
-            recorded.pages.map((page) => ({
+            pages.map((page) => ({
               id: newId(),
               workspaceId,
               documentId: job.documentId,
               page: page.page,
               text: page.text,
               textNormalised: normaliseArabic(page.text),
+              arabicWords: page.quality.arabicWords,
+              suspectWords: page.quality.suspectWords,
             })),
           );
         }

@@ -158,6 +158,7 @@
 | `packages/core/src/actions/extension/knowledge-extraction.ts` | مهمة القراءة في الخلفية وتسجيل نتيجتها |
 | `packages/core/src/actions/extension/outbox.ts` | معالج الموضوع `knowledge.extract` |
 | `packages/core/src/actions/extension/acting-member.ts` | تحديد العضو المنفِّذ |
+| `packages/db/migrations-ext/0004_extraction_quality.sql` | عدّا الكلمات العربية والمشبوهة على الوثيقة وعلى كل صفحة (المعيار 19). لا يمس جدولاً من الأصل |
 
 **قرار صلاحيات يستحق الذكر:** قراءة وثائق القطاع وصفحاتها تطلب مستوى «تعديل» على القطاع، لا «عرض». في الأصل كل عضو في مساحة العمل يملك «عرض» على كل القطاعات (لا خصوصية للقطاع)، و«تعديل» لأعضاء القطاع ولمسؤول النظام والمالك. الطلب يمر عبر `getAccessScoped` نفسها بمستوى أعلى، لا بفحص خاص.
 
@@ -194,7 +195,7 @@
 
 | الحزمة | المحتوى | تعتمد على |
 |---|---|---|
-| `packages/knowledge` | `normaliseArabic` (توحيد النص العربي) و`verifyCitation` (التحقق من اقتباس أمام نص صفحته). منطق صرف، واختبار يفرض ألا تستورد شيئاً من خارجها | لا شيء |
+| `packages/knowledge` | `normaliseArabic` (توحيد النص العربي) و`verifyCitation` (التحقق من اقتباس أمام نص صفحته) و`extractionQuality` و`isLowQuality` (جودة الاستخراج دون مرجع). منطق صرف، واختبار يفرض ألا تستورد شيئاً من خارجها | لا شيء |
 
 الأثر الوحيد على ملف من ملفات الأصل: إدخال للحزمة في `pnpm-lock.yaml`، وهو ملف مولَّد يُعاد بـ`pnpm install` عند أي تعارض.
 

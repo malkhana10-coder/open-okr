@@ -72016,6 +72016,46 @@
                                     "type": "null"
                                   }
                                 ]
+                              },
+                              "quality": {
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "arabicWords": {
+                                        "type": "integer",
+                                        "minimum": -9007199254740991,
+                                        "maximum": 9007199254740991
+                                      },
+                                      "suspectWords": {
+                                        "type": "integer",
+                                        "minimum": -9007199254740991,
+                                        "maximum": 9007199254740991
+                                      },
+                                      "low": {
+                                        "type": "boolean"
+                                      },
+                                      "lowPages": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        }
+                                      }
+                                    },
+                                    "required": [
+                                      "arabicWords",
+                                      "suspectWords",
+                                      "low",
+                                      "lowPages"
+                                    ],
+                                    "additionalProperties": false
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
                               }
                             },
                             "required": [
@@ -72025,7 +72065,8 @@
                               "year",
                               "processingStatus",
                               "failureReason",
-                              "pageCount"
+                              "pageCount",
+                              "quality"
                             ],
                             "additionalProperties": false
                           }
@@ -72118,12 +72159,37 @@
                         },
                         "text": {
                           "type": "string"
+                        },
+                        "quality": {
+                          "type": "object",
+                          "properties": {
+                            "arabicWords": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "suspectWords": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "low": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "arabicWords",
+                            "suspectWords",
+                            "low"
+                          ],
+                          "additionalProperties": false
                         }
                       },
                       "required": [
                         "page",
                         "pageCount",
-                        "text"
+                        "text",
+                        "quality"
                       ],
                       "additionalProperties": false
                     }
