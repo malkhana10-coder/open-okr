@@ -109,6 +109,14 @@
 
 لم يُنجز بعد من هذا البند: الأصناف المنطقية في الهيكل العام.
 
+### عزل الاتجاه للنصوص المختلطة
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `apps/web/app/globals.css` | سطر `@import` لملف العزل | منخفض |
+
+ملفات جديدة: `packages/ui/src/styles/extension/bidi-isolation.css` (قاعدة واحدة تحت `[dir="rtl"]` فقط: كل عنصر يُقرأ باتجاه نصه هو)، و`apps/web/test/extension/bidi-isolation.test.ts`، و`e2e/ext-bidi-isolation.spec.ts`.
+
 ## 4. العربية لغة يختارها العضو، وقيد قاعدة البيانات
 
 التصميم: [`design/b0-vertical-slice.md`](design/b0-vertical-slice.md) القسم 6، البندان 5 و5أ. قرار صاحب المنتج بتاريخ 2026-11-19: الخيار (أ).

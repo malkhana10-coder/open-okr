@@ -1,0 +1,23 @@
+/*
+ * Mixed text in a right-to-left page
+ * (docs/extension/design/b0-vertical-slice.md, "عزل الاتجاه").
+ *
+ * A right-to-left page lays every line out from the right. That is correct
+ * for Arabic and wrong for a line of English inside it: "53 days overdue."
+ * is drawn as ".days overdue 53". The Arabic catalogue is partial, so
+ * untranslated English is on most screens, and the names people type for
+ * objectives, indicators and sectors can be in either language.
+ *
+ * `plaintext` makes each element read in the direction of its own first
+ * strong letter, which is what `dir="auto"` does for one element. On an
+ * inline element it also isolates the text from the sentence around it, as
+ * `<bdi>` does. Where things sit on the page, the sidebar on the right and
+ * text aligned to the right, still follows the page.
+ *
+ * Under a right-to-left page only. A left-to-right page is untouched, so the
+ * English and Malay interfaces are laid out exactly as before.
+ */
+[dir="rtl"] body,
+[dir="rtl"] body * {
+  unicode-bidi: plaintext;
+}
