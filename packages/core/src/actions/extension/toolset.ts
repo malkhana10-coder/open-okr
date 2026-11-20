@@ -8,6 +8,9 @@
 export const PLANNING_TOOLSET: ReadonlySet<string> = new Set([
   "strategy.listDomains",
   "strategy.createDomain",
+  "strategy.listOrgUnits",
+  "strategy.setSector",
+  "strategy.setAgency",
   "knowledge.registerDocument",
   "knowledge.listDocuments",
   "knowledge.readPage",

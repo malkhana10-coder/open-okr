@@ -12474,6 +12474,62 @@
       "pages": false
     },
     {
+      "name": "strategy listOrgUnits",
+      "action": "strategy.listOrgUnits",
+      "method": "GET",
+      "path": "/strategy/listOrgUnits",
+      "scope": "read",
+      "summary": "The workspace's sectors, each with the agencies under it.",
+      "flags": [],
+      "pages": false
+    },
+    {
+      "name": "strategy setSector",
+      "action": "strategy.setSector",
+      "method": "POST",
+      "path": "/strategy/setSector",
+      "scope": "write",
+      "summary": "Marks a space as a sector, the upper of the two planning levels, and names who answers for it.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "lead-member-id",
+          "field": "leadMemberId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy setAgency",
+      "action": "strategy.setAgency",
+      "method": "POST",
+      "path": "/strategy/setAgency",
+      "scope": "write",
+      "summary": "Places a space under a sector as one of its agencies, or moves it to another sector.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sector-space-id",
+          "field": "sectorSpaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
       "name": "knowledge registerDocument",
       "action": "knowledge.registerDocument",
       "method": "POST",

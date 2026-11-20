@@ -244,6 +244,9 @@ describe("writes below full", () => {
       // Strategic domains are how a workspace is set up, so the write is the
       // Owner's and an Admin's (docs/extension/design/b0-vertical-slice.md §5).
       "strategy.createDomain": "workspace",
+      // The sector and agency structure is workspace setup too (§12.1).
+      "strategy.setAgency": "workspace",
+      "strategy.setSector": "workspace",
       "workflow.publish": "workspace",
     });
   });

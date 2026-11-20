@@ -70,6 +70,18 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the source panel that opens a page is not built yet",
   },
+  "strategy.listOrgUnits": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the sector screens that read the structure are not built yet",
+  },
+  "strategy.setSector": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the setup screen that arranges sectors is not built yet",
+  },
+  "strategy.setAgency": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the setup screen that arranges sectors is not built yet",
+  },
   "strategy.createDomain": {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the setup screen that adds a domain is not built yet",

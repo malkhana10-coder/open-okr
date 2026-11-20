@@ -7,6 +7,8 @@ import { z } from "zod";
 
 export const EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS = {
   "strategy.domain_created": z.object({ name: z.string() }),
+  "strategy.sector_set": z.object({ name: z.string() }),
+  "strategy.agency_set": z.object({ name: z.string(), sector: z.string() }),
   "knowledge.document_registered": z.object({
     title: z.string(),
     kind: z.string(),
@@ -26,6 +28,9 @@ export const EXTENSION_ACTIVITY_RENDERERS: Record<
 > = {
   "strategy.domain_created": (p) =>
     `A strategic domain "${String(p.name ?? "")}" was added`,
+  "strategy.sector_set": (p) => `"${String(p.name ?? "")}" was made a sector`,
+  "strategy.agency_set": (p) =>
+    `"${String(p.name ?? "")}" was placed under the sector "${String(p.sector ?? "")}"`,
   "knowledge.document_registered": (p) =>
     `A source document "${String(p.title ?? "")}" was filed`,
   "knowledge.document_read": (p) =>

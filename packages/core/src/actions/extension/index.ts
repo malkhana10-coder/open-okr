@@ -14,11 +14,15 @@ import {
   readSourceDocumentPage,
   registerSourceDocument,
 } from "./knowledge.ts";
+import { listOrgUnits, setAgency, setSector } from "./org-units.ts";
 import { createStrategyDomain, listStrategyDomains } from "./strategy.ts";
 
 export const EXTENSION_ACTION_MAP = {
   "strategy.listDomains": listStrategyDomains,
   "strategy.createDomain": createStrategyDomain,
+  "strategy.listOrgUnits": listOrgUnits,
+  "strategy.setSector": setSector,
+  "strategy.setAgency": setAgency,
   "knowledge.registerDocument": registerSourceDocument,
   "knowledge.listDocuments": listSourceDocuments,
   "knowledge.readPage": readSourceDocumentPage,

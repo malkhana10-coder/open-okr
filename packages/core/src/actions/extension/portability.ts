@@ -21,6 +21,17 @@ export const EXTENSION_TABLE_POLICY = [
       "The areas of the strategy that gaps and sector objectives are filed under.",
   },
   {
+    table: "org_sectors",
+    decision: "export",
+    reason:
+      "Which spaces are sectors, the upper of the two planning levels, and who answers for each.",
+  },
+  {
+    table: "org_agencies",
+    decision: "export",
+    reason: "Which spaces are agencies, and the sector each one is under.",
+  },
+  {
     table: "source_documents",
     decision: "export",
     reason:

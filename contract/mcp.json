@@ -15135,6 +15135,83 @@
       }
     },
     {
+      "name": "strategy.listOrgUnits",
+      "description": "The workspace's sectors, each with the agencies under it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {}
+    },
+    {
+      "name": "strategy.setSector",
+      "description": "Marks a space as a sector, the upper of the two planning levels, and names who answers for it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "leadMemberId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "strategy.setAgency",
+      "description": "Places a space under a sector as one of its agencies, or moves it to another sector.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "sectorSpaceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "spaceId",
+          "sectorSpaceId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000",
+        "sectorSpaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
       "name": "knowledge.registerDocument",
       "description": "Files an uploaded PDF under a sector as a source document, and asks for it to be read page by page.",
       "inputSchema": {

@@ -9,4 +9,5 @@ export {
   sourceDocumentPages,
   sourceDocuments,
 } from "./knowledge.ts";
+export { orgAgencies, orgSectors } from "./org-units.ts";
 export { strategyDomains } from "./strategy.ts";

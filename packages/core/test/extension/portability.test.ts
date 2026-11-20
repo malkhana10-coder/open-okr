@@ -101,6 +101,56 @@ describe("a workspace archive", () => {
     ]);
   });
 
+  it("carries the sectors and their agencies, still two levels", async () => {
+    const wb = await workerDb();
+    const source = { pool: wb.appPool, ...as(SOURCE_OWNER, sourceWorkspaceId) };
+    const sector = await callAction(source, "spaces.create", {
+      name: "قطاع الخدمات والتراخيص",
+    });
+    const agency = await callAction(source, "spaces.create", {
+      name: "وكالة التراخيص",
+    });
+    await callAction(source, "strategy.setSector", { spaceId: sector.id });
+    await callAction(source, "strategy.setAgency", {
+      spaceId: agency.id,
+      sectorSpaceId: sector.id,
+    });
+
+    const db = drizzle(wb.appPool);
+    const exported = await withWorkspace(db, sourceWorkspaceId, (tx) =>
+      exportWorkspace({
+        tx,
+        workspaceId: sourceWorkspaceId,
+        passphrase: PASSPHRASE,
+        instance: "test-source",
+      }),
+    );
+    const archive = readArchive(exported.bytes, { passphrase: PASSPHRASE });
+    await withWorkspace(db, targetWorkspaceId, (tx) =>
+      importWorkspace({
+        tx,
+        workspaceId: targetWorkspaceId,
+        archive,
+        dryRun: false,
+        actorMemberId: targetMemberId,
+      }),
+    );
+
+    const { sectors } = await callAction(
+      { pool: wb.appPool, ...as(TARGET_OWNER, targetWorkspaceId) },
+      "strategy.listOrgUnits",
+      {},
+    );
+    expect(
+      sectors.map((one) => ({
+        name: one.name,
+        agencies: one.agencies.map((under) => under.name),
+      })),
+    ).toEqual([
+      { name: "قطاع الخدمات والتراخيص", agencies: ["وكالة التراخيص"] },
+    ]);
+  });
+
   it("carries a sector's source documents and the text of their pages", async () => {
     const wb = await workerDb();
     const source = { pool: wb.appPool, ...as(SOURCE_OWNER, sourceWorkspaceId) };
