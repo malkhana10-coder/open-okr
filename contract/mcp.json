@@ -15302,6 +15302,104 @@
       }
     },
     {
+      "name": "strategy.listSectorPlan",
+      "description": "A sector's plan in one list: the objectives of the sector and its agencies with how each is classed, and the operational indicators they follow.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "strategy.setGoalProfile",
+      "description": "Says what an objective is in the plan: sector or operational, a priority or not, new or carried over, and where it comes from.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "goalId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The goal's id or short id, from goals.list, goals.due or goals.tree."
+          },
+          "objectiveType": {
+            "type": "string",
+            "enum": [
+              "sectoral",
+              "operational"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "priority",
+              "not_priority"
+            ]
+          },
+          "planStatus": {
+            "type": "string",
+            "enum": [
+              "new",
+              "carried"
+            ]
+          },
+          "sourceKind": {
+            "type": "string",
+            "enum": [
+              "sub_strategy",
+              "proposed",
+              "leadership_directive"
+            ]
+          },
+          "baselineUndetermined": {
+            "type": "boolean"
+          },
+          "sourceDocumentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "goalId",
+          "objectiveType",
+          "priority",
+          "planStatus",
+          "sourceKind",
+          "baselineUndetermined"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "goalId": "00000000-0000-4000-8000-000000000000",
+        "objectiveType": "sectoral",
+        "priority": "priority",
+        "planStatus": "new",
+        "sourceKind": "sub_strategy",
+        "baselineUndetermined": false
+      }
+    },
+    {
       "name": "strategy.listOrgUnits",
       "description": "The workspace's sectors, each with the agencies under it.",
       "inputSchema": {

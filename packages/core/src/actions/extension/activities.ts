@@ -10,6 +10,10 @@ export const EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS = {
   "strategy.gap_created": z.object({ title: z.string() }),
   "strategy.gap_updated": z.object({ title: z.string() }),
   "strategy.gap_dismissed": z.object({ title: z.string() }),
+  "strategy.goal_profile_set": z.object({
+    objectiveType: z.string(),
+    priority: z.string(),
+  }),
   "strategy.sector_set": z.object({ name: z.string() }),
   "strategy.agency_set": z.object({ name: z.string(), sector: z.string() }),
   "knowledge.document_registered": z.object({
@@ -42,6 +46,10 @@ export const EXTENSION_ACTIVITY_RENDERERS: Record<
     `The strategic gap "${String(p.title ?? "")}" was changed`,
   "strategy.gap_dismissed": (p) =>
     `The strategic gap "${String(p.title ?? "")}" was set aside`,
+  "strategy.goal_profile_set": (p) =>
+    p.objectiveType === "operational"
+      ? "The objective was classed as operational in the plan"
+      : "The objective was classed as a sector objective in the plan",
   "strategy.sector_set": (p) => `"${String(p.name ?? "")}" was made a sector`,
   "strategy.agency_set": (p) =>
     `"${String(p.name ?? "")}" was placed under the sector "${String(p.sector ?? "")}"`,

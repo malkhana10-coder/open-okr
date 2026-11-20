@@ -84,6 +84,9 @@
 | `packages/db/migrations-ext/0007_evidence.sql` | جدول `evidence`: اقتباس ووثيقته وصفحته ونتيجة التحقق |
 | `packages/core/src/actions/extension/evidence.ts` | `knowledge.addEvidence` و`knowledge.removeEvidence` و`knowledge.listEvidence`. النتيجة تُحسب بـ`verifyCitation` عند الحفظ ولا تؤخذ من المستدعي |
 | `packages/core/test/extension/evidence.test.ts` | اختباراتها |
+| `packages/db/migrations-ext/0008_goal_strategy_profiles.sql` | `goal_strategy_profiles`: نوع الهدف في الخطة وأولويته وحالته ومصدره وخط الأساس غير المحدد |
+| `packages/core/src/actions/extension/sector-plan.ts` | `strategy.setGoalProfile` (يُقاس على الهدف) و`strategy.listSectorPlan` (يُقاس على القطاع ويجمع أهداف وكالاته ومؤشراتها التشغيلية) |
+| `packages/core/test/extension/sector-plan.test.ts` | اختباراتها |
 
 ## 3. العربية لغة جزئية، واتجاه الصفحة
 

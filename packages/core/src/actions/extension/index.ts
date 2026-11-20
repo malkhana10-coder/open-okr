@@ -17,6 +17,7 @@ import {
   registerSourceDocument,
 } from "./knowledge.ts";
 import { listOrgUnits, setAgency, setSector } from "./org-units.ts";
+import { listSectorPlan, setGoalProfile } from "./sector-plan.ts";
 import { createStrategyDomain, listStrategyDomains } from "./strategy.ts";
 
 export const EXTENSION_ACTION_MAP = {
@@ -26,6 +27,8 @@ export const EXTENSION_ACTION_MAP = {
   "strategy.createGap": createGap,
   "strategy.updateGap": updateGap,
   "strategy.dismissGap": dismissGap,
+  "strategy.listSectorPlan": listSectorPlan,
+  "strategy.setGoalProfile": setGoalProfile,
   "strategy.listOrgUnits": listOrgUnits,
   "strategy.setSector": setSector,
   "strategy.setAgency": setAgency,

@@ -12590,6 +12590,93 @@
       "pages": false
     },
     {
+      "name": "strategy listSectorPlan",
+      "action": "strategy.listSectorPlan",
+      "method": "GET",
+      "path": "/strategy/listSectorPlan",
+      "scope": "read",
+      "summary": "A sector's plan in one list: the objectives of the sector and its agencies with how each is classed, and the operational indicators they follow.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy setGoalProfile",
+      "action": "strategy.setGoalProfile",
+      "method": "POST",
+      "path": "/strategy/setGoalProfile",
+      "scope": "write",
+      "summary": "Says what an objective is in the plan: sector or operational, a priority or not, new or carried over, and where it comes from.",
+      "flags": [
+        {
+          "name": "goal-id",
+          "field": "goalId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "objective-type",
+          "field": "objectiveType",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "sectoral",
+            "operational"
+          ]
+        },
+        {
+          "name": "priority",
+          "field": "priority",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "priority",
+            "not_priority"
+          ]
+        },
+        {
+          "name": "plan-status",
+          "field": "planStatus",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "new",
+            "carried"
+          ]
+        },
+        {
+          "name": "source-kind",
+          "field": "sourceKind",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "sub_strategy",
+            "proposed",
+            "leadership_directive"
+          ]
+        },
+        {
+          "name": "baseline-undetermined",
+          "field": "baselineUndetermined",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "source-document-id",
+          "field": "sourceDocumentId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
       "name": "strategy listOrgUnits",
       "action": "strategy.listOrgUnits",
       "method": "GET",

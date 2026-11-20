@@ -55,4 +55,10 @@ export const EXTENSION_TABLE_POLICY = [
     reason:
       "The quotations each gap rests on, with the page each is from and whether it was found there.",
   },
+  {
+    table: "goal_strategy_profiles",
+    decision: "export",
+    reason:
+      "What each objective is in the plan: sector or operational, its priority, whether it is new or carried over, and its source.",
+  },
 ] as const;

@@ -13,4 +13,13 @@ export {
   sourceDocuments,
 } from "./knowledge.ts";
 export { orgAgencies, orgSectors } from "./org-units.ts";
-export { GAP_STATUSES, strategicGaps, strategyDomains } from "./strategy.ts";
+export {
+  GAP_STATUSES,
+  goalStrategyProfiles,
+  OBJECTIVE_PRIORITIES,
+  OBJECTIVE_SOURCES,
+  OBJECTIVE_TYPES,
+  PLAN_STATUSES,
+  strategicGaps,
+  strategyDomains,
+} from "./strategy.ts";

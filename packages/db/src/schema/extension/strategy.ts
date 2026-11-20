@@ -6,6 +6,7 @@
  * stream.
  */
 import {
+  boolean,
   integer,
   pgTable,
   smallint,
@@ -14,8 +15,10 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { newId } from "../../id.ts";
+import { goals } from "../goals.ts";
 import { spaces } from "../spaces.ts";
 import { workspaceMembers, workspaces } from "../workspaces.ts";
+import { sourceDocuments } from "./knowledge.ts";
 
 /** A named area of the organisation's strategy. Gaps are filed under one. */
 export const strategyDomains = pgTable("strategy_domains", {
@@ -70,6 +73,49 @@ export const strategicGaps = pgTable("strategic_gaps", {
   createdBy: uuid("created_by").references(() => workspaceMembers.id, {
     onDelete: "set null",
   }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+});
+
+export const OBJECTIVE_TYPES = ["sectoral", "operational"] as const;
+export const OBJECTIVE_PRIORITIES = ["priority", "not_priority"] as const;
+export const PLAN_STATUSES = ["new", "carried"] as const;
+export const OBJECTIVE_SOURCES = [
+  "sub_strategy",
+  "proposed",
+  "leadership_directive",
+] as const;
+
+/**
+ * What an objective is in the plan, beside the goal (migration 0008 in the
+ * extension stream). The operational indicator, the third kind of item, is
+ * the product's own `kpis` and has no row here.
+ */
+export const goalStrategyProfiles = pgTable("goal_strategy_profiles", {
+  id: uuid("id").primaryKey().$defaultFn(newId),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  goalId: uuid("goal_id")
+    .notNull()
+    .references(() => goals.id, { onDelete: "cascade" }),
+  objectiveType: text("objective_type", { enum: OBJECTIVE_TYPES }).notNull(),
+  priority: text("priority", { enum: OBJECTIVE_PRIORITIES }).notNull(),
+  planStatus: text("plan_status", { enum: PLAN_STATUSES }).notNull(),
+  sourceKind: text("source_kind", { enum: OBJECTIVE_SOURCES }).notNull(),
+  sourceDocumentId: uuid("source_document_id").references(
+    () => sourceDocuments.id,
+    { onDelete: "set null" },
+  ),
+  /** The baseline is not known yet, which a plan writes as "TBD". */
+  baselineUndetermined: boolean("baseline_undetermined")
+    .notNull()
+    .default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

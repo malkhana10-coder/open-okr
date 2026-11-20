@@ -12,6 +12,8 @@ export const PLANNING_TOOLSET: ReadonlySet<string> = new Set([
   "strategy.createGap",
   "strategy.updateGap",
   "strategy.dismissGap",
+  "strategy.listSectorPlan",
+  "strategy.setGoalProfile",
   "strategy.listOrgUnits",
   "strategy.setSector",
   "strategy.setAgency",

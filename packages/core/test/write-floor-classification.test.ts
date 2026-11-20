@@ -61,6 +61,8 @@ const OWN_CHECK = new Set([
   "knowledge.addEvidence",
   "knowledge.removeEvidence",
   "strategy.createGap",
+  // Measured on the goal at `edit`, like any change to it (§12.2).
+  "strategy.setGoalProfile",
   "strategy.updateGap",
   "strategy.dismissGap",
   "blockers.raise",
