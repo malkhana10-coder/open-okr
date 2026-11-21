@@ -451,6 +451,13 @@ test("opening phase 4 names what earlier phases miss, and drafting stays open", 
  * they are done the gaps the phase 4 view listed are gone.
  */
 test("the planning phases complete from the browser, and the gaps clear", async () => {
+  // Twice the suite's thirty seconds. This is the longest test in the file:
+  // it walks three planning phases through the browser, about fourteen
+  // seconds on a developer's machine and twenty-five to thirty on a CI
+  // runner. On a slower runner it crossed the limit by a second, twice, with
+  // nothing wrong, and took the 217 specs behind it down each time. Every
+  // step and every assertion is unchanged.
+  test.setTimeout(60_000);
   await page.goto("/cycle?phase=1");
   // `count()` below does not wait, so counting before the phase has rendered
   // reads nothing to gather and skips the loop; the gaps then never clear.
