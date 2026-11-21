@@ -13,6 +13,7 @@ export const PLANNING_TOOLSET: ReadonlySet<string> = new Set([
   "governance.decide",
   "strategy.confirmGoalOwner",
   "planning.listRuns",
+  "planning.listObjectiveDrafts",
   "planning.runGapAgent",
   "planning.runObjectiveAgent",
   "strategy.listGaps",

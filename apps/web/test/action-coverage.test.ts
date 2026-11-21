@@ -56,15 +56,11 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
   // below removes these two lines the moment one does.
   "strategy.listSectorPlan": {
     apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector's objectives screen is not built yet",
+    why: "offered on REST, the command line and the agent endpoint; the alignment screen, which shows a sector's whole plan, is not built yet",
   },
   "strategy.setGoalProfile": {
     apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector's objectives screen is not built yet",
-  },
-  "planning.runObjectiveAgent": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector's objectives screen that runs the agent is not built yet",
+    why: "offered on REST, the command line and the agent endpoint; the alignment screen, which shows a sector's whole plan, is not built yet",
   },
   "governance.myNext": {
     apiOnly: true,
@@ -75,10 +71,6 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
     why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
   },
   "governance.decide": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
-  },
-  "strategy.confirmGoalOwner": {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
   },

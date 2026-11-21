@@ -12569,6 +12569,23 @@
       "pages": false
     },
     {
+      "name": "planning listObjectiveDrafts",
+      "action": "planning.listObjectiveDrafts",
+      "method": "GET",
+      "path": "/planning/listObjectiveDrafts",
+      "scope": "read",
+      "summary": "The objectives an agent drafted for a sector and its agencies, each with its proposed target, the gaps it answers, its quotations, and whether its owner is confirmed.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
       "name": "planning runGapAgent",
       "action": "planning.runGapAgent",
       "method": "POST",

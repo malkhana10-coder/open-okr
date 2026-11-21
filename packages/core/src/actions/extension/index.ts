@@ -28,6 +28,7 @@ import {
   readSourceDocumentPage,
   registerSourceDocument,
 } from "./knowledge.ts";
+import { listObjectiveDrafts } from "./objective-drafts.ts";
 import { runObjectiveAgent } from "./objective-runs.ts";
 import { listOrgUnits, setAgency, setSector } from "./org-units.ts";
 import { listSectorPlan, setGoalProfile } from "./sector-plan.ts";
@@ -41,6 +42,7 @@ export const EXTENSION_ACTION_MAP = {
   "governance.decide": decideApproval,
   "strategy.confirmGoalOwner": confirmGoalOwner,
   "planning.listRuns": listRuns,
+  "planning.listObjectiveDrafts": listObjectiveDrafts,
   "planning.runGapAgent": runGapAgent,
   "planning.runObjectiveAgent": runObjectiveAgent,
   "strategy.listGaps": listGaps,

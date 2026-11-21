@@ -13,6 +13,11 @@ const TABS = [
     key: "planning.tabs.documents",
   },
   { id: "gaps", href: "/planning/gaps", key: "planning.tabs.gaps" },
+  {
+    id: "objectives",
+    href: "/planning/objectives",
+    key: "planning.tabs.objectives",
+  },
 ] as const;
 
 export type PlanningTab = (typeof TABS)[number]["id"];

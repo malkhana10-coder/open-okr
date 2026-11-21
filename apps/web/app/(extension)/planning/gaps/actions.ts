@@ -13,7 +13,7 @@ import { revalidatePath } from "next/cache";
 import { planningContext } from "../../../../lib/extension/planning.ts";
 import { refusalOf } from "../../../../lib/refusal";
 import { getTranslations } from "../../../../lib/translations";
-import type { GapWriteState } from "./write-state.ts";
+import type { PlanningWriteState } from "../write-state.ts";
 
 const text = (form: FormData, name: string): string =>
   String(form.get(name) ?? "").trim();
@@ -48,7 +48,7 @@ async function run(
   write: (
     context: Awaited<ReturnType<typeof planningContext>>,
   ) => Promise<unknown>,
-): Promise<GapWriteState> {
+): Promise<PlanningWriteState> {
   try {
     await write(await planningContext());
   } catch (error) {
@@ -66,9 +66,9 @@ async function run(
 }
 
 export async function createGap(
-  _previous: GapWriteState,
+  _previous: PlanningWriteState,
   form: FormData,
-): Promise<GapWriteState> {
+): Promise<PlanningWriteState> {
   const description = text(form, "description");
   return run(form, ["title", "description"], (context) =>
     callAction(context, "strategy.createGap", {
@@ -80,9 +80,9 @@ export async function createGap(
 }
 
 export async function addSource(
-  _previous: GapWriteState,
+  _previous: PlanningWriteState,
   form: FormData,
-): Promise<GapWriteState> {
+): Promise<PlanningWriteState> {
   const keep = ["documentId", "page", "quote"];
   const page = pageOf(text(form, "page"));
   if (page === null) {
@@ -104,9 +104,9 @@ export async function addSource(
 }
 
 export async function removeSource(
-  _previous: GapWriteState,
+  _previous: PlanningWriteState,
   form: FormData,
-): Promise<GapWriteState> {
+): Promise<PlanningWriteState> {
   return run(form, [], (context) =>
     callAction(context, "knowledge.removeEvidence", {
       id: text(form, "evidence"),
@@ -115,18 +115,18 @@ export async function removeSource(
 }
 
 export async function dismissGap(
-  _previous: GapWriteState,
+  _previous: PlanningWriteState,
   form: FormData,
-): Promise<GapWriteState> {
+): Promise<PlanningWriteState> {
   return run(form, [], (context) =>
     callAction(context, "strategy.dismissGap", { id: text(form, "gap") }),
   );
 }
 
 export async function draftGaps(
-  _previous: GapWriteState,
+  _previous: PlanningWriteState,
   form: FormData,
-): Promise<GapWriteState> {
+): Promise<PlanningWriteState> {
   return run(form, [], (context) =>
     callAction(context, "planning.runGapAgent", {
       spaceId: text(form, "sector"),

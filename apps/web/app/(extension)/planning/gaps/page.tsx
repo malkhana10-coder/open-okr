@@ -9,6 +9,7 @@ import {
 import { pageTitle } from "../../../../lib/page-title.ts";
 import { getTranslations } from "../../../../lib/translations";
 import { PlanningTop } from "../planning-top.tsx";
+import { RunReport } from "../run-report.tsx";
 import {
   AddSourceForm,
   DismissGapButton,
@@ -110,7 +111,6 @@ export default async function PlanningGapsPage({
   const readable = documents
     .filter((document) => document.processingStatus === "ready")
     .map((document) => ({ id: document.id, title: document.title }));
-  const last = runs[0];
   const pageHref = (documentId: string, page: number) =>
     `/planning/documents?sector=${sectorId}&document=${documentId}&page=${page}`;
 
@@ -270,64 +270,7 @@ export default async function PlanningGapsPage({
             </p>
           ) : null}
           <DraftGapsButton sectorId={sectorId} />
-          {last ? (
-            <section
-              aria-labelledby="planning-last-run"
-              className="flex flex-col gap-2 rounded-md bg-bg-2 px-3 py-2.5 text-sm"
-            >
-              <h3 id="planning-last-run" className="font-bold text-ink">
-                {t("planning.runs.last")}
-              </h3>
-              <p className="text-ink-3">
-                {t("planning.runs.count", { count: runs.length })}
-              </p>
-              {last.status === "failed" ? (
-                <p className="text-bad">
-                  {last.failure
-                    ? t("planning.runs.failedBecause", {
-                        reason: last.failure,
-                      })
-                    : t("planning.runs.failed")}
-                </p>
-              ) : null}
-              {last.status === "failed" ? null : (
-                <>
-                  {last.report.read.length > 0 ? (
-                    <div>
-                      <p className="font-medium text-ink-2">
-                        {t("planning.runs.read")}
-                      </p>
-                      <ul className="list-disc ps-5 text-ink-2">
-                        {[...new Set(last.report.read)].map((line) => (
-                          <li key={line}>
-                            <bdi>{line}</bdi>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <p className="text-ink-2">
-                      {t("planning.runs.readNothing")}
-                    </p>
-                  )}
-                  {last.report.excluded.length > 0 ? (
-                    <div>
-                      <p className="font-medium text-ink-2">
-                        {t("planning.runs.excluded")}
-                      </p>
-                      <ul className="list-disc ps-5 text-ink-2">
-                        {[...new Set(last.report.excluded)].map((line) => (
-                          <li key={line}>
-                            <bdi>{line}</bdi>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                </>
-              )}
-            </section>
-          ) : null}
+          <RunReport runs={runs} />
         </CardBody>
       </Card>
 

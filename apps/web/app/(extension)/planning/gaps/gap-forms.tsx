@@ -7,7 +7,9 @@ import {
   TextInput,
   useTranslations,
 } from "@openokr/ui";
-import { type ReactNode, useActionState } from "react";
+import { useActionState } from "react";
+import { OneButton, Refusal } from "../one-button.tsx";
+import { NO_PLANNING_WRITE } from "../write-state.ts";
 import {
   addSource,
   createGap,
@@ -15,51 +17,6 @@ import {
   draftGaps,
   removeSource,
 } from "./actions.ts";
-import { type GapWriteState, NO_GAP_WRITE } from "./write-state.ts";
-
-type Action = (
-  previous: GapWriteState,
-  form: FormData,
-) => Promise<GapWriteState>;
-
-function Refusal({ state }: { readonly state: GapWriteState }) {
-  return state.error ? (
-    <p
-      role="alert"
-      className="rounded-md bg-bad-bg px-2.5 py-1.5 text-xs text-bad"
-    >
-      {state.error}
-    </p>
-  ) : null;
-}
-
-/** A form of one button: the write, and its refusal beside it. */
-function OneButton({
-  action,
-  fields,
-  children,
-}: {
-  readonly action: Action;
-  readonly fields: Readonly<Record<string, string>>;
-  readonly children: ReactNode;
-}) {
-  const [state, formAction, pending] = useActionState(action, NO_GAP_WRITE);
-  return (
-    <form
-      action={formAction}
-      aria-busy={pending}
-      className="flex flex-col gap-2"
-    >
-      {Object.entries(fields).map(([name, value]) => (
-        <input key={name} type="hidden" name={name} value={value} />
-      ))}
-      <div>
-        <SubmitButton>{children}</SubmitButton>
-      </div>
-      <Refusal state={state} />
-    </form>
-  );
-}
 
 export function DraftGapsButton({ sectorId }: { readonly sectorId: string }) {
   const { t } = useTranslations();
@@ -95,7 +52,7 @@ export function RemoveSourceButton({
 /** A gap written by hand. It starts as a draft, with no agent involved. */
 export function NewGapForm({ sectorId }: { readonly sectorId: string }) {
   const { t } = useTranslations();
-  const [state, action, pending] = useActionState(createGap, NO_GAP_WRITE);
+  const [state, action, pending] = useActionState(createGap, NO_PLANNING_WRITE);
   const kept = state.values;
   return (
     <form
@@ -142,7 +99,7 @@ export function AddSourceForm({
   }[];
 }) {
   const { t } = useTranslations();
-  const [state, action, pending] = useActionState(addSource, NO_GAP_WRITE);
+  const [state, action, pending] = useActionState(addSource, NO_PLANNING_WRITE);
   const kept = state.values;
   if (documents.length === 0) {
     return (

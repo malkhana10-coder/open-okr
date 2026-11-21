@@ -21,11 +21,14 @@
  * (criterion 17). The agent's output has no field for an owner.
  */
 import {
+  activeOnly,
+  cycles,
   evidence,
   gapGoalLinks,
   goalStrategyProfiles,
   newId,
   PLANNING_RUN_STATUSES,
+  withWorkspace,
 } from "@openokr/db";
 import { verifyCitation } from "@openokr/knowledge";
 import {
@@ -33,6 +36,8 @@ import {
   type ObjectiveAgentRequest,
   parseObjectiveAgentOutput,
 } from "@openokr/planning-agents";
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { z } from "zod";
 import { ACCESS_LEVELS } from "../../access/levels.ts";
 import { seedGoalFrequencyInTx } from "../../cadence/space-frequency.ts";
@@ -170,6 +175,47 @@ function settle(
   return { objectives, excluded };
 }
 
+/**
+ * Refuses a cycle a plan cannot be drafted into.
+ *
+ * The id comes from a form, so it is the caller's word. A drafted objective
+ * is created by the function `goals.create` uses and not by that action, so
+ * the action's own check of the cycle has to be made here: the cycle is this
+ * workspace's, it has not been removed, and it has not closed. Without it a
+ * draft lands in an archived cycle, and an id that names nothing fails as a
+ * database error after the provider has already been asked.
+ */
+async function cycleOpenToDrafts(
+  context: ActionCallContext,
+  cycleId: string,
+): Promise<void> {
+  const [cycle] = await withWorkspace(
+    drizzle(context.pool),
+    context.workspaceId,
+    (tx) =>
+      tx
+        .select({ status: cycles.status })
+        .from(cycles)
+        .where(
+          activeOnly(
+            cycles,
+            eq(cycles.workspaceId, context.workspaceId),
+            eq(cycles.id, cycleId),
+          ),
+        )
+        .limit(1),
+  );
+  if (!cycle) {
+    throw new OperationError("not_found", "No such cycle.");
+  }
+  if (cycle.status === "closed") {
+    throw new OperationError(
+      "conflict",
+      "That cycle is closed, so nothing can be drafted into it. Choose the cycle the plan is for.",
+    );
+  }
+}
+
 /** Writes the drafted objectives with everything that hangs on them. */
 function writeObjectives(
   objectives: readonly ObjectiveToStore[],
@@ -268,6 +314,7 @@ export const runObjectiveAgent = {
     );
     const input = runInput.parse(rawInput);
     const prepared = await prepare(context, input.spaceId);
+    await cycleOpenToDrafts(context, input.cycleId);
     const gaps = answerable(prepared);
     if (gaps.length === 0) {
       throw new OperationError(

@@ -1,9 +1,9 @@
 /**
- * What a write on the gaps screen reports back. Its own module because
+ * What a write on a planning screen reports back. Its own module because
  * `actions.ts` carries `"use server"`, and such a module may only export
  * async functions.
  */
-export interface GapWriteState {
+export interface PlanningWriteState {
   /** A refusal in words, or null. */
   readonly error: string | null;
   /** True once the write completed. */
@@ -12,4 +12,4 @@ export interface GapWriteState {
   readonly values?: Readonly<Record<string, string>>;
 }
 
-export const NO_GAP_WRITE: GapWriteState = { error: null };
+export const NO_PLANNING_WRITE: PlanningWriteState = { error: null };

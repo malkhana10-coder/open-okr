@@ -351,3 +351,132 @@ describe("planning.runObjectiveAgent: a run", () => {
     expect(runs[0]).toMatchObject({ agent: "objectives", status: "failed" });
   });
 });
+
+describe("planning.runObjectiveAgent: the cycle it drafts into", () => {
+  const goalsNow = async () =>
+    (
+      await (
+        await workerDb()
+      ).admin.query("select id from goals where workspace_id = $1", [
+        workspaceId,
+      ])
+    ).rows.length;
+  const into = async (cycle: string) =>
+    callAction(
+      {
+        ...(await owner()),
+        planner: new FixedPlanningProvider({
+          objectives: { objectives: [OBJECTIVE], report: REPORT },
+        }),
+      },
+      "planning.runObjectiveAgent",
+      { spaceId: sectorId, cycleId: cycle },
+    );
+
+  it("answers not found for a cycle the workspace does not have", async () => {
+    await expect(
+      into("00000000-0000-4000-8000-000000000000"),
+    ).rejects.toMatchObject({ code: "not_found" });
+    expect(await goalsNow()).toBe(0);
+  });
+
+  it("refuses a closed cycle, and drafts nothing", async () => {
+    const wb = await workerDb();
+    await wb.admin.query("update cycles set status = 'closed' where id = $1", [
+      cycleId,
+    ]);
+    await expect(into(cycleId)).rejects.toMatchObject({ code: "conflict" });
+    expect(await goalsNow()).toBe(0);
+  });
+});
+
+describe("planning.listObjectiveDrafts", () => {
+  const drafts = async (who = owner()) =>
+    (
+      await callAction(await who, "planning.listObjectiveDrafts", {
+        spaceId: sectorId,
+      })
+    ).objectives;
+
+  it("answers each drafted objective with what a reviewer needs to judge it", async () => {
+    await callAction(await owner(), "strategy.setSector", {
+      spaceId: sectorId,
+      leadMemberId,
+    });
+    await run([OBJECTIVE]);
+    const [draft, ...rest] = await drafts();
+    expect(rest).toEqual([]);
+    expect(draft).toMatchObject({
+      title: OBJECTIVE.title,
+      spaceId: agencyId,
+      objectiveType: "sectoral",
+      proposedTarget: "90% بنهاية 2027",
+      rationale: OBJECTIVE.rationale,
+      confidence: 75,
+      state: "draft",
+      owner: { memberId: leadMemberId },
+      ownerConfirmed: false,
+      gaps: [{ id: gapId, title: GAP_TITLE }],
+    });
+    expect(draft?.evidence).toMatchObject([
+      {
+        documentId,
+        documentTitle: TITLE,
+        page: 1,
+        verification: "verified",
+        unverifiedReason: null,
+      },
+    ]);
+    expect(draft?.owner.name).toBeTruthy();
+  });
+
+  it("says the owner is confirmed once somebody confirms", async () => {
+    await run([OBJECTIVE]);
+    const [before] = await drafts();
+    await callAction(await owner(), "strategy.confirmGoalOwner", {
+      goalId: before?.goalId as string,
+    });
+    const [after] = await drafts();
+    expect(before?.ownerConfirmed).toBe(false);
+    expect(after?.ownerConfirmed).toBe(true);
+  });
+
+  it("leaves out an objective a person wrote", async () => {
+    await callAction(await owner(), "goals.create", {
+      title: "هدف كتبه إنسان",
+      cycleId,
+      level: "department",
+      ownerKind: "space",
+      spaceId: sectorId,
+      championId: ownerMemberId,
+      weight: 1,
+    });
+    expect(await drafts()).toEqual([]);
+  });
+
+  it("answers not found to somebody who is not in the sector", async () => {
+    const wb = await workerDb();
+    await run([OBJECTIVE]);
+    await expect(
+      callAction(
+        { pool: wb.appPool, ...as(OUTSIDER) },
+        "planning.listObjectiveDrafts",
+        { spaceId: sectorId },
+      ),
+    ).rejects.toMatchObject({ code: "not_found" });
+  });
+
+  it("says an objective is awaiting approval once its sector's request is open", async () => {
+    await run([OBJECTIVE]);
+    const [before] = await drafts();
+    await callAction(await owner(), "strategy.confirmGoalOwner", {
+      goalId: before?.goalId as string,
+    });
+    await callAction(await owner(), "governance.submit", {
+      spaceId: sectorId,
+    });
+    const [after] = await drafts();
+    expect(before?.state).toBe("draft");
+    expect(after?.state).toBe("awaiting_approval");
+  });
+});
