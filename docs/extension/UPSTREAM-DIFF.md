@@ -323,3 +323,20 @@ git push origin --tags
 | `pnpm-lock.yaml` | سطرا الربط للحزمتين | يُعاد توليده |
 
 الحزمتان من المستودع نفسه، فلا تبعية خارجية جديدة.
+
+## 11. شاشات التخطيط: عنصر التنقل والترجمات (2026-11-21)
+
+الشاشات نفسها في مجلد امتداد: `apps/web/app/(extension)/planning/`. القوسان مجموعة مسارات في Next، فالعنوان يبقى `/planning` دون كلمة `extension`. ما لُمس من الأصل:
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `packages/core/src/modules/registry.ts` | وحدة `planning` بعنصر تنقل واحد في الشريط الجانبي، بعد وحدة `spaces` | متوسط: الملف يتغير مع كل شاشة جديدة في الأصل |
+| `apps/web/lib/nav-groups.ts` | سطر `planning: "nav.item.planning"` | منخفض |
+| `apps/web/lib/nav-icons.tsx` | أيقونة `Signpost` واستيرادها | منخفض |
+| `packages/ui/src/i18n/messages/en.json` و`ms.json` | مفاتيح `planning.*` و`nav.item.planning` و`pageTitle.planningDocuments` و`segmentError.planning`، في آخر الملف | منخفض: إضافة في آخر الملف |
+| `apps/web/test/nav-groups.test.ts` | `planning` في قائمة عناصر المجموعة الأولى | منخفض |
+| `packages/core/test/modules.test.ts` | `planning` و«Planning» في قائمة صفوف الشريط الجانبي | منخفض |
+| `docs/design/navigation-five-areas.md` | قسم 6 قصير يذكر الصف السادس | منخفض: إضافة في آخر الملف |
+| `apps/web/test/action-coverage.test.ts` | حذف أربعة استثناءات «بلا شاشة» صار لها شاشة | منخفض: القسم خاص بالامتداد |
+
+اختبار الأصل يشترط لكل مفتاح إنجليزي مقابلاً بالملايو، فكُتبت ترجمة الملايو لمفاتيح الامتداد. العربية في `ar.partial.json` كما في القسم 3.

@@ -21,6 +21,8 @@ describe("navBlocks", () => {
       "goals",
       "initiatives",
       "spaces",
+      // The planning extension's one entry (UPSTREAM-DIFF.md §11).
+      "planning",
       "cycle",
     ]);
   });
