@@ -12508,6 +12508,29 @@
       "pages": false
     },
     {
+      "name": "planning runObjectiveAgent",
+      "action": "planning.runObjectiveAgent",
+      "method": "POST",
+      "path": "/planning/runObjectiveAgent",
+      "scope": "write",
+      "summary": "Runs the sector-objectives agent on a sector's gaps. What it drafts is stored as objectives held back for review, each tied to the gaps it answers and with its quotations checked.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "cycle-id",
+          "field": "cycleId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
       "name": "strategy listGaps",
       "action": "strategy.listGaps",
       "method": "GET",

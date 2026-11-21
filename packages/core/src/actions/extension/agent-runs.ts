@@ -23,7 +23,9 @@
 import {
   activeOnly,
   evidence,
+  goals,
   newId,
+  orgAgencies,
   orgSectors,
   PLANNING_AGENTS,
   PLANNING_RUN_STATUSES,
@@ -75,11 +77,23 @@ interface ShownDocument {
   readonly pages: readonly { page: number; text: string }[];
 }
 
-interface Prepared {
+export interface Prepared {
   readonly memberId: string;
   readonly sector: string;
+  /** Who answers for the sector, when somebody has been named. */
+  readonly leadMemberId: string | null;
+  readonly agencies: readonly { spaceId: string; name: string }[];
   readonly documents: readonly ShownDocument[];
+  /** Every gap of the sector, set-aside ones too. */
+  readonly gaps: readonly {
+    id: string;
+    title: string;
+    description: string | null;
+    status: string;
+  }[];
   readonly existingGaps: readonly string[];
+  /** Titles of the objectives the sector and its agencies already own. */
+  readonly existingObjectives: readonly string[];
   readonly domains: readonly { id: string; name: string }[];
 }
 
@@ -90,7 +104,7 @@ const sectorNotFound = () =>
   );
 
 /** What the agent will be shown, for a caller who is in the sector. */
-async function prepare(
+export async function prepare(
   context: ActionCallContext,
   spaceId: string,
 ): Promise<Prepared> {
@@ -112,7 +126,11 @@ async function prepare(
         requires: ACCESS_LEVELS.edit,
       });
       const [sector] = await tx
-        .select({ name: spaces.name })
+        .select({
+          id: orgSectors.id,
+          name: spaces.name,
+          leadMemberId: orgSectors.leadMemberId,
+        })
         .from(orgSectors)
         .innerJoin(spaces, eq(spaces.id, orgSectors.spaceId))
         .where(
@@ -159,8 +177,41 @@ async function prepare(
                 ),
               )
               .orderBy(asc(sourceDocumentPages.page));
+      const agencies = await tx
+        .select({ spaceId: orgAgencies.spaceId, name: spaces.name })
+        .from(orgAgencies)
+        .innerJoin(spaces, eq(spaces.id, orgAgencies.spaceId))
+        .where(
+          activeOnly(
+            orgAgencies,
+            eq(orgAgencies.workspaceId, context.workspaceId),
+            eq(orgAgencies.sectorId, sector.id),
+          ),
+        );
+      const objectives = await tx
+        .select({ title: goals.title })
+        // openokr:allow-raw-read: titles only, of what the sector and its
+        // agencies own, for a caller the getter above found in the sector.
+        // So an agent does not draft an objective the sector already has.
+        .from(goals)
+        .where(
+          activeOnly(
+            goals,
+            eq(goals.workspaceId, context.workspaceId),
+            eq(goals.ownerKind, "space"),
+            inArray(goals.spaceId, [
+              spaceId,
+              ...agencies.map((agency) => agency.spaceId),
+            ]),
+          ),
+        );
       const gaps = await tx
-        .select({ title: strategicGaps.title })
+        .select({
+          id: strategicGaps.id,
+          title: strategicGaps.title,
+          description: strategicGaps.description,
+          status: strategicGaps.status,
+        })
         .from(strategicGaps)
         .where(
           activeOnly(
@@ -181,13 +232,17 @@ async function prepare(
       return {
         memberId,
         sector: sector.name,
+        leadMemberId: sector.leadMemberId,
+        agencies,
         documents: documents.map((document) => ({
           ...document,
           pages: pages
             .filter((page) => page.documentId === document.id)
             .map(({ page, text }) => ({ page, text })),
         })),
+        gaps,
         existingGaps: gaps.map((gap) => gap.title),
+        existingObjectives: objectives.map((objective) => objective.title),
         domains,
       };
     },
@@ -210,7 +265,7 @@ interface GapToStore {
 }
 
 /** Names compared the way a reader would call them the same. */
-const sameName = (text: string) =>
+export const sameName = (text: string) =>
   normaliseArabic(text).replace(/\s+/g, " ").trim();
 
 /**
@@ -281,20 +336,30 @@ function settle(
   return { gaps, excluded };
 }
 
-interface RunRecord {
+export interface RunRecord {
+  readonly agent: "gaps" | "objectives";
+  /** The registered action, for the audit row. */
+  readonly action: string;
   readonly status: "succeeded" | "failed";
   readonly failure: string | null;
   readonly provider: string;
   readonly model: string;
-  readonly output: GapAgentOutput | null;
+  readonly output: Record<string, unknown> | null;
   readonly report: { read: string[]; excluded: string[] };
   readonly durationMs: number;
   readonly costUsd: number | null;
-  readonly gaps: readonly GapToStore[];
+  /** How many drafts the run stores. */
+  readonly drafted: number;
+  /** Writes the drafts, on the run's own transaction. */
+  readonly write: (
+    tx: OperationTx,
+    workspaceId: string,
+    runId: string,
+  ) => Promise<void>;
 }
 
 /** Writes the run and what came of it, in one Operation. */
-async function record(
+export async function record(
   context: ActionCallContext,
   spaceId: string,
   prepared: Prepared,
@@ -304,7 +369,7 @@ async function record(
   await runOperation(
     { pool: context.pool },
     {
-      action: "planning.runGapAgent",
+      action: run.action,
       workspaceId: context.workspaceId,
       actor: context.actor,
       async execute({ tx, workspaceId }) {
@@ -314,7 +379,7 @@ async function record(
           id: runId,
           workspaceId,
           spaceId,
-          agent: "gaps",
+          agent: run.agent,
           provider: run.provider,
           model: run.model,
           status: run.status,
@@ -335,39 +400,7 @@ async function record(
           costUsd: run.costUsd === null ? null : String(run.costUsd),
           startedBy: prepared.memberId,
         });
-        for (const gap of run.gaps) {
-          const gapId = newId();
-          // openokr:allow-mutation: the same operation's transaction.
-          await tx.insert(strategicGaps).values({
-            id: gapId,
-            workspaceId,
-            spaceId,
-            domainId: gap.domainId,
-            title: gap.title,
-            description: gap.description,
-            rationale: gap.rationale,
-            confidence: gap.confidence,
-            // Always. The agent's output has no field that could say else.
-            status: "ai_draft",
-            createdBy: prepared.memberId,
-            agentRunId: runId,
-          });
-          // openokr:allow-mutation: the same operation's transaction.
-          await tx.insert(evidence).values(
-            gap.evidence.map((quotation) => ({
-              id: newId(),
-              workspaceId,
-              subjectType: "gap" as const,
-              subjectId: gapId,
-              documentId: quotation.documentId,
-              page: quotation.page,
-              quote: quotation.quote,
-              verification: quotation.verification,
-              unverifiedReason: quotation.unverifiedReason,
-              createdBy: prepared.memberId,
-            })),
-          );
-        }
+        await run.write(tx as OperationTx, workspaceId, runId);
         return {
           result: undefined,
           activity: {
@@ -375,13 +408,13 @@ async function record(
             subjectType: "space" as const,
             subjectId: spaceId,
             payload: {
-              agent: "gaps",
+              agent: run.agent,
               status: run.status,
-              drafted: run.gaps.length,
+              drafted: run.drafted,
             },
           },
           audit: {
-            action: "planning.runGapAgent",
+            action: run.action,
             targetType: "planning_agent_run",
             targetId: runId,
             payload: {
@@ -389,7 +422,7 @@ async function record(
               provider: run.provider,
               model: run.model,
               status: run.status,
-              drafted: run.gaps.length,
+              drafted: run.drafted,
             },
           },
         };
@@ -397,6 +430,49 @@ async function record(
     },
   );
   return runId;
+}
+
+/** Writes the gaps a run drafted and their evidence. */
+function writeGaps(
+  gaps: readonly GapToStore[],
+  spaceId: string,
+  memberId: string,
+): RunRecord["write"] {
+  return async (tx, workspaceId, runId) => {
+    for (const gap of gaps) {
+      const gapId = newId();
+      // openokr:allow-mutation: the same operation's transaction.
+      await tx.insert(strategicGaps).values({
+        id: gapId,
+        workspaceId,
+        spaceId,
+        domainId: gap.domainId,
+        title: gap.title,
+        description: gap.description,
+        rationale: gap.rationale,
+        confidence: gap.confidence,
+        // Always. The agent's output has no field that could say else.
+        status: "ai_draft",
+        createdBy: memberId,
+        agentRunId: runId,
+      });
+      // openokr:allow-mutation: the same operation's transaction.
+      await tx.insert(evidence).values(
+        gap.evidence.map((quotation) => ({
+          id: newId(),
+          workspaceId,
+          subjectType: "gap" as const,
+          subjectId: gapId,
+          documentId: quotation.documentId,
+          page: quotation.page,
+          quote: quotation.quote,
+          verification: quotation.verification,
+          unverifiedReason: quotation.unverifiedReason,
+          createdBy: memberId,
+        })),
+      );
+    }
+  };
 }
 
 export const runGapAgent = {
@@ -442,6 +518,8 @@ export const runGapAgent = {
     const started = Date.now();
     const failed = async (failure: string, model: string): Promise<never> => {
       await record(context, input.spaceId, prepared, {
+        agent: "gaps",
+        action: "planning.runGapAgent",
         status: "failed",
         failure,
         provider: planner.name,
@@ -450,7 +528,8 @@ export const runGapAgent = {
         report: { read: [], excluded: [] },
         durationMs: Date.now() - started,
         costUsd: null,
-        gaps: [],
+        drafted: 0,
+        write: async () => undefined,
       });
       throw new OperationError(
         "conflict",
@@ -474,6 +553,8 @@ export const runGapAgent = {
 
     const settled = settle(parsed.output, prepared);
     const runId = await record(context, input.spaceId, prepared, {
+      agent: "gaps",
+      action: "planning.runGapAgent",
       status: "succeeded",
       failure: null,
       provider: planner.name,
@@ -485,7 +566,8 @@ export const runGapAgent = {
       },
       durationMs: Date.now() - started,
       costUsd: result.costUsd ?? null,
-      gaps: settled.gaps,
+      drafted: settled.gaps.length,
+      write: writeGaps(settled.gaps, input.spaceId, prepared.memberId),
     });
     return {
       runId,

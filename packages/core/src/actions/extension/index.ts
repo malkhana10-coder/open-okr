@@ -17,6 +17,7 @@ import {
   readSourceDocumentPage,
   registerSourceDocument,
 } from "./knowledge.ts";
+import { runObjectiveAgent } from "./objective-runs.ts";
 import { listOrgUnits, setAgency, setSector } from "./org-units.ts";
 import { listSectorPlan, setGoalProfile } from "./sector-plan.ts";
 import { createStrategyDomain, listStrategyDomains } from "./strategy.ts";
@@ -26,6 +27,7 @@ export const EXTENSION_ACTION_MAP = {
   "strategy.createDomain": createStrategyDomain,
   "planning.listRuns": listRuns,
   "planning.runGapAgent": runGapAgent,
+  "planning.runObjectiveAgent": runObjectiveAgent,
   "strategy.listGaps": listGaps,
   "strategy.createGap": createGap,
   "strategy.updateGap": updateGap,

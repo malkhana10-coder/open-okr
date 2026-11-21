@@ -15,6 +15,13 @@ export {
   parseGapAgentOutput,
 } from "./gap-agent.ts";
 export {
+  MAX_OBJECTIVES_PER_RUN,
+  type ObjectiveAgentOutput,
+  type ObjectiveAgentRequest,
+  type ParsedObjectiveAgentOutput,
+  parseObjectiveAgentOutput,
+} from "./objective-agent.ts";
+export {
   type FixedDrafts,
   FixedPlanningProvider,
   type PlanningProvider,

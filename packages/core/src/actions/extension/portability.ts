@@ -68,4 +68,9 @@ export const EXTENSION_TABLE_POLICY = [
     reason:
       "What each objective is in the plan: sector or operational, its priority, whether it is new or carried over, and its source.",
   },
+  {
+    table: "gap_goal_links",
+    decision: "export",
+    reason: "Which gaps each objective answers.",
+  },
 ] as const;

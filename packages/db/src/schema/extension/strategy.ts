@@ -169,6 +169,40 @@ export const goalStrategyProfiles = pgTable("goal_strategy_profiles", {
   baselineUndetermined: boolean("baseline_undetermined")
     .notNull()
     .default(false),
+  /** What an agent adds to one it drafts. All null for a person's. */
+  proposedTarget: text("proposed_target"),
+  rationale: text("rationale"),
+  confidence: smallint("confidence"),
+  agentRunId: uuid("agent_run_id").references(() => planningAgentRuns.id, {
+    onDelete: "set null",
+  }),
+  /** Null until a person confirms or changes the owner given by rule. */
+  ownerConfirmedAt: timestamp("owner_confirmed_at", { withTimezone: true }),
+  ownerConfirmedBy: uuid("owner_confirmed_by").references(
+    () => workspaceMembers.id,
+    { onDelete: "set null" },
+  ),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+});
+
+/** Which gaps an objective answers (migration 0010 in the extension stream). */
+export const gapGoalLinks = pgTable("gap_goal_links", {
+  id: uuid("id").primaryKey().$defaultFn(newId),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  gapId: uuid("gap_id")
+    .notNull()
+    .references(() => strategicGaps.id, { onDelete: "cascade" }),
+  goalId: uuid("goal_id")
+    .notNull()
+    .references(() => goals.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

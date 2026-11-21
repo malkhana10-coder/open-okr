@@ -15187,6 +15187,39 @@
       }
     },
     {
+      "name": "planning.runObjectiveAgent",
+      "description": "Runs the sector-objectives agent on a sector's gaps. What it drafts is stored as objectives held back for review, each tied to the gaps it answers and with its quotations checked.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "cycleId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The cycle's id or short id, from cycles.current or cycles.list."
+          }
+        },
+        "required": [
+          "spaceId",
+          "cycleId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000",
+        "cycleId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
       "name": "strategy.listGaps",
       "description": "A sector's strategic gaps, with where each one stands.",
       "inputSchema": {

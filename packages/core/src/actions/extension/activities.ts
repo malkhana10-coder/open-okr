@@ -43,10 +43,12 @@ export const EXTENSION_ACTIVITY_RENDERERS: Record<
   ExtensionActivityKind,
   (payload: Record<string, unknown>) => string
 > = {
-  "planning.agent_run": (p) =>
-    p.status === "succeeded"
-      ? `The gap agent ran and drafted ${String(p.drafted ?? 0)}`
-      : "The gap agent ran and drafted nothing",
+  "planning.agent_run": (p) => {
+    const agent = p.agent === "objectives" ? "objectives agent" : "gap agent";
+    return p.status === "succeeded"
+      ? `The ${agent} ran and drafted ${String(p.drafted ?? 0)}`
+      : `The ${agent} ran and drafted nothing`;
+  },
   "strategy.domain_created": (p) =>
     `A strategic domain "${String(p.name ?? "")}" was added`,
   "strategy.gap_created": (p) =>

@@ -15,6 +15,7 @@ export {
 export { orgAgencies, orgSectors } from "./org-units.ts";
 export {
   GAP_STATUSES,
+  gapGoalLinks,
   goalStrategyProfiles,
   OBJECTIVE_PRIORITIES,
   OBJECTIVE_SOURCES,

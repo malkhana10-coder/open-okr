@@ -90,6 +90,9 @@
 | `packages/db/migrations-ext/0009_planning_agent_runs.sql` | جدول `planning_agent_runs`، وعمود `agent_run_id` على `strategic_gaps` |
 | `packages/core/src/actions/extension/agent-runs.ts` | `planning.runGapAgent` و`planning.listRuns` |
 | `packages/core/test/extension/gap-agent-run.test.ts` | اختباراتها |
+| `packages/db/migrations-ext/0010_objective_drafts.sql` | أعمدة الوكيل وتأكيد المسؤول على `goal_strategy_profiles`، وجدول `gap_goal_links` |
+| `packages/core/src/actions/extension/objective-runs.ts` | `planning.runObjectiveAgent` |
+| `packages/core/test/extension/objective-agent-run.test.ts` | اختباراته |
 
 ## 3. العربية لغة جزئية، واتجاه الصفحة
 
@@ -171,6 +174,7 @@
 | `packages/core/package.json` | الاعتماد على `@openokr/knowledge` | منخفض |
 | `packages/core/package.json` | الاعتماد على `@openokr/planning-agents` | منخفض |
 | `packages/core/src/actions/define.ts` | سطر استيراد نوع، وحقل اختياري `planner` في سياق الإجراء، بجانب `drafter` الموجود. به يصل مزوّد وكلاء التخطيط إلى الإجراء | منخفض إلى متوسط |
+| `packages/core/src/actions/goals.ts` | كلمة `export` أمام الدالتين `recompute` و`realign`. مشغّل وكيل الأهداف ينشئ الهدف بدالة الأصل `createGoalInTx` ثم يجري ما يجريه `goals.create` بعدها، حتى لا تتكرر قاعدة من الأصل في الامتداد | منخفض إلى متوسط: الملف كبير ويتغير كثيراً، والتعديل كلمتان |
 | `packages/core/test/write-floor-classification.test.ts`، `apps/web/test/action-coverage.test.ts` | تصنيف الإجراءات الثلاثة الجديدة | منخفض |
 
 ملفات جديدة في مجلدات `extension/`:

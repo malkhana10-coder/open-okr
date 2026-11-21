@@ -41,7 +41,7 @@ export interface GapAgentRequest {
 /** The most gaps one run may draft. More than a person will review. */
 export const MAX_GAPS_PER_RUN = 40;
 
-const quotation = z.strictObject({
+export const quotation = z.strictObject({
   /** The document's title, exactly as it was given. */
   document: z.string().trim().min(1).max(300),
   /** Counted from 1. */
@@ -62,7 +62,7 @@ const draftedGap = z.strictObject({
 });
 
 /** What the agent read and what it left out, for the person reviewing. */
-const report = z.strictObject({
+export const report = z.strictObject({
   read: z.array(z.string().trim().min(1).max(500)).max(100),
   excluded: z.array(z.string().trim().min(1).max(500)).max(100),
 });
@@ -84,9 +84,13 @@ export function parseGapAgentOutput(raw: unknown): ParsedGapAgentOutput {
   if (parsed.success) {
     return { ok: true, output: parsed.data };
   }
-  const problem = parsed.error.issues
+  return { ok: false, problem: describeProblem(parsed.error) };
+}
+
+/** The first few things wrong with an output, for the run's record. */
+export function describeProblem(error: z.ZodError): string {
+  return error.issues
     .slice(0, 5)
     .map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
     .join("; ");
-  return { ok: false, problem };
 }

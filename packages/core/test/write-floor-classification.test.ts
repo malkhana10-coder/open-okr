@@ -62,6 +62,7 @@ const OWN_CHECK = new Set([
   "knowledge.removeEvidence",
   // Measured on the sector at `edit` before the provider is asked.
   "planning.runGapAgent",
+  "planning.runObjectiveAgent",
   "strategy.createGap",
   // Measured on the goal at `edit`, like any change to it (§12.2).
   "strategy.setGoalProfile",

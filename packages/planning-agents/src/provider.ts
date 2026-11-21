@@ -13,8 +13,9 @@
  * fixed, so a screen can say so too.
  */
 import type { GapAgentRequest } from "./gap-agent.ts";
+import type { ObjectiveAgentRequest } from "./objective-agent.ts";
 
-export type PlanningRequest = GapAgentRequest;
+export type PlanningRequest = GapAgentRequest | ObjectiveAgentRequest;
 
 export interface PlanningResult {
   /** Unchecked. The caller parses it. */
@@ -36,6 +37,7 @@ export interface PlanningProvider {
 /** Drafts written in advance, one per agent. */
 export interface FixedDrafts {
   readonly gaps?: unknown;
+  readonly objectives?: unknown;
 }
 
 export class FixedPlanningProvider implements PlanningProvider {
