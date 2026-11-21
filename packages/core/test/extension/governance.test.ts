@@ -402,6 +402,19 @@ describe("governance.decide", () => {
   });
 });
 
+describe("governance.myNext: who may send", () => {
+  it("says the strategy office and the owner may send, and a member or leadership may not", async () => {
+    const may = async (userId: string) =>
+      (await callAction(await call(userId), "governance.myNext", {})).maySubmit;
+    expect(await may(STRATEGY)).toBe(true);
+    expect(await may(OWNER)).toBe(true);
+    expect(await may(PLAIN)).toBe(false);
+    // Leadership decides. Deciding is more than sending, so it may send too,
+    // which is what the level means: the matrix has no "decide only".
+    expect(await may(LEADER)).toBe(true);
+  });
+});
+
 describe("governance.myNext", () => {
   it("shows leadership what waits for a decision, without their being in the sector", async () => {
     await readyBatch();

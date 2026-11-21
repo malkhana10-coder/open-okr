@@ -18,6 +18,16 @@ const TABS = [
     href: "/planning/objectives",
     key: "planning.tabs.objectives",
   },
+  {
+    id: "alignment",
+    href: "/planning/alignment",
+    key: "planning.tabs.alignment",
+  },
+  {
+    id: "approvals",
+    href: "/planning/approvals",
+    key: "planning.tabs.approvals",
+  },
 ] as const;
 
 export type PlanningTab = (typeof TABS)[number]["id"];
@@ -34,12 +44,19 @@ export async function PlanningTop({
   title,
   intro,
   opened,
+  sectorOptional = false,
   children,
 }: {
   readonly tab: PlanningTab;
   readonly title: string;
   readonly intro: string;
   readonly opened: OpenedSector<unknown>;
+  /**
+   * The screen has something for a person who is in no sector, so being in
+   * none is not said as a refusal. Approvals is the one: leadership decides
+   * a sector's request without being a member of the sector.
+   */
+  readonly sectorOptional?: boolean;
   /** The screen's own content, drawn only for a sector that opened. */
   readonly children?: ReactNode;
 }) {
@@ -52,8 +69,13 @@ export async function PlanningTop({
         ? opened.named
         : null;
   const query = sectorId ? `?sector=${sectorId}` : "";
-  const refusal =
-    opened.state === "none"
+  const outside =
+    sectorOptional &&
+    opened.state === "refused" &&
+    opened.reason === "noneOpen";
+  const refusal = outside
+    ? null
+    : opened.state === "none"
       ? t("planning.sector.none")
       : opened.state === "refused"
         ? opened.reason === "noneOpen"
@@ -87,7 +109,7 @@ export async function PlanningTop({
         <p className="text-sm text-ink-3">{intro}</p>
       </CardHeader>
       <CardBody className="flex flex-col gap-4">
-        {opened.state === "none" ? null : (
+        {opened.state === "none" || outside ? null : (
           <SectorPicker
             action={here}
             sectors={opened.sectors}

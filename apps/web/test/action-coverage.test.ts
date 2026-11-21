@@ -56,23 +56,11 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
   // below removes these two lines the moment one does.
   "strategy.listSectorPlan": {
     apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the alignment screen, which shows a sector's whole plan, is not built yet",
+    why: "offered on REST, the command line and the agent endpoint; no screen shows a sector's whole plan, hand-written objectives included, yet",
   },
   "strategy.setGoalProfile": {
     apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the alignment screen, which shows a sector's whole plan, is not built yet",
-  },
-  "governance.myNext": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
-  },
-  "governance.submit": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
-  },
-  "governance.decide": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
+    why: "offered on REST, the command line and the agent endpoint; no screen shows a sector's whole plan, hand-written objectives included, yet",
   },
   "knowledge.listEvidence": {
     answeredBy: "knowledge.listSectorEvidence",

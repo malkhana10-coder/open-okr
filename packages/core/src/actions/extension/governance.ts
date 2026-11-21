@@ -29,9 +29,11 @@ import {
   newId,
   orgAgencies,
   orgSectors,
+  rolePermissions,
   spaces,
   strategicGaps,
   withContext,
+  workspaceMembers,
 } from "@openokr/db";
 import { and, asc, desc, eq, inArray, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -584,6 +586,12 @@ export const myNext = defineReadAction({
         comment: z.string(),
       }),
     ),
+    /**
+     * The caller's role may send a sector's request: `edit` on approvals.
+     * A screen reads it to say so before the button is pressed. Sending
+     * also needs `edit` on the sector, which `governance.submit` decides.
+     */
+    maySubmit: z.boolean(),
   }),
   access: ACCESS_LEVELS.view,
   async handler(context) {
@@ -689,7 +697,32 @@ export const myNext = defineReadAction({
             });
           }
         }
-        return { toDecide, returned };
+        // The role's own level on approvals. A request's access context
+        // adds nothing for a sender, so this is what `governance.submit`
+        // will find when it asks the same of the request it makes.
+        const [role] = await tx
+          .select({ level: rolePermissions.level })
+          .from(workspaceMembers)
+          .innerJoin(
+            rolePermissions,
+            and(
+              eq(rolePermissions.roleId, workspaceMembers.roleId),
+              eq(rolePermissions.domain, "approval"),
+            ),
+          )
+          .where(
+            activeOnly(
+              workspaceMembers,
+              eq(workspaceMembers.workspaceId, context.workspaceId),
+              eq(workspaceMembers.id, memberId),
+            ),
+          )
+          .limit(1);
+        return {
+          toDecide,
+          returned,
+          maySubmit: (role?.level ?? 0) >= ACCESS_LEVELS.edit,
+        };
       },
     );
   },

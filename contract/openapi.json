@@ -71904,11 +71904,15 @@
                             ],
                             "additionalProperties": false
                           }
+                        },
+                        "maySubmit": {
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "toDecide",
-                        "returned"
+                        "returned",
+                        "maySubmit"
                       ],
                       "additionalProperties": false
                     }
