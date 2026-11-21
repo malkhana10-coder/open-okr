@@ -169,6 +169,34 @@ describe("knowledge.addEvidence", () => {
     expect(added.verification).toBe("verified");
   });
 
+  it("verifies a quotation that dropped the page's leading conjunction, and keeps the page's wording", async () => {
+    const withConjunction = await fileDocument(sectorId, [
+      "تعتمد المعالجة على إجراءات ورقية، ولا يوجد نظام موحد يربط الفروع بالمركز الرئيس.",
+    ]);
+    const added = await add(
+      "لا يوجد نظام موحد يربط الفروع",
+      1,
+      withConjunction,
+    );
+    expect(added).toMatchObject({
+      verification: "verified",
+      quote: "ولا يوجد نظام موحد يربط الفروع",
+    });
+    expect((await listed())[0]?.quote).toBe("ولا يوجد نظام موحد يربط الفروع");
+  });
+
+  it("does not verify a quotation that dropped a joined preposition", async () => {
+    const withPreposition = await fileDocument(sectorId, [
+      "تُرفع التقارير للقطاع المعني بمتابعة المستهدف كل ربع.",
+    ]);
+    const added = await add(
+      "القطاع المعني بمتابعة المستهدف",
+      1,
+      withPreposition,
+    );
+    expect(added.verification).toBe("unverified");
+  });
+
   it("keeps a quotation that is not on the page, marked unverified, and says why (criterion 5)", async () => {
     const added = await add("تهدف الجهة إلى مضاعفة عدد الفروع خلال عامين");
     expect(added).toMatchObject({

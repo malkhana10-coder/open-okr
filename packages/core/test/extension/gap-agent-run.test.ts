@@ -292,6 +292,36 @@ describe("planning.runGapAgent: a run", () => {
   });
 });
 
+describe("planning.runGapAgent: a quotation that dropped a conjunction", () => {
+  it("stores it verified, in the page's own wording", async () => {
+    const wb = await workerDb();
+    await fileDocument();
+    await run([
+      {
+        ...SOUND_GAP,
+        evidence: [
+          {
+            document: TITLE,
+            page: 2,
+            // The page says "ولا يوجد".
+            quote: "لا يوجد نظام موحد يربط الفروع بالمركز الرئيس",
+          },
+        ],
+      },
+    ]);
+    const stored = await wb.admin.query(
+      "select quote, verification from evidence where workspace_id = $1",
+      [workspaceId],
+    );
+    expect(stored.rows).toEqual([
+      {
+        quote: "ولا يوجد نظام موحد يربط الفروع بالمركز الرئيس",
+        verification: "verified",
+      },
+    ]);
+  });
+});
+
 describe("planning.runGapAgent: output the agent has no right to", () => {
   it("stores no gap when the output claims a status, and records the failed run (criterion 16)", async () => {
     await fileDocument();

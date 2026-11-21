@@ -23,11 +23,33 @@ import { normaliseArabic } from "./arabic.ts";
 export const MIN_QUOTE_WORDS = 4;
 
 export type CitationVerdict =
-  | { readonly status: "verified" }
+  | {
+      readonly status: "verified";
+      /**
+       * `exact` when the quotation is on the page word for word.
+       * `leading_conjunction` when it is there once the page's "و" or "ف" is
+       * put back on its first word.
+       */
+      readonly match: "exact" | "leading_conjunction";
+      /**
+       * The quotation to keep. For an exact match, the quotation as given.
+       * Otherwise the same words with the page's conjunction restored, so
+       * what is kept is what the page says.
+       */
+      readonly quote: string;
+    }
   | {
       readonly status: "unverified";
       readonly reason: "too_short" | "not_on_page";
     };
+
+/**
+ * The two letters Arabic joins to a word for "and" and "so".
+ *
+ * Only these. A joined lam, ba or kaf is a preposition, and "للقطاع" does not
+ * say what "القطاع" says, so a quotation that drops one is not on the page.
+ */
+const CONJUNCTIONS = ["و", "ف"] as const;
 
 /**
  * The words of a text, in order, and nothing else.
@@ -62,7 +84,43 @@ export function verifyCitation(input: {
   }
   // Spaces on both sides, so the quotation matches whole words only.
   const page = ` ${words(input.pageText).join(" ")} `;
-  return page.includes(` ${quote.join(" ")} `)
-    ? { status: "verified" }
-    : { status: "unverified", reason: "not_on_page" };
+  if (page.includes(` ${quote.join(" ")} `)) {
+    return { status: "verified", match: "exact", quote: input.quote.trim() };
+  }
+
+  // A sentence that opens with "ولا يوجد" is often quoted as "لا يوجد". The
+  // conjunction is put back on the first word, and only there, and the rest
+  // must still be on the page word for word.
+  //
+  // **This cannot tell a conjunction from a letter that belongs to the
+  // word.** "وزارة" is one word, and "زارة الصحة تعلن الخطة" will match a
+  // page that says "وزارة الصحة تعلن الخطة". That is safe for one reason:
+  // what is returned to be kept is the page's wording, with its first
+  // letter. Whatever is stored and shown as verified is on the page, word
+  // for word, so this rule can widen which quotations are accepted and
+  // cannot attach to a page anything the page does not say.
+  const [first, ...rest] = quote;
+  // A one-letter first word plus a conjunction is not how anything is quoted.
+  if (first !== undefined && [...first].length >= 2) {
+    for (const conjunction of CONJUNCTIONS) {
+      const restored = [conjunction + first, ...rest].join(" ");
+      if (page.includes(` ${restored} `)) {
+        return {
+          status: "verified",
+          match: "leading_conjunction",
+          quote: restoreConjunction(input.quote, conjunction),
+        };
+      }
+    }
+  }
+  return { status: "unverified", reason: "not_on_page" };
+}
+
+/** The quotation with the conjunction joined to its first letter. */
+function restoreConjunction(quote: string, conjunction: string): string {
+  const trimmed = quote.trim();
+  const at = trimmed.search(/\p{L}/u);
+  return at < 0
+    ? trimmed
+    : trimmed.slice(0, at) + conjunction + trimmed.slice(at);
 }

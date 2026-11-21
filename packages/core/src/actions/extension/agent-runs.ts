@@ -252,7 +252,8 @@ function settle(
       kept.push({
         documentId: document.id,
         page: quotation.page,
-        quote: quotation.quote,
+        // The page's wording when the check restored a conjunction.
+        quote: verdict.status === "verified" ? verdict.quote : quotation.quote,
         verification: verdict.status,
         unverifiedReason:
           verdict.status === "unverified" ? verdict.reason : null,

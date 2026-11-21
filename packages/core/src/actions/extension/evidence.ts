@@ -66,6 +66,8 @@ export const addEvidence = defineWriteAction({
   }),
   output: z.object({
     id: z.uuid(),
+    /** The quotation as it was kept, in the page's wording when verified. */
+    quote: z.string(),
     verification: z.enum(EVIDENCE_VERIFICATIONS),
     unverifiedReason: z.enum(EVIDENCE_UNVERIFIED_REASONS).nullable(),
   }),
@@ -122,6 +124,10 @@ export const addEvidence = defineWriteAction({
       });
       const unverifiedReason =
         verdict.status === "unverified" ? verdict.reason : null;
+      // What is kept is what the page says. Where the check put the page's
+      // "و" or "ف" back on the first word, that wording replaces the
+      // caller's. An unverified quotation is kept as it was given.
+      const quote = verdict.status === "verified" ? verdict.quote : input.quote;
       const id = newId();
       // openokr:allow-mutation: the calling Operation's own transaction.
       await tx.insert(evidence).values({
@@ -131,13 +137,13 @@ export const addEvidence = defineWriteAction({
         subjectId: input.subjectId,
         documentId: input.documentId,
         page: input.page,
-        quote: input.quote,
+        quote,
         verification: verdict.status,
         unverifiedReason,
         createdBy: memberId,
       });
       return {
-        result: { id, verification: verdict.status, unverifiedReason },
+        result: { id, quote, verification: verdict.status, unverifiedReason },
         activity: {
           kind: "knowledge.evidence_added" as const,
           subjectType: "space" as const,

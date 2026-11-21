@@ -22,7 +22,7 @@ describe("verifyCitation", () => {
         quote: "رفع نسبة إنجاز طلبات التراخيص خلال خمسة أيام عمل",
         pageText: PAGE,
       }),
-    ).toEqual({ status: "verified" });
+    ).toMatchObject({ status: "verified", match: "exact" });
   });
 
   it("verifies one that differs only in vowel marks, hamza form or tatweel", () => {
@@ -31,7 +31,7 @@ describe("verifyCitation", () => {
         quote: "رَفْعُ نسبة انجاز طلبات التراخيـــص خلال خمسة ايام عمل",
         pageText: PAGE,
       }),
-    ).toEqual({ status: "verified" });
+    ).toMatchObject({ status: "verified", match: "exact" });
   });
 
   it("verifies one that differs only in digits, punctuation or line breaks", () => {
@@ -40,7 +40,7 @@ describe("verifyCitation", () => {
         quote: "إلى 90% بنهاية\nعام 2027 مع الحفاظ على رضا المستفيدين",
         pageText: PAGE,
       }),
-    ).toEqual({ status: "verified" });
+    ).toMatchObject({ status: "verified", match: "exact" });
   });
 
   it("does not verify a quotation the page does not carry", () => {
@@ -77,7 +77,7 @@ describe("verifyCitation", () => {
       status: "unverified",
       reason: "too_short",
     });
-    expect(verifyCitation({ ...short, minWords: 3 })).toEqual({
+    expect(verifyCitation({ ...short, minWords: 3 })).toMatchObject({
       status: "verified",
     });
     expect(
@@ -109,5 +109,139 @@ describe("verifyCitation", () => {
         pageText: "",
       }),
     ).toEqual({ status: "unverified", reason: "not_on_page" });
+  });
+});
+
+/**
+ * A leading conjunction (design, criterion 6; approved 21 November 2026).
+ *
+ * Arabic writes "and" and "so" as one letter joined to the next word. A
+ * person or a model quoting a sentence that opens with "ولا يوجد" will often
+ * write "لا يوجد". The check allows for that, as narrowly as it can.
+ */
+describe("verifyCitation: a conjunction joined to the first word", () => {
+  const page =
+    "تعتمد المعالجة على إجراءات ورقية، ولا يوجد نظام موحد يربط الفروع. فلا تتاح للقيادة مقارنة الأداء.";
+
+  it("verifies a quotation whose first word lost its waw", () => {
+    expect(
+      verifyCitation({ quote: "لا يوجد نظام موحد يربط", pageText: page }),
+    ).toEqual({
+      status: "verified",
+      match: "leading_conjunction",
+      // What is kept is what the page says, with its conjunction.
+      quote: "ولا يوجد نظام موحد يربط",
+    });
+  });
+
+  it("verifies a quotation whose first word lost its fa", () => {
+    expect(
+      verifyCitation({
+        quote: "لا تتاح للقيادة مقارنة الأداء",
+        pageText: page,
+      }),
+    ).toEqual({
+      status: "verified",
+      match: "leading_conjunction",
+      quote: "فلا تتاح للقيادة مقارنة الأداء",
+    });
+  });
+
+  it("says a word-for-word match is exact, and keeps the quotation as it is", () => {
+    expect(
+      verifyCitation({ quote: "ولا يوجد نظام موحد يربط", pageText: page }),
+    ).toEqual({
+      status: "verified",
+      match: "exact",
+      quote: "ولا يوجد نظام موحد يربط",
+    });
+  });
+
+  it("prefers the exact match when the page holds both", () => {
+    const both =
+      "لا يوجد نظام موحد يربط الفروع. ولا يوجد نظام موحد يربط الأقسام.";
+    expect(
+      verifyCitation({ quote: "لا يوجد نظام موحد يربط", pageText: both }),
+    ).toMatchObject({ match: "exact", quote: "لا يوجد نظام موحد يربط" });
+  });
+
+  it("does not allow for a lam, a ba or a kaf: those change what is said", () => {
+    for (const [quote, text] of [
+      ["القطاع يتولى متابعة المستهدف", "وهو للقطاع يتولى متابعة المستهدف"],
+      ["النظام الموحد يربط الفروع", "تعمل بالنظام الموحد يربط الفروع"],
+      ["المعتاد في الجهات الحكومية", "تسير كالمعتاد في الجهات الحكومية"],
+    ] as const) {
+      expect(verifyCitation({ quote, pageText: text })).toEqual({
+        status: "unverified",
+        reason: "not_on_page",
+      });
+    }
+  });
+
+  it("allows for it on the first word only", () => {
+    // The third word lost its waw. Every word after the first is exact.
+    expect(
+      verifyCitation({
+        quote: "إجراءات ورقية لا يوجد نظام",
+        pageText: page,
+      }),
+    ).toEqual({ status: "unverified", reason: "not_on_page" });
+  });
+
+  it("does not allow for two conjunctions, or for one the quotation already has", () => {
+    expect(
+      verifyCitation({
+        quote: "لا يوجد نظام موحد",
+        pageText: "وفلا يوجد نظام موحد",
+      }).status,
+    ).toBe("unverified");
+  });
+
+  it("still asks for four words", () => {
+    expect(verifyCitation({ quote: "لا يوجد نظام", pageText: page })).toEqual({
+      status: "unverified",
+      reason: "too_short",
+    });
+  });
+
+  /**
+   * The rule cannot tell a conjunction from a word whose own first letter is
+   * a waw: "وزارة" is a ministry, not "and" joined to anything. So "زارة
+   * الصحة تعلن الخطة" does verify on a page that says "وزارة الصحة تعلن
+   * الخطة". What keeps that from being a hole is what is stored: the page's
+   * own words, "وزارة الصحة تعلن الخطة". The quotation that is kept and shown
+   * is on the page, word for word. Nothing the page does not say can be
+   * attached to it this way.
+   */
+  it("keeps the page's own words where the first letter was part of the word", () => {
+    expect(
+      verifyCitation({
+        quote: "زارة الصحة تعلن الخطة",
+        pageText: "أمس وزارة الصحة تعلن الخطة الجديدة",
+      }),
+    ).toEqual({
+      status: "verified",
+      match: "leading_conjunction",
+      quote: "وزارة الصحة تعلن الخطة",
+    });
+  });
+
+  it("does not turn a one-letter first word into a match", () => {
+    // "و" plus "ب" would be "وب", and nothing is quoted that way.
+    expect(
+      verifyCitation({
+        quote: "ب نظام موحد يربط",
+        pageText: "وب نظام موحد يربط الفروع",
+      }).status,
+    ).toBe("unverified");
+  });
+
+  it("keeps vowel marks and digits out of the way, as the exact check does", () => {
+    expect(
+      verifyCitation({
+        quote: "لا يوجد نظام مُوحَّد",
+        pageText: "وَلا يوجد نظام موحد",
+      }),
+    ).toMatchObject({ status: "verified", match: "leading_conjunction" });
   });
 });
