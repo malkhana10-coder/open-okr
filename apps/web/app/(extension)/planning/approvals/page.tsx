@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   openSector,
   planningContext,
+  planningFormatFor,
 } from "../../../../lib/extension/planning.ts";
 import { pageTitle } from "../../../../lib/page-title.ts";
 import { getTranslations } from "../../../../lib/translations";
@@ -41,6 +42,7 @@ export default async function PlanningApprovalsPage({
   const { t } = await getTranslations();
   const search = await searchParams;
   const context = await planningContext();
+  const fmt = await planningFormatFor(context);
   const [next, opened] = await Promise.all([
     callAction(context, "governance.myNext", {}),
     openSector(
@@ -78,8 +80,8 @@ export default async function PlanningApprovalsPage({
               </h3>
               <p className="text-sm text-ink-2">
                 {t("planning.approvals.next.toDecide", {
-                  gaps: request.gaps,
-                  objectives: request.objectives,
+                  gaps: fmt.number(request.gaps),
+                  objectives: fmt.number(request.objectives),
                 })}
               </p>
               <Link
@@ -91,8 +93,8 @@ export default async function PlanningApprovalsPage({
               <ApproveForm
                 requestId={request.requestId}
                 sector={request.spaceName}
-                gaps={request.gaps}
-                objectives={request.objectives}
+                gaps={fmt.number(request.gaps)}
+                objectives={fmt.number(request.objectives)}
               />
               <ReturnForm
                 requestId={request.requestId}
@@ -200,12 +202,12 @@ export default async function PlanningApprovalsPage({
                 </p>
                 <p className="tabular">
                   {t("planning.approvals.send.waitingGaps", {
-                    count: waitingGaps,
+                    count: fmt.number(waitingGaps),
                   })}
                 </p>
                 <p className="tabular">
                   {t("planning.approvals.send.waitingObjectives", {
-                    count: waitingObjectives,
+                    count: fmt.number(waitingObjectives),
                   })}
                 </p>
               </div>
@@ -217,11 +219,13 @@ export default async function PlanningApprovalsPage({
               <>
                 <ul className="tabular flex flex-col gap-1 text-sm text-ink-2">
                   <li>
-                    {t("planning.approvals.send.gaps", { count: gaps.length })}
+                    {t("planning.approvals.send.gaps", {
+                      count: fmt.number(gaps.length),
+                    })}
                   </li>
                   <li>
                     {t("planning.approvals.send.objectives", {
-                      count: drafts.length,
+                      count: fmt.number(drafts.length),
                     })}
                   </li>
                 </ul>
@@ -238,14 +242,14 @@ export default async function PlanningApprovalsPage({
                       {unverified > 0 ? (
                         <li>
                           {t("planning.approvals.send.unverified", {
-                            count: unverified,
+                            count: fmt.number(unverified),
                           })}
                         </li>
                       ) : null}
                       {unconfirmed > 0 ? (
                         <li>
                           {t("planning.approvals.send.unconfirmed", {
-                            count: unconfirmed,
+                            count: fmt.number(unconfirmed),
                           })}
                         </li>
                       ) : null}
@@ -255,7 +259,7 @@ export default async function PlanningApprovalsPage({
                 {returned > 0 ? (
                   <p className="text-sm text-ink-2">
                     {t("planning.approvals.send.returnedBefore", {
-                      count: returned,
+                      count: fmt.number(returned),
                     })}
                   </p>
                 ) : null}

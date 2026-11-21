@@ -5152,5 +5152,8 @@
   "planning.alignment.note": "Only objectives an agent drafted are tied to gaps for now. One written by hand is not shown here.",
   "planning.alignment.chooseOne": "Choose a gap or an objective to see what it is tied to.",
   "planning.alignment.linkedObjectives": "Objectives that answer the chosen gap: {count}",
-  "planning.alignment.linkedGaps": "Gaps the chosen objective answers: {count}"
+  "planning.alignment.linkedGaps": "Gaps the chosen objective answers: {count}",
+  "planning.runs.when": "Ran on {date}",
+  "planning.documents.upload.choose": "Choose a file",
+  "planning.documents.upload.noFile": "No file chosen"
 }

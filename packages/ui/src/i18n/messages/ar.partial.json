@@ -241,5 +241,8 @@
   "planning.alignment.note": "لا يُربط بالفجوات الآن إلا ما صاغه الوكيل الآلي من أهداف. الهدف المكتوب يدوياً لا يظهر هنا.",
   "planning.alignment.chooseOne": "اختر فجوة أو هدفاً لترى ما يرتبط به.",
   "planning.alignment.linkedObjectives": "الأهداف التي تعالج الفجوة المختارة: {count}",
-  "planning.alignment.linkedGaps": "الفجوات التي يعالجها الهدف المختار: {count}"
+  "planning.alignment.linkedGaps": "الفجوات التي يعالجها الهدف المختار: {count}",
+  "planning.runs.when": "وقت التشغيل: {date}",
+  "planning.documents.upload.choose": "اختر ملفاً",
+  "planning.documents.upload.noFile": "لم يُختر ملف"
 }

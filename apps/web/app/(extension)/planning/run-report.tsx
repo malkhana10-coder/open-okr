@@ -3,6 +3,7 @@ import { getTranslations } from "../../../lib/translations";
 interface Run {
   readonly status: "succeeded" | "failed";
   readonly failure: string | null;
+  readonly createdAt: string;
   readonly report: {
     readonly read: readonly string[];
     readonly excluded: readonly string[];
@@ -17,9 +18,14 @@ interface Run {
  */
 export async function RunReport({
   runs,
+  format,
 }: {
   /** One agent's runs on the sector, newest first. */
   readonly runs: readonly Run[];
+  readonly format: {
+    readonly number: (value: number) => string;
+    readonly date: (iso: string) => string;
+  };
 }) {
   const { t } = await getTranslations();
   const last = runs[0];
@@ -35,7 +41,10 @@ export async function RunReport({
         {t("planning.runs.last")}
       </h3>
       <p className="text-ink-3">
-        {t("planning.runs.count", { count: runs.length })}
+        {t("planning.runs.when", { date: format.date(last.createdAt) })}
+      </p>
+      <p className="tabular text-ink-3">
+        {t("planning.runs.count", { count: format.number(runs.length) })}
       </p>
       {last.status === "failed" ? (
         <p className="text-bad">

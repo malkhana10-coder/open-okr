@@ -25,7 +25,9 @@ export async function SectorPicker({
         label={t("planning.sector.label")}
         name="sector"
         defaultValue={sectorId ?? ""}
-        inputClassName="w-auto min-w-56"
+        // A fixed width: the longest sector name would otherwise move
+        // everything beside the menu.
+        inputClassName="w-72"
       >
         {sectors.map((sector) => (
           <option key={sector.spaceId} value={sector.spaceId}>

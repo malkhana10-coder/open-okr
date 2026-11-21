@@ -22,6 +22,16 @@ export function UploadForm({
   const { t } = useTranslations();
   const [state, action, pending] = useActionState(uploadDocument, NO_UPLOAD);
   const [tooLarge, setTooLarge] = useState(false);
+  const [chosenName, setChosenName] = useState<string | null>(null);
+  // React empties the form once its action answers, refusal or not, and
+  // the file field with it. The name shown beside the field goes too, or it
+  // would name a file that is no longer chosen. Done while rendering, the
+  // way React adjusts state to a changed value, rather than in an effect.
+  const [answered, setAnswered] = useState(state);
+  if (answered !== state) {
+    setAnswered(state);
+    setChosenName(null);
+  }
   const kept = state.values;
 
   // Said in the browser, before anything is sent: the server stops reading a
@@ -47,16 +57,40 @@ export function UploadForm({
       className="flex flex-col gap-3 sm:max-w-xl"
     >
       <input type="hidden" name="sector" value={sectorId} />
+      {/* The browser writes its own file field in its own language, so the
+          field is hidden and these words are the product's. The input stays
+          in the label, focusable, and the label is its name. */}
       <label className="flex flex-col gap-1 text-sm text-ink-2">
-        <span className="font-medium">
+        <span id={`${sectorId}-file-label`} className="font-medium">
           {t("planning.documents.upload.file")}
         </span>
-        <input
-          type="file"
-          name="file"
-          accept="application/pdf,.pdf"
-          className="text-sm text-ink file:me-3 file:rounded-md file:border-0 file:bg-bg-2 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink"
-        />
+        <span className="flex cursor-pointer items-center gap-3 rounded-md has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand">
+          <span
+            aria-hidden="true"
+            className="rounded-md border border-line-2 bg-surface px-3 py-1.5 text-sm font-medium text-ink-2 hover:border-ink-4"
+          >
+            {t("planning.documents.upload.choose")}
+          </span>
+          <span
+            id={`${sectorId}-file-status`}
+            className="truncate text-sm text-ink-3"
+          >
+            <bdi>{chosenName ?? t("planning.documents.upload.noFile")}</bdi>
+          </span>
+          <input
+            type="file"
+            name="file"
+            accept="application/pdf,.pdf"
+            // Named by the heading alone, with what is chosen as its
+            // description, rather than by everything inside the label.
+            aria-labelledby={`${sectorId}-file-label`}
+            aria-describedby={`${sectorId}-file-status`}
+            className="sr-only"
+            onChange={(event) =>
+              setChosenName(event.currentTarget.files?.[0]?.name ?? null)
+            }
+          />
+        </span>
       </label>
       <TextInput
         // Remounted with what was typed when a refusal comes back.

@@ -26,7 +26,7 @@ export default async function PlanningAlignmentPage({
 }: {
   readonly searchParams: Promise<{ readonly sector?: string }>;
 }) {
-  const { t } = await getTranslations();
+  const { t, locale } = await getTranslations();
   const search = await searchParams;
   const context = await planningContext();
   const opened = await openSector(
@@ -67,6 +67,7 @@ export default async function PlanningAlignmentPage({
             </p>
           ) : (
             <AlignmentColumns
+              locale={locale}
               gaps={gaps.map((gap) => ({ id: gap.id, title: gap.title }))}
               objectives={objectives.map((objective) => ({
                 id: objective.goalId,

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "@openokr/ui";
 import { useState } from "react";
+import { planningFormat } from "../../../../lib/extension/format.ts";
 
 export interface AlignedGap {
   readonly id: string;
@@ -25,11 +26,15 @@ export interface AlignedObjective {
 export function AlignmentColumns({
   gaps,
   objectives,
+  locale,
 }: {
+  /** The reader's language, for the counts. */
+  readonly locale: string;
   readonly gaps: readonly AlignedGap[];
   readonly objectives: readonly AlignedObjective[];
 }) {
   const { t } = useTranslations();
+  const { number } = planningFormat(locale, "UTC");
   const [chosen, setChosen] = useState<{
     readonly kind: "gap" | "objective";
     readonly id: string;
@@ -71,8 +76,12 @@ export function AlignmentColumns({
         {linkedCount === null
           ? t("planning.alignment.chooseOne")
           : chosen?.kind === "gap"
-            ? t("planning.alignment.linkedObjectives", { count: linkedCount })
-            : t("planning.alignment.linkedGaps", { count: linkedCount })}
+            ? t("planning.alignment.linkedObjectives", {
+                count: number(linkedCount),
+              })
+            : t("planning.alignment.linkedGaps", {
+                count: number(linkedCount),
+              })}
       </p>
       <div className="grid gap-4 md:grid-cols-2">
         <section
@@ -83,7 +92,7 @@ export function AlignmentColumns({
             {t("planning.alignment.gaps")}
           </h2>
           <p className="tabular text-sm text-ink-3">
-            {t("planning.alignment.count", { count: gaps.length })}
+            {t("planning.alignment.count", { count: number(gaps.length) })}
           </p>
           <ul className="flex flex-col gap-2">
             {gaps.map((gap) => {
@@ -129,7 +138,9 @@ export function AlignmentColumns({
             {t("planning.alignment.objectives")}
           </h2>
           <p className="tabular text-sm text-ink-3">
-            {t("planning.alignment.count", { count: objectives.length })}
+            {t("planning.alignment.count", {
+              count: number(objectives.length),
+            })}
           </p>
           <ul className="flex flex-col gap-2">
             {objectives.map((objective) => {

@@ -6,7 +6,9 @@ import {
 } from "@openokr/core";
 import type { PlanningProvider } from "@openokr/planning-agents";
 import { getPool } from "../pool";
+import { getTranslations } from "../translations";
 import { requireWorkspace } from "../workspace";
+import { planningFormat } from "./format.ts";
 
 /**
  * What every planning screen starts from: who is asking, and the provider the
@@ -156,4 +158,15 @@ export async function openSector<Data>(
     named,
     reason: named ? "denied" : "noneOpen",
   };
+}
+
+/** Numbers and dates in the reader's language and timezone. */
+export async function planningFormatFor(
+  context: ActionCallContext,
+): Promise<ReturnType<typeof planningFormat>> {
+  const [{ locale }, { settings }] = await Promise.all([
+    getTranslations(),
+    callAction(context, "settings.readForMember", {}),
+  ]);
+  return planningFormat(locale, String(settings.timezone ?? "UTC"));
 }

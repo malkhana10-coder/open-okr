@@ -5152,5 +5152,8 @@
   "planning.alignment.note": "Buat masa ini hanya objektif yang dirangka oleh ejen dikaitkan dengan jurang. Objektif yang ditulis sendiri tidak dipaparkan di sini.",
   "planning.alignment.chooseOne": "Pilih satu jurang atau objektif untuk melihat kaitannya.",
   "planning.alignment.linkedObjectives": "Objektif yang menjawab jurang yang dipilih: {count}",
-  "planning.alignment.linkedGaps": "Jurang yang dijawab oleh objektif yang dipilih: {count}"
+  "planning.alignment.linkedGaps": "Jurang yang dijawab oleh objektif yang dipilih: {count}",
+  "planning.runs.when": "Dijalankan pada {date}",
+  "planning.documents.upload.choose": "Pilih fail",
+  "planning.documents.upload.noFile": "Tiada fail dipilih"
 }

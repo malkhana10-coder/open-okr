@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   openSector,
   planningContext,
+  planningFormatFor,
   planningProvider,
 } from "../../../../lib/extension/planning.ts";
 import { pageTitle } from "../../../../lib/page-title.ts";
@@ -66,6 +67,7 @@ export default async function PlanningGapsPage({
   const { t } = await getTranslations();
   const search = await searchParams;
   const context = await planningContext();
+  const fmt = await planningFormatFor(context);
   const opened = await openSector(
     context,
     search.sector,
@@ -154,17 +156,17 @@ export default async function PlanningGapsPage({
                         ? t("planning.gaps.source.none")
                         : gap.evidence.length === 1
                           ? t("planning.gaps.source.countOne", {
-                              count: gap.evidence.length,
+                              count: fmt.number(gap.evidence.length),
                             })
                           : t("planning.gaps.source.countOther", {
-                              count: gap.evidence.length,
+                              count: fmt.number(gap.evidence.length),
                             })}
                       {unverified > 0 ? (
                         <>
                           {" "}
                           <span className="font-medium text-warn">
                             {t("planning.gaps.source.unverifiedCount", {
-                              count: unverified,
+                              count: fmt.number(unverified),
                             })}
                           </span>
                         </>
@@ -186,7 +188,7 @@ export default async function PlanningGapsPage({
                         {gap.confidence === null ? null : (
                           <p className="text-ink-3">
                             {t("planning.gaps.confidence", {
-                              percent: gap.confidence,
+                              percent: fmt.number(gap.confidence),
                             })}
                           </p>
                         )}
@@ -207,7 +209,7 @@ export default async function PlanningGapsPage({
                                   >
                                     {t("planning.gaps.source.where", {
                                       title: one.documentTitle,
-                                      page: one.page,
+                                      page: fmt.number(one.page),
                                     })}
                                   </Link>
                                   {one.verification === "verified" ? (
@@ -270,7 +272,7 @@ export default async function PlanningGapsPage({
             </p>
           ) : null}
           <DraftGapsButton sectorId={sectorId} />
-          <RunReport runs={runs} />
+          <RunReport runs={runs} format={fmt} />
         </CardBody>
       </Card>
 

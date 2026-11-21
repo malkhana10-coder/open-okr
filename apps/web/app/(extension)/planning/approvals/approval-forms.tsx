@@ -33,8 +33,9 @@ export function ApproveForm({
 }: {
   readonly requestId: string;
   readonly sector: string;
-  readonly gaps: number;
-  readonly objectives: number;
+  /** Already written in the reader's digits and separators. */
+  readonly gaps: string;
+  readonly objectives: string;
 }) {
   const { t } = useTranslations();
   const [state, action, pending] = useActionState(

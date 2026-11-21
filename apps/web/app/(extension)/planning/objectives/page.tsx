@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   openSector,
   planningContext,
+  planningFormatFor,
   planningProvider,
 } from "../../../../lib/extension/planning.ts";
 import { pageTitle } from "../../../../lib/page-title.ts";
@@ -60,6 +61,7 @@ export default async function PlanningObjectivesPage({
   const { t } = await getTranslations();
   const search = await searchParams;
   const context = await planningContext();
+  const fmt = await planningFormatFor(context);
   const opened = await openSector(
     context,
     search.sector,
@@ -179,7 +181,7 @@ export default async function PlanningObjectivesPage({
                     {unverified > 0 ? (
                       <p className="text-sm font-medium text-warn">
                         {t("planning.gaps.source.unverifiedCount", {
-                          count: unverified,
+                          count: fmt.number(unverified),
                         })}
                       </p>
                     ) : null}
@@ -199,7 +201,7 @@ export default async function PlanningObjectivesPage({
                         {objective.confidence === null ? null : (
                           <p className="text-ink-3">
                             {t("planning.gaps.confidence", {
-                              percent: objective.confidence,
+                              percent: fmt.number(objective.confidence),
                             })}
                           </p>
                         )}
@@ -234,7 +236,7 @@ export default async function PlanningObjectivesPage({
                                   >
                                     {t("planning.gaps.source.where", {
                                       title: one.documentTitle,
-                                      page: one.page,
+                                      page: fmt.number(one.page),
                                     })}
                                   </Link>
                                   {one.verification === "verified" ? (
@@ -297,7 +299,7 @@ export default async function PlanningObjectivesPage({
               {t("planning.objectives.agent.noCycle")}
             </p>
           )}
-          <RunReport runs={runs} />
+          <RunReport runs={runs} format={fmt} />
         </CardBody>
       </Card>
     </div>

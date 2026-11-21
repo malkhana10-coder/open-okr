@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   openSector,
   planningContext,
+  planningFormatFor,
   refusedSector,
 } from "../../../../lib/extension/planning.ts";
 import { pageTitle } from "../../../../lib/page-title.ts";
@@ -54,6 +55,7 @@ export default async function PlanningDocumentsPage({
   const { t, locale } = await getTranslations();
   const search = await searchParams;
   const context = await planningContext();
+  const fmt = await planningFormatFor(context);
   const opened = await openSector(
     context,
     search.sector,
@@ -99,8 +101,8 @@ export default async function PlanningDocumentsPage({
     `${HERE}?sector=${sectorId}&document=${documentId}&page=${page}`;
   const pages = (count: number) =>
     count === 1
-      ? t("planning.documents.status.pagesOne", { count })
-      : t("planning.documents.status.pagesOther", { count });
+      ? t("planning.documents.status.pagesOne", { count: fmt.number(count) })
+      : t("planning.documents.status.pagesOther", { count: fmt.number(count) });
   const list = new Intl.ListFormat(locale, { type: "conjunction" });
   const pending = documents.some(
     (document) => document.processingStatus === "pending",
@@ -135,7 +137,7 @@ export default async function PlanningDocumentsPage({
                     <span className="text-sm text-ink-2">
                       {t("planning.documents.lowPages", {
                         pages: list.format(
-                          document.quality.lowPages.map(String),
+                          document.quality.lowPages.map(fmt.number),
                         ),
                       })}
                     </span>
@@ -186,8 +188,8 @@ export default async function PlanningDocumentsPage({
                 <bdi>{open.title}</bdi>
                 <span className="font-medium text-ink-3">
                   {t("planning.page.position", {
-                    page: reading.page,
-                    count: reading.pageCount,
+                    page: fmt.number(reading.page),
+                    count: fmt.number(reading.pageCount),
                   })}
                 </span>
               </h2>
