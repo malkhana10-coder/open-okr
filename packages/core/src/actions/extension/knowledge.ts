@@ -26,7 +26,7 @@ import {
   withContext,
 } from "@openokr/db";
 import { isLowQuality } from "@openokr/knowledge";
-import { asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { z } from "zod";
 import { ACCESS_LEVELS } from "../../access/levels.ts";
@@ -356,6 +356,82 @@ function isLowPage(
     isLowQuality({ arabicWords, suspectWords })
   );
 }
+
+/**
+ * Where a source document's file is kept, for somebody who may read the
+ * document (criterion 7: a quotation's source opens on its page).
+ *
+ * The product's own download gives a file to whoever uploaded it and to
+ * readers of what it hangs on. A source document hangs on nothing, so a
+ * sector member who did not upload it would be refused. This answers by the
+ * rule that already gives them every page of its text: `edit` on the
+ * document's sector. The same people, and also while the document is still
+ * being read or could not be read, when its pages are not there yet.
+ *
+ * Only a file that is `ok` is given, as the product's own download gives
+ * only that: one being scanned or set aside by the scanner is never served.
+ */
+export const openDocumentFile = defineReadAction({
+  name: "knowledge.openDocumentFile",
+  summary:
+    "Where a source document's file is kept, its name and type, for somebody who may read the document.",
+  input: z.object({ documentId: z.uuid() }),
+  output: z.object({
+    storageKey: z.string(),
+    filename: z.string(),
+    contentType: z.string(),
+  }),
+  access: ACCESS_LEVELS.view,
+  async handler(context, input) {
+    return inSector(context, async (tx, memberId) => {
+      const notFound = () =>
+        new OperationError(
+          "not_found",
+          "No such document, or you do not have access to it.",
+        );
+      const [document] = await tx
+        .select({
+          spaceId: sourceDocuments.spaceId,
+          storageKey: blobs.storageKey,
+          filename: blobs.filename,
+          contentType: blobs.contentType,
+        })
+        .from(sourceDocuments)
+        .innerJoin(
+          blobs,
+          and(
+            eq(blobs.id, sourceDocuments.blobId),
+            eq(blobs.workspaceId, context.workspaceId),
+            eq(blobs.status, "ok"),
+            activeOnly(blobs),
+          ),
+        )
+        .where(
+          activeOnly(
+            sourceDocuments,
+            eq(sourceDocuments.workspaceId, context.workspaceId),
+            eq(sourceDocuments.id, input.documentId),
+          ),
+        )
+        .limit(1);
+      if (!document) {
+        throw notFound();
+      }
+      await getAccessScoped(tx, {
+        workspaceId: context.workspaceId,
+        memberId,
+        resourceType: "space",
+        resourceId: document.spaceId,
+        requires: ACCESS_LEVELS.edit,
+      });
+      return {
+        storageKey: document.storageKey,
+        filename: document.filename,
+        contentType: document.contentType,
+      };
+    });
+  },
+});
 
 /** Runs a read in the workspace, as the member the call was made as. */
 async function inSector<T>(

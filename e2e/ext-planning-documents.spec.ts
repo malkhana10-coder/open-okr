@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { apiFor, LICENSING_PDF, makeSector } from "./ext-planning.ts";
 import { expect, test } from "./fixtures.ts";
 import { goTo, signIn } from "./instance-account.ts";
@@ -90,6 +91,28 @@ test("a sector's strategy is uploaded, read and opened page by page", async ({
     name: "Licensing sub-strategy page 2 of 13",
   });
   await expect(second).toContainText("المقدمة والنطاق");
+  // The file itself opens on the page read (criterion 7).
+  const original = second.getByRole("link", {
+    name: "Open the original file at this page",
+  });
+  const href = (await original.getAttribute("href")) ?? "";
+  expect(href).toMatch(/\/file#page=2$/);
+  const file = await page.request.get(href.replace(/#.*$/, ""));
+  expect(file.status()).toBe(200);
+  expect(file.headers()["content-type"]).toBe("application/pdf");
+  expect(file.headers()["content-disposition"]).toMatch(/^inline;/);
+  expect((await file.body()).subarray(0, 5).toString("latin1")).toBe("%PDF-");
+  // Nothing on it may run where it opens: the app's own policy covers it.
+  const policy = file.headers()["content-security-policy"] ?? "";
+  expect(policy).toContain("object-src 'none'");
+  expect(policy).toMatch(/script-src 'self' 'nonce-/);
+  expect(file.headers()["x-content-type-options"]).toBe("nosniff");
+  // A document that is not there is answered as one nobody may see.
+  const missing = await page.request.get(
+    href.replace(/documents\/[^/]+\/file.*$/, `documents/${randomUUID()}/file`),
+  );
+  expect(missing.status()).toBe(404);
+
   await second.getByRole("link", { name: "Previous page" }).click();
   await expect(reader).toBeVisible();
 
@@ -103,6 +126,31 @@ test("a sector's strategy is uploaded, read and opened page by page", async ({
   ).toBeVisible();
   await page.getByRole("link", { name: "Close" }).click();
   await expect(page.getByRole("region")).toHaveCount(0);
+
+  // A file named in Arabic opens too. A header carries bytes, not letters,
+  // so the name goes in its encoded form beside a plain fallback.
+  await goTo(page, `/planning/documents?sector=${sectorId}`);
+  await page.getByLabel("PDF file").setInputFiles({
+    name: "الاستراتيجية-الفرعية.pdf",
+    mimeType: "application/pdf",
+    buffer: readFileSync(LICENSING_PDF),
+  });
+  await page.getByLabel("Title").fill("Arabic file name");
+  await page.getByRole("button", { name: "Upload" }).click();
+  const arabicRow = page.getByRole("listitem").filter({
+    hasText: "Arabic file name",
+  });
+  await expect(arabicRow).toContainText("13 pages", { timeout: 60_000 });
+  await arabicRow.getByRole("link", { name: "Read" }).click();
+  const arabicHref =
+    (await page
+      .getByRole("link", { name: "Open the original file at this page" })
+      .getAttribute("href")) ?? "";
+  const arabicFile = await page.request.get(arabicHref.replace(/#.*$/, ""));
+  expect(arabicFile.status()).toBe(200);
+  expect(arabicFile.headers()["content-disposition"]).toContain(
+    `filename*=UTF-8''${encodeURIComponent("الاستراتيجية-الفرعية.pdf")}`,
+  );
 });
 
 test("a space that is not a sector is not opened as one", async ({

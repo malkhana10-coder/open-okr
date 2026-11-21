@@ -25,6 +25,7 @@ import {
 } from "./governance.ts";
 import {
   listSourceDocuments,
+  openDocumentFile,
   readSourceDocumentPage,
   registerSourceDocument,
 } from "./knowledge.ts";
@@ -57,6 +58,7 @@ export const EXTENSION_ACTION_MAP = {
   "knowledge.registerDocument": registerSourceDocument,
   "knowledge.listDocuments": listSourceDocuments,
   "knowledge.readPage": readSourceDocumentPage,
+  "knowledge.openDocumentFile": openDocumentFile,
   "knowledge.listEvidence": listEvidence,
   "knowledge.listSectorEvidence": listSectorEvidence,
   "knowledge.addEvidence": addEvidence,

@@ -244,5 +244,8 @@
   "planning.alignment.linkedGaps": "الفجوات التي يعالجها الهدف المختار: {count}",
   "planning.runs.when": "وقت التشغيل: {date}",
   "planning.documents.upload.choose": "اختر ملفاً",
-  "planning.documents.upload.noFile": "لم يُختر ملف"
+  "planning.documents.upload.noFile": "لم يُختر ملف",
+  "planning.page.original": "فتح الملف الأصلي عند هذه الصفحة",
+  "planning.gaps.source.original": "الملف الأصلي",
+  "planning.gaps.source.originalNamed": "الملف الأصلي لـ{title}، الصفحة {page}، في نافذة جديدة"
 }

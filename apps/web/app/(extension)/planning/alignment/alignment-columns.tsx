@@ -108,9 +108,10 @@ export function AlignmentColumns({
                     type="button"
                     aria-pressed={pressed}
                     onClick={() => choose("gap", gap.id)}
+                    dir="auto"
                     className="w-full text-start text-sm font-medium text-ink"
                   >
-                    <bdi>{gap.title}</bdi>
+                    {gap.title}
                   </button>
                   {linked ? (
                     <span className="text-xs font-medium text-brand-text">
@@ -157,9 +158,10 @@ export function AlignmentColumns({
                     type="button"
                     aria-pressed={pressed}
                     onClick={() => choose("objective", objective.id)}
+                    dir="auto"
                     className="w-full text-start text-sm font-medium text-ink"
                   >
-                    <bdi>{objective.title}</bdi>
+                    {objective.title}
                   </button>
                   {linked ? (
                     <span className="text-xs font-medium text-brand-text">

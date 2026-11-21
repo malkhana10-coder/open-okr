@@ -5155,5 +5155,8 @@
   "planning.alignment.linkedGaps": "Gaps the chosen objective answers: {count}",
   "planning.runs.when": "Ran on {date}",
   "planning.documents.upload.choose": "Choose a file",
-  "planning.documents.upload.noFile": "No file chosen"
+  "planning.documents.upload.noFile": "No file chosen",
+  "planning.page.original": "Open the original file at this page",
+  "planning.gaps.source.original": "Original file",
+  "planning.gaps.source.originalNamed": "Original file of {title}, page {page}, in a new tab"
 }

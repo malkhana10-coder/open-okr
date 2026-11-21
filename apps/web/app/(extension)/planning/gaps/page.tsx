@@ -9,6 +9,7 @@ import {
 } from "../../../../lib/extension/planning.ts";
 import { pageTitle } from "../../../../lib/page-title.ts";
 import { getTranslations } from "../../../../lib/translations";
+import { originalHref } from "../original.ts";
 import { PlanningTop } from "../planning-top.tsx";
 import { RunReport } from "../run-report.tsx";
 import {
@@ -136,8 +137,8 @@ export default async function PlanningGapsPage({
                     className="flex flex-col gap-2 rounded-md border border-line px-3 py-2.5"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2">
-                      <h3 className="font-medium text-ink">
-                        <bdi>{gap.title}</bdi>
+                      <h3 dir="auto" className="font-medium text-ink">
+                        {gap.title}
                       </h3>
                       <span className="flex flex-wrap items-center gap-2">
                         {domain ? <Chip tone="neutral">{domain}</Chip> : null}
@@ -212,6 +213,24 @@ export default async function PlanningGapsPage({
                                       page: fmt.number(one.page),
                                     })}
                                   </Link>
+                                  <a
+                                    href={originalHref(
+                                      one.documentId,
+                                      one.page,
+                                    )}
+                                    target="_blank"
+                                    rel="noopener"
+                                    aria-label={t(
+                                      "planning.gaps.source.originalNamed",
+                                      {
+                                        title: one.documentTitle,
+                                        page: fmt.number(one.page),
+                                      },
+                                    )}
+                                    className="text-brand hover:underline"
+                                  >
+                                    {t("planning.gaps.source.original")}
+                                  </a>
                                   {one.verification === "verified" ? (
                                     <Chip tone="ok">
                                       {t("planning.gaps.source.verified")}

@@ -12972,6 +12972,23 @@
       "pages": false
     },
     {
+      "name": "knowledge openDocumentFile",
+      "action": "knowledge.openDocumentFile",
+      "method": "GET",
+      "path": "/knowledge/openDocumentFile",
+      "scope": "read",
+      "summary": "Where a source document's file is kept, its name and type, for somebody who may read the document.",
+      "flags": [
+        {
+          "name": "document-id",
+          "field": "documentId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
       "name": "knowledge listEvidence",
       "action": "knowledge.listEvidence",
       "method": "GET",

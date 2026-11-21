@@ -15813,6 +15813,31 @@
       }
     },
     {
+      "name": "knowledge.openDocumentFile",
+      "description": "Where a source document's file is kept, its name and type, for somebody who may read the document.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "documentId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "documentId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
       "name": "knowledge.listEvidence",
       "description": "The quotations a gap rests on, each with its document, its page and whether it was found there.",
       "inputSchema": {

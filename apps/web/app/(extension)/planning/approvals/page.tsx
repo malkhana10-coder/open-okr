@@ -75,8 +75,8 @@ export default async function PlanningApprovalsPage({
               key={request.requestId}
               className="flex flex-col gap-3 rounded-md border border-line px-3 py-2.5"
             >
-              <h3 className="font-medium text-ink">
-                <bdi>{request.spaceName}</bdi>
+              <h3 dir="auto" className="font-medium text-ink">
+                {request.spaceName}
               </h3>
               <p className="text-sm text-ink-2">
                 {t("planning.approvals.next.toDecide", {
@@ -107,8 +107,8 @@ export default async function PlanningApprovalsPage({
               key={request.requestId}
               className="flex flex-col gap-2 rounded-md border border-line px-3 py-2.5"
             >
-              <h3 className="font-medium text-ink">
-                <bdi>{request.spaceName}</bdi>
+              <h3 dir="auto" className="font-medium text-ink">
+                {request.spaceName}
               </h3>
               <p className="text-sm text-ink-2">
                 {t("planning.approvals.next.returned")}

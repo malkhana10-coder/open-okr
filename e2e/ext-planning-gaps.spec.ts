@@ -60,7 +60,7 @@ test("a gap is written by hand, quoted, and the agent drafts the rest", async ({
   await openDetails(manual);
   await manual.getByLabel("Document").selectOption({ label: DOCUMENT });
   // A page that is not a number is refused in words, and nothing is lost.
-  await manual.getByLabel("Page").fill("three");
+  await manual.getByLabel("Page", { exact: true }).fill("three");
   await manual.getByLabel("Quotation").fill(ON_THE_PAGE);
   await manual.getByRole("button", { name: "Add source" }).click();
   await expect(
@@ -68,12 +68,12 @@ test("a gap is written by hand, quoted, and the agent drafts the rest", async ({
   ).toBeVisible();
   await expect(manual.getByLabel("Quotation")).toHaveValue(ON_THE_PAGE);
   // The digits an Arabic keyboard types are a page number too.
-  await manual.getByLabel("Page").fill("٣");
+  await manual.getByLabel("Page", { exact: true }).fill("٣");
   await manual.getByRole("button", { name: "Add source" }).click();
   const quoted = manual.getByRole("listitem").filter({ hasText: ON_THE_PAGE });
   await expect(quoted).toContainText("Verified");
   await expect(
-    quoted.getByRole("link", { name: `${DOCUMENT}, page 3` }),
+    quoted.getByRole("link", { name: `${DOCUMENT}, page 3` , exact: true }),
   ).toHaveAttribute("href", /\/planning\/documents\?.*page=3/);
 
   // The details stay open across the write.
@@ -81,7 +81,7 @@ test("a gap is written by hand, quoted, and the agent drafts the rest", async ({
 
   // One that is not on the page is kept and marked (criterion 5).
   await manual.getByLabel("Document").selectOption({ label: DOCUMENT });
-  await manual.getByLabel("Page").fill("3");
+  await manual.getByLabel("Page", { exact: true }).fill("3");
   await manual.getByLabel("Quotation").fill("دليل الاشتراطات غير متاح للمستفيدين اليوم");
   await manual.getByRole("button", { name: "Add source" }).click();
   const paraphrase = manual

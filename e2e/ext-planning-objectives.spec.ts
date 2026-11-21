@@ -72,7 +72,7 @@ test("objectives are drafted from the gaps, and a person confirms an owner", asy
     "لا دليل موحد منشور لاشتراطات التراخيص",
   );
   await expect(
-    objective.getByRole("link", { name: "Licensing sub-strategy, page 9" }),
+    objective.getByRole("link", { name: "Licensing sub-strategy, page 9" , exact: true }),
   ).toBeVisible();
   await expect(objective.getByText("Verified", { exact: true })).toBeVisible();
 

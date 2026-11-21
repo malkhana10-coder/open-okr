@@ -25,6 +25,7 @@ import { provisionWorkspaceForUser } from "../../src/workspaces/provisioning.ts"
 
 const OWNER = "source-owner";
 const OUTSIDER = "source-outsider";
+const COLLEAGUE = "source-colleague";
 
 let workspaceId: string;
 let spaceId: string;
@@ -443,6 +444,95 @@ describe("the quality of what was read (criterion 19)", () => {
       { spaceId },
     );
     expect(documents[0]?.quality).toBeNull();
+  });
+});
+
+describe("knowledge.openDocumentFile (criterion 7)", () => {
+  /** A member of the sector who did not upload the file. */
+  async function colleague(): Promise<void> {
+    const wb = await workerDb();
+    await wb.admin.query(
+      "insert into users (id, name, email) values ($1, 'Colleague', 'source-colleague@example.com')",
+      [COLLEAGUE],
+    );
+    const row = await wb.admin.query<{ id: string }>(
+      `insert into workspace_members (id, workspace_id, user_id, name, status, kind)
+       values (gen_random_uuid(), $1, $2, 'Colleague', 'active', 'human') returning id`,
+      [workspaceId, COLLEAGUE],
+    );
+    const { roles } = await callAction(
+      { pool: wb.appPool, ...as(OWNER) },
+      "roles.list",
+      {},
+    );
+    const memberId = row.rows[0]?.id as string;
+    await callAction({ pool: wb.appPool, ...as(OWNER) }, "roles.assign", {
+      memberId,
+      roleId: roles.find((role) => role.builtinKey === "viewer")?.id as string,
+    });
+    await callAction({ pool: wb.appPool, ...as(OWNER) }, "spaces.addMember", {
+      spaceId,
+      memberId,
+      role: "member",
+    });
+  }
+
+  const open = async (userId: string, documentId: string) =>
+    callAction(
+      { pool: (await workerDb()).appPool, ...as(userId) },
+      "knowledge.openDocumentFile",
+      { documentId },
+    );
+
+  it("gives a member of the sector the file, though somebody else uploaded it", async () => {
+    const storage = memoryStorage();
+    const stored = await upload(storage);
+    const document = await register(stored.blobId);
+    await colleague();
+
+    const file = await open(COLLEAGUE, document.id);
+    expect(file.contentType).toBe("application/pdf");
+    expect(file.filename).toBe("strategy.pdf");
+    expect(storage.objects.get(file.storageKey)?.toString()).toBe(
+      "%PDF-1.7 the strategy",
+    );
+    // The product's own download refuses them: it is not their upload and
+    // it hangs on nothing they read. That is why this read exists.
+    const wb = await workerDb();
+    await expect(
+      callAction(
+        { pool: wb.appPool, ...as(COLLEAGUE) },
+        "blobs.getForDownload",
+        { blobId: stored.blobId },
+      ),
+    ).rejects.toMatchObject({ code: "not_found" });
+  });
+
+  it("answers not found to somebody who is not in the sector", async () => {
+    const stored = await upload(memoryStorage());
+    const document = await register(stored.blobId);
+    await expect(open(OUTSIDER, document.id)).rejects.toMatchObject({
+      code: "not_found",
+    });
+  });
+
+  it("never serves a file the scanner holds or set aside", async () => {
+    const stored = await upload(memoryStorage());
+    const document = await register(stored.blobId);
+    const wb = await workerDb();
+    await wb.admin.query(
+      "update blobs set status = 'quarantined' where id = $1",
+      [stored.blobId],
+    );
+    await expect(open(OWNER, document.id)).rejects.toMatchObject({
+      code: "not_found",
+    });
+  });
+
+  it("answers not found for a document that does not exist", async () => {
+    await expect(
+      open(OWNER, "00000000-0000-4000-8000-000000000000"),
+    ).rejects.toMatchObject({ code: "not_found" });
   });
 });
 

@@ -26,14 +26,41 @@ describe("bidirectional isolation", () => {
     expect(rule).toMatch(/unicode-bidi:\s*plaintext/);
   });
 
+  it("puts alignment back to the page's start, for both engines", () => {
+    // Without it every box with no strong letter of its own, a button alone
+    // in a row, is drawn from the left on an Arabic page.
+    expect(rule).toMatch(/text-align:\s*match-parent/);
+    expect(rule).toMatch(/text-align:\s*-webkit-match-parent/);
+    expect(rule).toMatch(/:not\(input, textarea, pre, pre \*, code\)/);
+  });
+
   it("applies under a right-to-left page and nowhere else", () => {
-    const selectors = [...rule.matchAll(/^([^@/*\s][^{]*)\{/gm)].map((match) =>
+    // Comments out first, then each rule's selector: whatever stands
+    // between one block's end and the next block's start.
+    const bare = rule.replace(/\/\*[\s\S]*?\*\//g, "");
+    const selectors = [...bare.matchAll(/([^{}]+)\{/g)].map((match) =>
       (match[1] ?? "").trim(),
     );
     expect(selectors.length).toBeGreaterThan(0);
     for (const selector of selectors) {
-      for (const part of selector.split(",")) {
-        expect(part.trim()).toMatch(/^\[dir="rtl"\]/);
+      // Commas inside `:not()` and `:where()` belong to one selector.
+      const parts: string[] = [];
+      let depth = 0;
+      let current = "";
+      for (const char of selector) {
+        depth += char === "(" ? 1 : char === ")" ? -1 : 0;
+        if (char === "," && depth === 0) {
+          parts.push(current);
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+      parts.push(current);
+      for (const part of parts) {
+        // Directly, or inside `:where()`, which keeps the same scope and
+        // gives it no weight.
+        expect(part.trim()).toMatch(/^(:where\()?\[dir="rtl"\]/);
       }
     }
   });

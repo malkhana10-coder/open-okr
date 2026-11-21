@@ -61,8 +61,8 @@ export async function RunReport({
               </p>
               <ul className="list-disc ps-5 text-ink-2">
                 {[...new Set(last.report.read)].map((line) => (
-                  <li key={line}>
-                    <bdi>{line}</bdi>
+                  <li dir="auto" key={line}>
+                    {line}
                   </li>
                 ))}
               </ul>
@@ -77,8 +77,8 @@ export async function RunReport({
               </p>
               <ul className="list-disc ps-5 text-ink-2">
                 {[...new Set(last.report.excluded)].map((line) => (
-                  <li key={line}>
-                    <bdi>{line}</bdi>
+                  <li dir="auto" key={line}>
+                    {line}
                   </li>
                 ))}
               </ul>

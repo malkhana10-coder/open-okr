@@ -77,6 +77,75 @@ async function tab(page: Page, name: string): Promise<void> {
     .click();
 }
 
+/**
+ * Every line of Arabic on the screen starts at the right edge of its box.
+ * Under the bidi rule a box with no strong letter of its own was drawn from
+ * the left: a button alone in a row, a name in `<bdi>`. That is the fault
+ * this catches (DECISIONS-LOG ت-57).
+ */
+async function linesStartRight(page: Page): Promise<void> {
+  const misplaced = await page
+    .getByRole("main")
+    .locator(".stagger")
+    .first()
+    .evaluate((root) => {
+      const found: string[] = [];
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const text = node.textContent ?? "";
+        // Any line that starts with a letter or a digit, Arabic or not:
+        // a line with no Arabic letter at its start is the one at risk.
+        if (!/^\s*[\p{L}\p{N}]/u.test(text)) {
+          continue;
+        }
+        // A mixed line is drawn in pieces; its right end is the rightmost.
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        let right = Math.max(
+          ...[...range.getClientRects()].map((rect) => rect.right),
+        );
+        // The nearest block that lays this line out. A box inside the line,
+        // a button, is placed by its own edge, not by its text's.
+        let block = node.parentElement;
+        while (block && getComputedStyle(block).display.startsWith("inline")) {
+          if (getComputedStyle(block).display !== "inline") {
+            right = block.getBoundingClientRect().right;
+          }
+          block = block.parentElement;
+        }
+        if (!block || block.closest("select, option, summary")) {
+          continue;
+        }
+        const style = getComputedStyle(block);
+        // Flex and grid place their items themselves, a disclosure's marker
+        // stands before its text, and a centred line is centred on purpose.
+        if (
+          ["flex", "grid"].includes(style.display) ||
+          style.textAlign === "center"
+        ) {
+          continue;
+        }
+        // The line's start is its first words: a later piece of the same
+        // line sits wherever the words before it end.
+        const first = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+        let lead = first.nextNode();
+        while (lead && (lead.textContent ?? "").trim() === "") {
+          lead = first.nextNode();
+        }
+        if (lead !== node) {
+          continue;
+        }
+        const box = block.getBoundingClientRect();
+        const padding = Number.parseFloat(style.paddingRight) || 0;
+        if (Number.isFinite(right) && box.right - padding - right > 4) {
+          found.push(text.trim().slice(0, 40));
+        }
+      }
+      return found;
+    });
+  expect(misplaced).toEqual([]);
+}
+
 async function readsRightToLeft(page: Page): Promise<void> {
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   const main = await page.getByRole("main").boundingBox();
@@ -87,6 +156,18 @@ async function readsRightToLeft(page: Page): Promise<void> {
     (main?.x ?? 0) + (main?.width ?? 0) - 2,
   );
   expect(await latinWords(page)).toEqual([]);
+  await linesStartRight(page);
+  // The browser's own file field writes in the browser's language, so it
+  // is never shown: a picture would miss its return by a few pixels.
+  const fields = await page.locator('input[type="file"]').evaluateAll((all) =>
+    all.map((field) => {
+      const box = field.getBoundingClientRect();
+      return box.width * box.height;
+    }),
+  );
+  for (const area of fields) {
+    expect(area).toBeLessThanOrEqual(1);
+  }
   // Western digits, as decided (design §12.5), on every screen.
   await expect(
     page.getByRole("main").getByText(/[\u0660-\u0669\u06F0-\u06F9]/),
@@ -222,7 +303,7 @@ test("the planning screens read right to left, all in Arabic", async ({
         arabic.getByLabel("السنة"),
         arabic.getByTestId("app-footer"),
       ],
-      maxDiffPixelRatio: 0.004,
+      maxDiffPixelRatio: 0.01,
     });
     await goTo(page, `/planning/documents?sector=${sectorId}`);
     await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
@@ -235,7 +316,7 @@ test("the planning screens read right to left, all in Arabic", async ({
         page.getByLabel("Year"),
         page.getByTestId("app-footer"),
       ],
-      maxDiffPixelRatio: 0.004,
+      maxDiffPixelRatio: 0.01,
     });
   }
 

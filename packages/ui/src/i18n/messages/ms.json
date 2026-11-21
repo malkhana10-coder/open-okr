@@ -5155,5 +5155,8 @@
   "planning.alignment.linkedGaps": "Jurang yang dijawab oleh objektif yang dipilih: {count}",
   "planning.runs.when": "Dijalankan pada {date}",
   "planning.documents.upload.choose": "Pilih fail",
-  "planning.documents.upload.noFile": "Tiada fail dipilih"
+  "planning.documents.upload.noFile": "Tiada fail dipilih",
+  "planning.page.original": "Buka fail asal pada halaman ini",
+  "planning.gaps.source.original": "Fail asal",
+  "planning.gaps.source.originalNamed": "Fail asal {title}, halaman {page}, dalam tab baharu"
 }

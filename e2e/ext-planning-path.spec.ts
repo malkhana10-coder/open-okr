@@ -152,5 +152,12 @@ test("one person sends a sector's request, another returns it, then approves it"
   await drafting.getByRole("link", { name: "Approvals", exact: true }).click();
   await expect(send).toContainText("Nothing to send");
 
+  // Live means where every objective is: the product's own goals screen,
+  // in the plan's cycle (criterion 9).
+  await goTo(drafting, `/goals?cycle=${cycleId}`);
+  await expect(
+    drafting.getByText("نشر اشتراطات كل أنواع التراخيص في دليل واحد").first(),
+  ).toBeVisible({ timeout: 15_000 });
+
   await theirs.close();
 });

@@ -9,6 +9,7 @@ import {
 } from "../../../../lib/extension/planning.ts";
 import { pageTitle } from "../../../../lib/page-title.ts";
 import { getTranslations } from "../../../../lib/translations";
+import { originalHref } from "../original.ts";
 import { PlanningTop } from "../planning-top.tsx";
 import { PendingRefresh } from "./pending-refresh.tsx";
 import { UploadForm } from "./upload-form.tsx";
@@ -229,6 +230,18 @@ export default async function PlanningDocumentsPage({
                     {t("planning.page.next")}
                   </Link>
                 ) : null}
+                {/* The file itself, on this page: the check compared a quotation
+                    with the text above, and a reader may want the page as it
+                    was printed. A plain link, so the browser's PDF viewer
+                    opens it where it opens files. */}
+                <a
+                  href={originalHref(open.id, reading.page)}
+                  target="_blank"
+                  rel="noopener"
+                  className="font-medium text-brand hover:underline"
+                >
+                  {t("planning.page.original")}
+                </a>
                 <Link
                   href={`${HERE}?sector=${sectorId}`}
                   className="text-ink-3 hover:underline"

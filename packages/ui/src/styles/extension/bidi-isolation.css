@@ -11,8 +11,19 @@
  * `plaintext` makes each element read in the direction of its own first
  * strong letter, which is what `dir="auto"` does for one element. On an
  * inline element it also isolates the text from the sentence around it, as
- * `<bdi>` does. Where things sit on the page, the sidebar on the right and
- * text aligned to the right, still follows the page.
+ * `<bdi>` does.
+ *
+ * **It also moves alignment, which the second rule puts back.** Under
+ * `plaintext`, "start" is the start of each paragraph's own direction, and a
+ * box with no strong letter of its own (a button alone in a row, a name in
+ * `<bdi>`) is read as left to right and drawn at the left. `match-parent`
+ * aligns every box to the page's start instead, so the sidebar, the text and
+ * the buttons all sit on the right. Inside `:where()` it weighs nothing, so
+ * any class that aligns on purpose (`text-center`) still wins.
+ *
+ * Not for what is typed or code: an email, a link, a token or a number in a
+ * field, and a line of code, keep starting from their own side, which is
+ * what the first rule gave them.
  *
  * Under a right-to-left page only. A left-to-right page is untouched, so the
  * English and Malay interfaces are laid out exactly as before.
@@ -20,4 +31,14 @@
 [dir="rtl"] body,
 [dir="rtl"] body * {
   unicode-bidi: plaintext;
+}
+
+/*
+ * Both spellings: Firefox knows the standard one, and Chromium and Safari
+ * only the prefixed one, which a browser that does not know it skips.
+ */
+:where([dir="rtl"] body *:not(input, textarea, pre, pre *, code)) {
+  text-align: match-parent;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: one per engine, above. */
+  text-align: -webkit-match-parent;
 }

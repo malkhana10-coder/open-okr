@@ -133,7 +133,7 @@
 |---|---|---|
 | `apps/web/app/globals.css` | سطر `@import` لملف العزل | منخفض |
 
-ملفات جديدة: `packages/ui/src/styles/extension/bidi-isolation.css` (قاعدة واحدة تحت `[dir="rtl"]` فقط: كل عنصر يُقرأ باتجاه نصه هو)، و`apps/web/test/extension/bidi-isolation.test.ts`، و`e2e/ext-bidi-isolation.spec.ts`.
+ملفات جديدة: `packages/ui/src/styles/extension/bidi-isolation.css` (قاعدتان تحت `[dir="rtl"]` فقط: كل عنصر يُقرأ باتجاه نصه هو، وكل صندوق يُحاذى إلى بداية الصفحة، أي يميناً، عدا الحقول والشيفرة. **الثانية تغيّر محاذاة كل شاشة في الأصل بالعربية** (الجلسة 16، ت-57): رأس جدول بلا صنف ونص زر يلتف إلى سطرين يصيران يميناً بدل الوسط، وفقرة إنجليزية في صفحة عربية تُحاذى يميناً. أي صنف محاذاة صريح يغلبها)، و`apps/web/test/extension/bidi-isolation.test.ts`، و`e2e/ext-bidi-isolation.spec.ts`.
 
 ## 4. العربية لغة يختارها العضو، وقيد قاعدة البيانات
 
