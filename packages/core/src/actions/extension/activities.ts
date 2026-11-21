@@ -7,6 +7,16 @@ import { z } from "zod";
 
 export const EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS = {
   "strategy.domain_created": z.object({ name: z.string() }),
+  "strategy.goal_owner_confirmed": z.object({}),
+  "governance.submitted": z.object({
+    gaps: z.number().int(),
+    objectives: z.number().int(),
+  }),
+  "governance.decided": z.object({
+    status: z.string(),
+    gaps: z.number().int(),
+    objectives: z.number().int(),
+  }),
   "planning.agent_run": z.object({
     agent: z.string(),
     status: z.string(),
@@ -49,6 +59,14 @@ export const EXTENSION_ACTIVITY_RENDERERS: Record<
       ? `The ${agent} ran and drafted ${String(p.drafted ?? 0)}`
       : `The ${agent} ran and drafted nothing`;
   },
+  "strategy.goal_owner_confirmed": () =>
+    "The owner of a drafted objective was confirmed",
+  "governance.submitted": (p) =>
+    `${String(p.gaps ?? 0)} gap(s) and ${String(p.objectives ?? 0)} objective(s) were sent for approval`,
+  "governance.decided": (p) =>
+    p.status === "approved"
+      ? "An approval request was approved"
+      : "An approval request was returned",
   "strategy.domain_created": (p) =>
     `A strategic domain "${String(p.name ?? "")}" was added`,
   "strategy.gap_created": (p) =>

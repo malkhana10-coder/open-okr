@@ -4985,5 +4985,6 @@
   "role.builtin.viewer": "Pemerhati",
   "cycle.inputPack.whoCanChange": "Hanya Pemilik atau Pentadbir boleh mengubah pek input.",
   "cycle.inputPack.whoCanChangeWithFacilitator": "Hanya Pemilik, Pentadbir atau {name}, fasilitator kitaran ini, boleh mengubah pek input.",
-  "cycle.need.packFills": "Pemilik, Pentadbir atau fasilitator kitaran mengisi bahagian ini."
+  "cycle.need.packFills": "Pemilik, Pentadbir atau fasilitator kitaran mengisi bahagian ini.",
+  "admin.roles.domainApproval": "Kelulusan"
 }

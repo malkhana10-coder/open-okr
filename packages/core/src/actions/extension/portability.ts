@@ -73,4 +73,15 @@ export const EXTENSION_TABLE_POLICY = [
     decision: "export",
     reason: "Which gaps each objective answers.",
   },
+  {
+    table: "approval_requests",
+    decision: "export",
+    reason:
+      "Each batch a sector sent for approval, who sent it, who decided it and what they said.",
+  },
+  {
+    table: "approval_items",
+    decision: "export",
+    reason: "What was in each approval request, and the decision on it.",
+  },
 ] as const;

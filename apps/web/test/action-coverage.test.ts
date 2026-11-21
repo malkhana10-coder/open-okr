@@ -102,6 +102,22 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the sector's objectives screen that runs the agent is not built yet",
   },
+  "governance.myNext": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
+  },
+  "governance.submit": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
+  },
+  "governance.decide": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
+  },
+  "strategy.confirmGoalOwner": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
+  },
   "strategy.listGaps": {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",

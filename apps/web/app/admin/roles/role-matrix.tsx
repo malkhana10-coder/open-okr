@@ -55,6 +55,7 @@ const DOMAIN_LABEL: Readonly<Record<string, string>> = {
   comment: "admin.roles.domainComment",
   space: "admin.roles.domainSpace",
   workspace: "admin.roles.domainWorkspace",
+  approval: "admin.roles.domainApproval",
 };
 
 const LEVELS = [

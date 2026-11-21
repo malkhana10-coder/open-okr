@@ -13,6 +13,12 @@ import { listRuns, runGapAgent } from "./agent-runs.ts";
 import { addEvidence, listEvidence, removeEvidence } from "./evidence.ts";
 import { createGap, dismissGap, listGaps, updateGap } from "./gaps.ts";
 import {
+  confirmGoalOwner,
+  decideApproval,
+  myNext,
+  submitForApproval,
+} from "./governance.ts";
+import {
   listSourceDocuments,
   readSourceDocumentPage,
   registerSourceDocument,
@@ -25,6 +31,10 @@ import { createStrategyDomain, listStrategyDomains } from "./strategy.ts";
 export const EXTENSION_ACTION_MAP = {
   "strategy.listDomains": listStrategyDomains,
   "strategy.createDomain": createStrategyDomain,
+  "governance.myNext": myNext,
+  "governance.submit": submitForApproval,
+  "governance.decide": decideApproval,
+  "strategy.confirmGoalOwner": confirmGoalOwner,
   "planning.listRuns": listRuns,
   "planning.runGapAgent": runGapAgent,
   "planning.runObjectiveAgent": runObjectiveAgent,

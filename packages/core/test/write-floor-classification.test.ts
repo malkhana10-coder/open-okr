@@ -61,6 +61,11 @@ const OWN_CHECK = new Set([
   "knowledge.addEvidence",
   "knowledge.removeEvidence",
   // Measured on the sector at `edit` before the provider is asked.
+  // Measured on the sector and on the request's own `approval` context
+  // (docs/extension/design/b0-vertical-slice.md §13).
+  "governance.submit",
+  "governance.decide",
+  "strategy.confirmGoalOwner",
   "planning.runGapAgent",
   "planning.runObjectiveAgent",
   "strategy.createGap",

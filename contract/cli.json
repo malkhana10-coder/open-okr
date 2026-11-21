@@ -5273,7 +5273,8 @@
             "task",
             "comment",
             "space",
-            "workspace"
+            "workspace",
+            "approval"
           ]
         },
         {
@@ -12469,6 +12470,83 @@
           "field": "description",
           "type": "string",
           "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "governance myNext",
+      "action": "governance.myNext",
+      "method": "GET",
+      "path": "/governance/myNext",
+      "scope": "read",
+      "summary": "What waits for you in approvals: requests you may decide, and requests of yours that came back.",
+      "flags": [],
+      "pages": false
+    },
+    {
+      "name": "governance submit",
+      "action": "governance.submit",
+      "method": "POST",
+      "path": "/governance/submit",
+      "scope": "write",
+      "summary": "Sends a sector's open gaps and drafted objectives for approval as one request. Refused while any of them rests on an unverified quotation, or while a drafted objective's owner is unconfirmed.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "governance decide",
+      "action": "governance.decide",
+      "method": "POST",
+      "path": "/governance/decide",
+      "scope": "write",
+      "summary": "Approves an approval request, or returns it with a comment. Approving makes its drafted objectives live. The person who sent a request cannot decide it.",
+      "flags": [
+        {
+          "name": "request-id",
+          "field": "requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "decision",
+          "field": "decision",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "approve",
+            "return"
+          ]
+        },
+        {
+          "name": "comment",
+          "field": "comment",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy confirmGoalOwner",
+      "action": "strategy.confirmGoalOwner",
+      "method": "POST",
+      "path": "/strategy/confirmGoalOwner",
+      "scope": "write",
+      "summary": "Confirms the owner of an objective an agent drafted. The owner was given by rule, and the objective cannot be sent for approval until a person has confirmed it.",
+      "flags": [
+        {
+          "name": "goal-id",
+          "field": "goalId",
+          "type": "string",
+          "required": true
         }
       ],
       "pages": false

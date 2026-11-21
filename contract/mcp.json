@@ -5601,7 +5601,8 @@
               "task",
               "comment",
               "space",
-              "workspace"
+              "workspace",
+              "approval"
             ]
           },
           "level": {
@@ -5673,7 +5674,8 @@
                     "task",
                     "comment",
                     "space",
-                    "workspace"
+                    "workspace",
+                    "approval"
                   ]
                 },
                 "level": {
@@ -15132,6 +15134,112 @@
       },
       "example": {
         "name": "…"
+      }
+    },
+    {
+      "name": "governance.myNext",
+      "description": "What waits for you in approvals: requests you may decide, and requests of yours that came back.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {}
+    },
+    {
+      "name": "governance.submit",
+      "description": "Sends a sector's open gaps and drafted objectives for approval as one request. Refused while any of them rests on an unverified quotation, or while a drafted objective's owner is unconfirmed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "governance.decide",
+      "description": "Approves an approval request, or returns it with a comment. Approving makes its drafted objectives live. The person who sent a request cannot decide it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "return"
+            ]
+          },
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "requestId",
+          "decision"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "requestId": "00000000-0000-4000-8000-000000000000",
+        "decision": "approve"
+      }
+    },
+    {
+      "name": "strategy.confirmGoalOwner",
+      "description": "Confirms the owner of an objective an agent drafted. The owner was given by rule, and the objective cannot be sent for approval until a person has confirmed it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "goalId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The goal's id or short id, from goals.list, goals.due or goals.tree."
+          }
+        },
+        "required": [
+          "goalId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "goalId": "00000000-0000-4000-8000-000000000000"
       }
     },
     {

@@ -28865,7 +28865,8 @@
                       "task",
                       "comment",
                       "space",
-                      "workspace"
+                      "workspace",
+                      "approval"
                     ]
                   },
                   "level": {
@@ -29002,7 +29003,8 @@
                             "task",
                             "comment",
                             "space",
-                            "workspace"
+                            "workspace",
+                            "approval"
                           ]
                         },
                         "level": {
@@ -71801,6 +71803,456 @@
                 },
                 "required": [
                   "name"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Validate"
+          }
+        ]
+      }
+    },
+    "/governance/myNext": {
+      "get": {
+        "operationId": "governance.myNext",
+        "summary": "What waits for you in approvals: requests you may decide, and requests of yours that came back.",
+        "tags": [
+          "governance"
+        ],
+        "x-openokr-scope": "read",
+        "x-openokr-safety": "read",
+        "responses": {
+          "200": {
+            "description": "The action's own output, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "toDecide": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "requestId": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "spaceId": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "spaceName": {
+                                "type": "string"
+                              },
+                              "gaps": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "objectives": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": [
+                              "requestId",
+                              "spaceId",
+                              "spaceName",
+                              "gaps",
+                              "objectives"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "returned": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "requestId": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "spaceId": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "spaceName": {
+                                "type": "string"
+                              },
+                              "comment": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "requestId",
+                              "spaceId",
+                              "spaceName",
+                              "comment"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "toDecide",
+                        "returned"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          },
+          "405": {
+            "$ref": "#/components/responses/E405"
+          },
+          "409": {
+            "$ref": "#/components/responses/E409"
+          },
+          "422": {
+            "$ref": "#/components/responses/E422"
+          },
+          "429": {
+            "$ref": "#/components/responses/E429"
+          },
+          "500": {
+            "$ref": "#/components/responses/E500"
+          }
+        }
+      }
+    },
+    "/governance/submit": {
+      "post": {
+        "operationId": "governance.submit",
+        "summary": "Sends a sector's open gaps and drafted objectives for approval as one request. Refused while any of them rests on an unverified quotation, or while a drafted objective's owner is unconfirmed.",
+        "tags": [
+          "governance"
+        ],
+        "x-openokr-scope": "write",
+        "x-openokr-safety": "write",
+        "responses": {
+          "200": {
+            "description": "The action's own output, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "gaps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "objectives": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "requestId",
+                        "gaps",
+                        "objectives"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          },
+          "405": {
+            "$ref": "#/components/responses/E405"
+          },
+          "409": {
+            "$ref": "#/components/responses/E409"
+          },
+          "422": {
+            "$ref": "#/components/responses/E422"
+          },
+          "429": {
+            "$ref": "#/components/responses/E429"
+          },
+          "500": {
+            "$ref": "#/components/responses/E500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "spaceId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": [
+                  "spaceId"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Validate"
+          }
+        ]
+      }
+    },
+    "/governance/decide": {
+      "post": {
+        "operationId": "governance.decide",
+        "summary": "Approves an approval request, or returns it with a comment. Approving makes its drafted objectives live. The person who sent a request cannot decide it.",
+        "tags": [
+          "governance"
+        ],
+        "x-openokr-scope": "write",
+        "x-openokr-safety": "write",
+        "responses": {
+          "200": {
+            "description": "The action's own output, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "approved",
+                            "returned"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "requestId",
+                        "status"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          },
+          "405": {
+            "$ref": "#/components/responses/E405"
+          },
+          "409": {
+            "$ref": "#/components/responses/E409"
+          },
+          "422": {
+            "$ref": "#/components/responses/E422"
+          },
+          "429": {
+            "$ref": "#/components/responses/E429"
+          },
+          "500": {
+            "$ref": "#/components/responses/E500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "requestId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "approve",
+                      "return"
+                    ]
+                  },
+                  "comment": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "requestId",
+                  "decision"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Validate"
+          }
+        ]
+      }
+    },
+    "/strategy/confirmGoalOwner": {
+      "post": {
+        "operationId": "strategy.confirmGoalOwner",
+        "summary": "Confirms the owner of an objective an agent drafted. The owner was given by rule, and the objective cannot be sent for approval until a person has confirmed it.",
+        "tags": [
+          "strategy"
+        ],
+        "x-openokr-scope": "write",
+        "x-openokr-safety": "write",
+        "responses": {
+          "200": {
+            "description": "The action's own output, under `data`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "goalId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "goalId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          },
+          "405": {
+            "$ref": "#/components/responses/E405"
+          },
+          "409": {
+            "$ref": "#/components/responses/E409"
+          },
+          "422": {
+            "$ref": "#/components/responses/E422"
+          },
+          "429": {
+            "$ref": "#/components/responses/E429"
+          },
+          "500": {
+            "$ref": "#/components/responses/E500"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "goalId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": [
+                  "goalId"
                 ]
               }
             }

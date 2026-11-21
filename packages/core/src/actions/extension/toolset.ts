@@ -8,6 +8,10 @@
 export const PLANNING_TOOLSET: ReadonlySet<string> = new Set([
   "strategy.listDomains",
   "strategy.createDomain",
+  "governance.myNext",
+  "governance.submit",
+  "governance.decide",
+  "strategy.confirmGoalOwner",
   "planning.listRuns",
   "planning.runGapAgent",
   "planning.runObjectiveAgent",

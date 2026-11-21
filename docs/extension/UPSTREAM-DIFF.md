@@ -263,3 +263,35 @@ git push origin --tags
 
 الوظيفة تقرأ مخطط التبعيات من GitHub، وكان مطفأً في النسخة المتفرعة فتفشل بـ«Forbidden». فعّله صاحب المنتج من Settings ثم Advanced Security، وحالته On. لا تعديل في المستودع.
 
+## 7. نطاق الاعتماد في مصفوفة الأدوار (2026-11-21)
+
+التصميم: القسم 13 من [`design/b0-vertical-slice.md`](design/b0-vertical-slice.md)، معتمد من صاحب المنتج. هذا أوسع تعديل على النواة حتى الآن، لأنه تغيير في الصلاحيات.
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `packages/db/src/schema/workspace-roles.ts` | `approval` آخر `ROLE_DOMAINS` | متوسط: لو أضاف الأصل نطاقاً، نبقي نطاقنا الأخير |
+| `packages/core/src/access/roles.ts` | مستوى `approval` لكل دور مدمج: المالك «كامل»، مسؤول النظام «تعديل»، العضو والمشاهد «عرض» | متوسط |
+| `packages/core/src/access/reads.ts` | سطر `approval` في `SUBJECT_RESOLVERS`، ليكون طلب الاعتماد مورداً يُحسم بالمصفوفة | منخفض إلى متوسط |
+| `apps/web/app/admin/roles/role-matrix.tsx` | مفتاح اسم النطاق. **يظهر عموداً ثامناً في شاشة الأدوار** | منخفض |
+| `packages/ui/src/i18n/messages/en.json`، `ms.json`، `ar.partial.json` | المفتاح `admin.roles.domainApproval` | منخفض |
+| `packages/core/src/actions/goal-drafts.ts` | كلمة `export` أمام `moveDraft`، وسطر استيراد، وثلاثة أسطر في `goals.publishDraft` ترفض نشر هدف صاغه وكيل | متوسط |
+| `packages/core/test/workspace-roles.test.ts` | الدور الجديد يُكتب بثمانية نطاقات لا سبعة | منخفض |
+
+ملفات جديدة في مجلدات `extension/`:
+
+| الملف | المحتوى |
+|---|---|
+| `packages/db/migrations-ext/0011_approval_requests.sql`، `packages/db/src/schema/extension/governance.ts` | `approval_requests` و`approval_items` |
+| `packages/core/src/actions/extension/governance.ts` | `governance.submit` و`governance.decide` و`governance.myNext` و`strategy.confirmGoalOwner` |
+| `packages/core/src/actions/extension/held-for-approval.ts` | الحارس الذي يستدعيه `goals.publishDraft` |
+| `packages/core/test/extension/governance.test.ts` | اختباراتها |
+
+### لماذا يُمنع نشر الأصل
+
+في الأصل، مالك الهدف المسودة ينشره بنفسه (`goals.publishDraft`). لهدف كتبه إنسان هذه قاعدة الأصل وتبقى. لهدف صاغه وكيل، النشر بهذا الطريق يجعل نصاً من الآلة حياً بكلمة مالكه وحده، متجاوزاً القيادة. فالهدف الذي يحمل ملفه تشغيل وكيل لا يصير حياً إلا باعتماد طلبه.
+
+### حدّان معروفان
+
+- مساحات العمل التي أُنشئت قبل هذا التغيير لا تملك أدوارها المدمجة صف `approval`، فمالكها لا يعتمد. شرط مانع قبل ترقية أي نسخة فيها بيانات (`EXECUTION-PLAN.md`، القسم 7ب).
+- لو أعاد الأصل ترتيب `ROLE_DOMAINS` أو غيّر `seedBuiltinRoles`، فاختبار `governance.test.ts` يفشل عند أول جلب، لأنه ينشئ دورين بنطاق `approval` ويعتمد بهما.
+

@@ -65,6 +65,8 @@ const BUILTIN_ROLES: readonly BuiltinRole[] = [
       comment: full,
       space: full,
       workspace: full,
+      // Sends a request for approval and decides one (design §13).
+      approval: full,
     },
   },
   {
@@ -81,6 +83,9 @@ const BUILTIN_ROLES: readonly BuiltinRole[] = [
       // Not `full`: the workspace context is what carries the settings and the
       // ability to hand the workspace over, and that is the owner's.
       workspace: edit,
+      // Sends and does not decide: approving a plan is leadership's
+      // decision, not an administrator's (design §13).
+      approval: edit,
     },
   },
   {
@@ -95,6 +100,7 @@ const BUILTIN_ROLES: readonly BuiltinRole[] = [
       comment,
       space: view,
       workspace: view,
+      approval: view,
     },
   },
   {
@@ -109,6 +115,7 @@ const BUILTIN_ROLES: readonly BuiltinRole[] = [
       comment: view,
       space: view,
       workspace: view,
+      approval: view,
     },
   },
 ];
