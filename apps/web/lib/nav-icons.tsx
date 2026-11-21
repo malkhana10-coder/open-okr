@@ -29,6 +29,7 @@ import {
   ScrollText,
   Search,
   Shield,
+  Signpost,
   SlidersHorizontal,
   Sparkle,
   Sparkles,
@@ -77,6 +78,8 @@ const ICONS: Readonly<Record<string, ReactNode>> = {
   "check-in": <CheckCircle2 className="size-full" />,
   sessions: <CalendarDays className="size-full" />,
   spaces: <Layers className="size-full" />,
+  // A marked route: where the plan is headed, before any of it is work.
+  planning: <Signpost className="size-full" />,
   // A card that names its holder, for Your account (plan 0.8.0 Y2). Not a
   // person-shape: `Users`, `UserPlus` and `UserCog` are taken below.
   "account-profile": <IdCard className="size-full" />,

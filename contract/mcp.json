@@ -211,7 +211,8 @@
                 "type": "string",
                 "enum": [
                   "en",
-                  "ms"
+                  "ms",
+                  "ar"
                 ]
               },
               {
@@ -5600,7 +5601,8 @@
               "task",
               "comment",
               "space",
-              "workspace"
+              "workspace",
+              "approval"
             ]
           },
           "level": {
@@ -5672,7 +5674,8 @@
                     "task",
                     "comment",
                     "space",
-                    "workspace"
+                    "workspace",
+                    "approval"
                   ]
                 },
                 "level": {
@@ -15084,6 +15087,895 @@
       },
       "example": {
         "cycleId": "…"
+      }
+    },
+    {
+      "name": "strategy.listDomains",
+      "description": "The workspace's strategic domains, the areas gaps and sector objectives are filed under.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {}
+    },
+    {
+      "name": "strategy.createDomain",
+      "description": "Adds a strategic domain, an area of the strategy that gaps and sector objectives are filed under.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "A longer explanation, in plain words."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "name": "…"
+      }
+    },
+    {
+      "name": "governance.myNext",
+      "description": "What waits for you in approvals: requests you may decide, and requests of yours that came back.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {}
+    },
+    {
+      "name": "governance.submit",
+      "description": "Sends a sector's open gaps and drafted objectives for approval as one request. Refused while any of them rests on an unverified quotation, or while a drafted objective's owner is unconfirmed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "governance.decide",
+      "description": "Approves an approval request, or returns it with a comment. Approving makes its drafted objectives live. The person who sent a request cannot decide it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "return"
+            ]
+          },
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "requestId",
+          "decision"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "requestId": "00000000-0000-4000-8000-000000000000",
+        "decision": "approve"
+      }
+    },
+    {
+      "name": "strategy.confirmGoalOwner",
+      "description": "Confirms the owner of an objective an agent drafted. The owner was given by rule, and the objective cannot be sent for approval until a person has confirmed it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "goalId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The goal's id or short id, from goals.list, goals.due or goals.tree."
+          }
+        },
+        "required": [
+          "goalId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "goalId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "planning.listRuns",
+      "description": "The planning agents' runs on a sector, newest first, each with what the agent read and what was left out.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "planning.listObjectiveDrafts",
+      "description": "The objectives an agent drafted for a sector and its agencies, each with its proposed target, the gaps it answers, its quotations, and whether its owner is confirmed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "planning.runGapAgent",
+      "description": "Runs the gap agent on a sector's source documents. What it drafts is stored as drafts for a person to review, each with its quotations checked against their pages.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "planning.runObjectiveAgent",
+      "description": "Runs the sector-objectives agent on a sector's gaps. What it drafts is stored as objectives held back for review, each tied to the gaps it answers and with its quotations checked.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "cycleId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The cycle's id or short id, from cycles.current or cycles.list."
+          }
+        },
+        "required": [
+          "spaceId",
+          "cycleId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000",
+        "cycleId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "strategy.listGaps",
+      "description": "A sector's strategic gaps, with where each one stands.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "strategy.createGap",
+      "description": "Writes a strategic gap for a sector: something its strategy asks for that the sector is not yet doing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "A short title, as a person would read it in a list."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "description": "A longer explanation, in plain words."
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "domainId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "spaceId",
+          "title"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000",
+        "title": "…"
+      }
+    },
+    {
+      "name": "strategy.updateGap",
+      "description": "Changes a strategic gap that has not been sent for approval, or that came back.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "A short title, as a person would read it in a list."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A longer explanation, in plain words."
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "domainId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "id": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "strategy.dismissGap",
+      "description": "Sets a strategic gap aside. It stays on record, so the same gap is not drafted again.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "id": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "strategy.listSectorPlan",
+      "description": "A sector's plan in one list: the objectives of the sector and its agencies with how each is classed, and the operational indicators they follow.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "strategy.setGoalProfile",
+      "description": "Says what an objective is in the plan: sector or operational, a priority or not, new or carried over, and where it comes from.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "goalId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The goal's id or short id, from goals.list, goals.due or goals.tree."
+          },
+          "objectiveType": {
+            "type": "string",
+            "enum": [
+              "sectoral",
+              "operational"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "priority",
+              "not_priority"
+            ]
+          },
+          "planStatus": {
+            "type": "string",
+            "enum": [
+              "new",
+              "carried"
+            ]
+          },
+          "sourceKind": {
+            "type": "string",
+            "enum": [
+              "sub_strategy",
+              "proposed",
+              "leadership_directive"
+            ]
+          },
+          "baselineUndetermined": {
+            "type": "boolean"
+          },
+          "sourceDocumentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "goalId",
+          "objectiveType",
+          "priority",
+          "planStatus",
+          "sourceKind",
+          "baselineUndetermined"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "goalId": "00000000-0000-4000-8000-000000000000",
+        "objectiveType": "sectoral",
+        "priority": "priority",
+        "planStatus": "new",
+        "sourceKind": "sub_strategy",
+        "baselineUndetermined": false
+      }
+    },
+    {
+      "name": "strategy.listOrgUnits",
+      "description": "The workspace's sectors, each with the agencies under it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {}
+    },
+    {
+      "name": "strategy.setSector",
+      "description": "Marks a space as a sector, the upper of the two planning levels, and names who answers for it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "leadMemberId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "strategy.setAgency",
+      "description": "Places a space under a sector as one of its agencies, or moves it to another sector.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "sectorSpaceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "spaceId",
+          "sectorSpaceId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000",
+        "sectorSpaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "knowledge.registerDocument",
+      "description": "Files an uploaded PDF under a sector as a source document, and asks for it to be read page by page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          },
+          "blobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "A short title, as a person would read it in a list."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "strategy",
+              "sub_strategy",
+              "previous_plan",
+              "report"
+            ],
+            "description": "The kind, from the listed values."
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 2200
+          }
+        },
+        "required": [
+          "spaceId",
+          "blobId",
+          "title",
+          "kind",
+          "year"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000",
+        "blobId": "00000000-0000-4000-8000-000000000000",
+        "title": "…",
+        "kind": "strategy",
+        "year": 0
+      }
+    },
+    {
+      "name": "knowledge.listDocuments",
+      "description": "A sector's source documents, with how far reading each one has got.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "knowledge.readPage",
+      "description": "The text of one page of a source document.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "documentId",
+          "page"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "documentId": "00000000-0000-4000-8000-000000000000",
+        "page": 0
+      }
+    },
+    {
+      "name": "knowledge.openDocumentFile",
+      "description": "Where a source document's file is kept, its name and type, for somebody who may read the document.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "documentId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "documentId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "knowledge.listEvidence",
+      "description": "The quotations a gap rests on, each with its document, its page and whether it was found there.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subjectType": {
+            "type": "string",
+            "enum": [
+              "gap"
+            ],
+            "description": "What the item is attached to."
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the item it is attached to, matching subjectType."
+          }
+        },
+        "required": [
+          "subjectType",
+          "subjectId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "subjectType": "gap",
+        "subjectId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "knowledge.listSectorEvidence",
+      "description": "The quotations every gap of a sector rests on, each naming its gap, its document, its page and whether it was found there.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "knowledge.addEvidence",
+      "description": "Attaches a quotation from a page of a source document to a gap, and records whether the quotation is really on that page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subjectType": {
+            "type": "string",
+            "enum": [
+              "gap"
+            ],
+            "description": "What the item is attached to."
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the item it is attached to, matching subjectType."
+          },
+          "documentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "subjectType",
+          "subjectId",
+          "documentId",
+          "page",
+          "quote"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "subjectType": "gap",
+        "subjectId": "00000000-0000-4000-8000-000000000000",
+        "documentId": "00000000-0000-4000-8000-000000000000",
+        "page": 0,
+        "quote": "…"
+      }
+    },
+    {
+      "name": "knowledge.removeEvidence",
+      "description": "Removes a quotation from what it was attached to.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "scope": "destructive",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false
+      },
+      "example": {
+        "id": "00000000-0000-4000-8000-000000000000"
       }
     },
     {

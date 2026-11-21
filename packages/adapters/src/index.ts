@@ -106,9 +106,6 @@ export {
   NodeDnsResolver,
   type NodeDnsResolverOptions,
 } from "./drivers/dns/node.ts";
-// The two file drivers the upload path and the relay construct (completeness
-// review M-24). Exported by name, like the storage drivers below: the host
-// builds one, and everything else sees the port.
 export { SharpImageProcessor } from "./drivers/image/sharp.ts";
 // Exported for the scheduler host (P6-G01a), which needs a queue on its own
 // rather than the whole adapter set `createAdapters` builds. Same shape as the
@@ -143,6 +140,16 @@ export {
   S3Storage,
   type S3StorageOptions,
 } from "./drivers/storage/s3.ts";
+export type {
+  ExtractedPage,
+  TextExtractionResult,
+  TextExtractor,
+} from "./extension/extraction-port.ts";
+// The two file drivers the upload path and the relay construct (completeness
+// review M-24). Exported by name, like the storage drivers below: the host
+// builds one, and everything else sees the port.
+// The planning extension's document reader (docs/extension/UPSTREAM-DIFF.md).
+export { PdfjsTextExtractor } from "./extension/pdfjs-extractor.ts";
 // The egress guard itself stays private: `createAIProvider` is the only way
 // to be handed one, which is the whole point of it (M-10). What leaves is the
 // vocabulary a host needs to pass a policy in and read an event out.

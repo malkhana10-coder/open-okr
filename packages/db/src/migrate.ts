@@ -47,7 +47,17 @@ export interface RunMigrationsOptions {
   readonly dataChanges?: readonly DataChangeScript[];
   /** Where the runner says what it ran first, and how long that took. */
   readonly log?: (line: string) => void;
+  /**
+   * The table this stream's history is recorded in. `_migrations` when
+   * omitted. A second stream with its own ledger keeps its own forward-only
+   * order, so its file names never have to sort against the shipped ones
+   * (docs/extension/design/b0-vertical-slice.md §6).
+   */
+  readonly ledger?: string;
 }
+
+/** A ledger is named in SQL text, so it is held to a plain identifier. */
+const LEDGER_NAME = /^_[a-z][a-z_]{0,40}$/;
 
 export class MigrationError extends Error {
   override readonly name = "MigrationError";
@@ -298,9 +308,15 @@ export async function runMigrations(
     ]),
   );
   const log = options.log ?? (() => {});
+  const ledger = options.ledger ?? "_migrations";
+  if (!LEDGER_NAME.test(ledger)) {
+    throw new MigrationError(
+      `Migration ledger "${ledger}" is not a plain identifier.`,
+    );
+  }
 
   await client.query(`
-    create table if not exists _migrations (
+    create table if not exists ${ledger} (
       name text primary key,
       checksum text not null,
       applied_at timestamptz not null default now()
@@ -310,7 +326,7 @@ export async function runMigrations(
   await client.query("select pg_advisory_lock($1)", [MIGRATION_LOCK_KEY]);
   try {
     const { rows } = await client.query(
-      "select name, checksum from _migrations order by name",
+      `select name, checksum from ${ledger} order by name`,
     );
     const applied = new Map(
       rows.map((row) => [row.name as string, row.checksum as string]),
@@ -351,10 +367,10 @@ export async function runMigrations(
     // number of migrations a project has, and this happens once per database.
     for (const name of stale) {
       const file = files.find((candidate) => candidate.name === name);
-      await client.query(
-        "update _migrations set checksum = $2 where name = $1",
-        [name, (file as MigrationFile).checksum],
-      );
+      await client.query(`update ${ledger} set checksum = $2 where name = $1`, [
+        name,
+        (file as MigrationFile).checksum,
+      ]);
     }
 
     const lastApplied = [...applied.keys()].sort().at(-1);
@@ -389,7 +405,7 @@ export async function runMigrations(
       try {
         await client.query(file.content);
         await client.query(
-          "insert into _migrations (name, checksum) values ($1, $2)",
+          `insert into ${ledger} (name, checksum) values ($1, $2)`,
           [file.name, file.checksum],
         );
         await client.query("commit");

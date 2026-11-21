@@ -50,6 +50,7 @@ const DENSITIES = [
 const LANGUAGES = [
   { value: "en", label: "appearance.english" },
   { value: "ms", label: "appearance.bahasaMelayu" },
+  { value: "ar", label: "appearance.arabic" },
 ] as const;
 
 export function AppearanceControl({
@@ -70,14 +71,14 @@ export function AppearanceControl({
    * (P6-G22a). Passed in from the server, because unlike the theme there is
    * no provider holding it: the catalogue is chosen while the page renders.
    */
-  readonly language?: "en" | "ms" | null;
+  readonly language?: "en" | "ms" | "ar" | null;
 }) {
   const { t } = useTranslations();
   const { theme, density, width, setTheme, setDensity, setWidth } = useTheme();
   const [problem, setProblem] = useState<string | null>(null);
-  const [pendingLanguage, setPendingLanguage] = useState<"en" | "ms" | null>(
-    language,
-  );
+  const [pendingLanguage, setPendingLanguage] = useState<
+    "en" | "ms" | "ar" | null
+  >(language);
 
   const grid = layout === "grid";
   const fieldset = grid

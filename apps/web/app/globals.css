@@ -6,6 +6,10 @@
 @import "../../../packages/ui/src/styles/prosemirror.css" layer(base);
 /* Lists, spacing, code and links in rich text, written and read. */
 @import "../../../packages/ui/src/styles/rich-text.css" layer(components);
+/* The planning extension: mixed Arabic and Latin text in a right-to-left page
+ * (docs/extension/UPSTREAM-DIFF.md). */
+@import "../../../packages/ui/src/styles/extension/bidi-isolation.css"
+  layer(base);
 /* The agent faces' moods, which the CSP keeps out of an inline <style>. */
 @import "../../../packages/ui/src/styles/agent-face.css" layer(components);
 

@@ -194,9 +194,11 @@ export function GeneralSettingsForm({
           >
             <option value="en">{t("appearance.english")}</option>
             <option value="ms">{t("appearance.bahasaMelayu")}</option>
+            <option value="ar">{t("appearance.arabic")}</option>
             {settings.language &&
             settings.language !== "en" &&
-            settings.language !== "ms" ? (
+            settings.language !== "ms" &&
+            settings.language !== "ar" ? (
               <option value={String(settings.language)}>
                 {String(settings.language)}
               </option>

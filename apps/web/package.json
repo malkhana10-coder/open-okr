@@ -30,6 +30,8 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@openokr/knowledge": "workspace:*",
+    "@openokr/planning-agents": "workspace:*",
     "@opentelemetry/api": "^1.10.0",
     "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",

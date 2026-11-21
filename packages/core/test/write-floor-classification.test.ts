@@ -53,6 +53,26 @@ const SELF_SERVICE = new Set([
  * document or the author's own row, where the role already applies.
  */
 const OWN_CHECK = new Set([
+  // Measured on the sector the document is filed under, at `edit`
+  // (docs/extension/design/b0-vertical-slice.md §5).
+  "knowledge.registerDocument",
+  // A gap is the sector's, and each of these is measured on the sector at
+  // `edit` (docs/extension/design/b0-vertical-slice.md §5).
+  "knowledge.addEvidence",
+  "knowledge.removeEvidence",
+  // Measured on the sector at `edit` before the provider is asked.
+  // Measured on the sector and on the request's own `approval` context
+  // (docs/extension/design/b0-vertical-slice.md §13).
+  "governance.submit",
+  "governance.decide",
+  "strategy.confirmGoalOwner",
+  "planning.runGapAgent",
+  "planning.runObjectiveAgent",
+  "strategy.createGap",
+  // Measured on the goal at `edit`, like any change to it (§12.2).
+  "strategy.setGoalProfile",
+  "strategy.updateGap",
+  "strategy.dismissGap",
   "blockers.raise",
   "alignment.applyFinding",
   "alignment.dismissFinding",
@@ -238,6 +258,12 @@ describe("writes below full", () => {
       "kpis.setFormula": "kpi",
       "kpis.update": "kpi",
       "reactions.add": "comment",
+      // Strategic domains are how a workspace is set up, so the write is the
+      // Owner's and an Admin's (docs/extension/design/b0-vertical-slice.md §5).
+      "strategy.createDomain": "workspace",
+      // The sector and agency structure is workspace setup too (§12.1).
+      "strategy.setAgency": "workspace",
+      "strategy.setSector": "workspace",
       "workflow.publish": "workspace",
     });
   });

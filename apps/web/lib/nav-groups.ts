@@ -107,6 +107,7 @@ const ITEM_KEYS: Readonly<Record<string, string>> = {
   "check-in": "nav.item.check-in",
   sessions: "nav.item.sessions",
   spaces: "nav.item.spaces",
+  planning: "nav.item.planning",
   cycle: "nav.item.cycle",
   "account-profile": "nav.item.account-profile",
   "account-channels": "nav.item.account-channels",

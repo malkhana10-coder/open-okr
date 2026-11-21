@@ -8,6 +8,8 @@
  * need them and both are permission-filtered already.
  */
 
+import { PLANNING_TOOLSET } from "../../actions/extension/toolset.ts";
+
 export const TOOLSET_NAMES = [
   "core",
   "work",
@@ -15,6 +17,7 @@ export const TOOLSET_NAMES = [
   "room",
   "admin",
   "integrations",
+  "planning",
 ] as const;
 export type ToolsetName = (typeof TOOLSET_NAMES)[number];
 
@@ -439,4 +442,6 @@ export const TOOLSETS: Readonly<Record<ToolsetName, ReadonlySet<string>>> = {
     "imports.previewTable",
     "imports.runTable",
   ]),
+  // The planning extension's tools, listed in its own folder.
+  planning: PLANNING_TOOLSET,
 };

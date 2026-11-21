@@ -203,7 +203,7 @@ describe("choosing toolsets", () => {
     const choice = parseToolsets("core,nonsense");
     expect(choice.kind).toBe("unknown");
     expect(choice.kind === "unknown" && choice.message).toBe(
-      "There is no toolset called nonsense. Choose from core, work, facilitation, room, admin, integrations, all.",
+      "There is no toolset called nonsense. Choose from core, work, facilitation, room, admin, integrations, planning, all.",
     );
   });
 

@@ -65,3 +65,11 @@ Group headings go: five rows need none. The sidebar link carries a `title`, so i
 - "My week", the team digest and the champion cockpit: backlog 12, the next change.
 - Renaming the default term for a space to "team": a terminology default, left to each workspace.
 - Merging initiatives and tasks into one object.
+
+## 6. The planning extension's row
+
+The fork that adds annual strategic planning draws one more sidebar row,
+Planning, between Spaces and Cycle. Its five screens (documents, gaps,
+objectives, approvals, alignment) are reached inside it, so the sidebar grows
+by one row and not by five. The five areas and their contents are unchanged.
+Recorded in `docs/extension/UPSTREAM-DIFF.md` §11.

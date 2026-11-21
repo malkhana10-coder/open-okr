@@ -5273,7 +5273,8 @@
             "task",
             "comment",
             "space",
-            "workspace"
+            "workspace",
+            "approval"
           ]
         },
         {
@@ -12434,6 +12435,657 @@
         {
           "name": "cycle-id",
           "field": "cycleId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy listDomains",
+      "action": "strategy.listDomains",
+      "method": "GET",
+      "path": "/strategy/listDomains",
+      "scope": "read",
+      "summary": "The workspace's strategic domains, the areas gaps and sector objectives are filed under.",
+      "flags": [],
+      "pages": false
+    },
+    {
+      "name": "strategy createDomain",
+      "action": "strategy.createDomain",
+      "method": "POST",
+      "path": "/strategy/createDomain",
+      "scope": "write",
+      "summary": "Adds a strategic domain, an area of the strategy that gaps and sector objectives are filed under.",
+      "flags": [
+        {
+          "name": "name",
+          "field": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "description",
+          "field": "description",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "governance myNext",
+      "action": "governance.myNext",
+      "method": "GET",
+      "path": "/governance/myNext",
+      "scope": "read",
+      "summary": "What waits for you in approvals: requests you may decide, and requests of yours that came back.",
+      "flags": [],
+      "pages": false
+    },
+    {
+      "name": "governance submit",
+      "action": "governance.submit",
+      "method": "POST",
+      "path": "/governance/submit",
+      "scope": "write",
+      "summary": "Sends a sector's open gaps and drafted objectives for approval as one request. Refused while any of them rests on an unverified quotation, or while a drafted objective's owner is unconfirmed.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "governance decide",
+      "action": "governance.decide",
+      "method": "POST",
+      "path": "/governance/decide",
+      "scope": "write",
+      "summary": "Approves an approval request, or returns it with a comment. Approving makes its drafted objectives live. The person who sent a request cannot decide it.",
+      "flags": [
+        {
+          "name": "request-id",
+          "field": "requestId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "decision",
+          "field": "decision",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "approve",
+            "return"
+          ]
+        },
+        {
+          "name": "comment",
+          "field": "comment",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy confirmGoalOwner",
+      "action": "strategy.confirmGoalOwner",
+      "method": "POST",
+      "path": "/strategy/confirmGoalOwner",
+      "scope": "write",
+      "summary": "Confirms the owner of an objective an agent drafted. The owner was given by rule, and the objective cannot be sent for approval until a person has confirmed it.",
+      "flags": [
+        {
+          "name": "goal-id",
+          "field": "goalId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "planning listRuns",
+      "action": "planning.listRuns",
+      "method": "GET",
+      "path": "/planning/listRuns",
+      "scope": "read",
+      "summary": "The planning agents' runs on a sector, newest first, each with what the agent read and what was left out.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "planning listObjectiveDrafts",
+      "action": "planning.listObjectiveDrafts",
+      "method": "GET",
+      "path": "/planning/listObjectiveDrafts",
+      "scope": "read",
+      "summary": "The objectives an agent drafted for a sector and its agencies, each with its proposed target, the gaps it answers, its quotations, and whether its owner is confirmed.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "planning runGapAgent",
+      "action": "planning.runGapAgent",
+      "method": "POST",
+      "path": "/planning/runGapAgent",
+      "scope": "write",
+      "summary": "Runs the gap agent on a sector's source documents. What it drafts is stored as drafts for a person to review, each with its quotations checked against their pages.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "planning runObjectiveAgent",
+      "action": "planning.runObjectiveAgent",
+      "method": "POST",
+      "path": "/planning/runObjectiveAgent",
+      "scope": "write",
+      "summary": "Runs the sector-objectives agent on a sector's gaps. What it drafts is stored as objectives held back for review, each tied to the gaps it answers and with its quotations checked.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "cycle-id",
+          "field": "cycleId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy listGaps",
+      "action": "strategy.listGaps",
+      "method": "GET",
+      "path": "/strategy/listGaps",
+      "scope": "read",
+      "summary": "A sector's strategic gaps, with where each one stands.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy createGap",
+      "action": "strategy.createGap",
+      "method": "POST",
+      "path": "/strategy/createGap",
+      "scope": "write",
+      "summary": "Writes a strategic gap for a sector: something its strategy asks for that the sector is not yet doing.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "field": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "description",
+          "field": "description",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rationale",
+          "field": "rationale",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "domain-id",
+          "field": "domainId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy updateGap",
+      "action": "strategy.updateGap",
+      "method": "POST",
+      "path": "/strategy/updateGap",
+      "scope": "write",
+      "summary": "Changes a strategic gap that has not been sent for approval, or that came back.",
+      "flags": [
+        {
+          "name": "id",
+          "field": "id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "field": "title",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "description",
+          "field": "description",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rationale",
+          "field": "rationale",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "domain-id",
+          "field": "domainId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy dismissGap",
+      "action": "strategy.dismissGap",
+      "method": "POST",
+      "path": "/strategy/dismissGap",
+      "scope": "write",
+      "summary": "Sets a strategic gap aside. It stays on record, so the same gap is not drafted again.",
+      "flags": [
+        {
+          "name": "id",
+          "field": "id",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy listSectorPlan",
+      "action": "strategy.listSectorPlan",
+      "method": "GET",
+      "path": "/strategy/listSectorPlan",
+      "scope": "read",
+      "summary": "A sector's plan in one list: the objectives of the sector and its agencies with how each is classed, and the operational indicators they follow.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy setGoalProfile",
+      "action": "strategy.setGoalProfile",
+      "method": "POST",
+      "path": "/strategy/setGoalProfile",
+      "scope": "write",
+      "summary": "Says what an objective is in the plan: sector or operational, a priority or not, new or carried over, and where it comes from.",
+      "flags": [
+        {
+          "name": "goal-id",
+          "field": "goalId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "objective-type",
+          "field": "objectiveType",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "sectoral",
+            "operational"
+          ]
+        },
+        {
+          "name": "priority",
+          "field": "priority",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "priority",
+            "not_priority"
+          ]
+        },
+        {
+          "name": "plan-status",
+          "field": "planStatus",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "new",
+            "carried"
+          ]
+        },
+        {
+          "name": "source-kind",
+          "field": "sourceKind",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "sub_strategy",
+            "proposed",
+            "leadership_directive"
+          ]
+        },
+        {
+          "name": "baseline-undetermined",
+          "field": "baselineUndetermined",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "source-document-id",
+          "field": "sourceDocumentId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy listOrgUnits",
+      "action": "strategy.listOrgUnits",
+      "method": "GET",
+      "path": "/strategy/listOrgUnits",
+      "scope": "read",
+      "summary": "The workspace's sectors, each with the agencies under it.",
+      "flags": [],
+      "pages": false
+    },
+    {
+      "name": "strategy setSector",
+      "action": "strategy.setSector",
+      "method": "POST",
+      "path": "/strategy/setSector",
+      "scope": "write",
+      "summary": "Marks a space as a sector, the upper of the two planning levels, and names who answers for it.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "lead-member-id",
+          "field": "leadMemberId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "strategy setAgency",
+      "action": "strategy.setAgency",
+      "method": "POST",
+      "path": "/strategy/setAgency",
+      "scope": "write",
+      "summary": "Places a space under a sector as one of its agencies, or moves it to another sector.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sector-space-id",
+          "field": "sectorSpaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge registerDocument",
+      "action": "knowledge.registerDocument",
+      "method": "POST",
+      "path": "/knowledge/registerDocument",
+      "scope": "write",
+      "summary": "Files an uploaded PDF under a sector as a source document, and asks for it to be read page by page.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "blob-id",
+          "field": "blobId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "field": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "field": "kind",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "strategy",
+            "sub_strategy",
+            "previous_plan",
+            "report"
+          ]
+        },
+        {
+          "name": "year",
+          "field": "year",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge listDocuments",
+      "action": "knowledge.listDocuments",
+      "method": "GET",
+      "path": "/knowledge/listDocuments",
+      "scope": "read",
+      "summary": "A sector's source documents, with how far reading each one has got.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge readPage",
+      "action": "knowledge.readPage",
+      "method": "GET",
+      "path": "/knowledge/readPage",
+      "scope": "read",
+      "summary": "The text of one page of a source document.",
+      "flags": [
+        {
+          "name": "document-id",
+          "field": "documentId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "page",
+          "field": "page",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge openDocumentFile",
+      "action": "knowledge.openDocumentFile",
+      "method": "GET",
+      "path": "/knowledge/openDocumentFile",
+      "scope": "read",
+      "summary": "Where a source document's file is kept, its name and type, for somebody who may read the document.",
+      "flags": [
+        {
+          "name": "document-id",
+          "field": "documentId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge listEvidence",
+      "action": "knowledge.listEvidence",
+      "method": "GET",
+      "path": "/knowledge/listEvidence",
+      "scope": "read",
+      "summary": "The quotations a gap rests on, each with its document, its page and whether it was found there.",
+      "flags": [
+        {
+          "name": "subject-type",
+          "field": "subjectType",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "gap"
+          ]
+        },
+        {
+          "name": "subject-id",
+          "field": "subjectId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge listSectorEvidence",
+      "action": "knowledge.listSectorEvidence",
+      "method": "GET",
+      "path": "/knowledge/listSectorEvidence",
+      "scope": "read",
+      "summary": "The quotations every gap of a sector rests on, each naming its gap, its document, its page and whether it was found there.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge addEvidence",
+      "action": "knowledge.addEvidence",
+      "method": "POST",
+      "path": "/knowledge/addEvidence",
+      "scope": "write",
+      "summary": "Attaches a quotation from a page of a source document to a gap, and records whether the quotation is really on that page.",
+      "flags": [
+        {
+          "name": "subject-type",
+          "field": "subjectType",
+          "type": "string",
+          "required": true,
+          "enum": [
+            "gap"
+          ]
+        },
+        {
+          "name": "subject-id",
+          "field": "subjectId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "document-id",
+          "field": "documentId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "page",
+          "field": "page",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "quote",
+          "field": "quote",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "knowledge removeEvidence",
+      "action": "knowledge.removeEvidence",
+      "method": "POST",
+      "path": "/knowledge/removeEvidence",
+      "scope": "destructive",
+      "summary": "Removes a quotation from what it was attached to.",
+      "flags": [
+        {
+          "name": "id",
+          "field": "id",
           "type": "string",
           "required": true
         }

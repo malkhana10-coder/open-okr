@@ -50,6 +50,10 @@ export const ROLE_DOMAINS = [
   "comment",
   "space",
   "workspace",
+  // The planning extension's approval requests
+  // (docs/extension/design/b0-vertical-slice.md §13). Last, so the matrix an
+  // administrator already knows keeps its order.
+  "approval",
 ] as const;
 export type RoleDomain = (typeof ROLE_DOMAINS)[number];
 

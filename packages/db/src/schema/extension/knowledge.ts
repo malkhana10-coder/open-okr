@@ -1,0 +1,130 @@
+/**
+ * The planning extension's knowledge tables
+ * (docs/extension/design/b0-vertical-slice.md §4).
+ *
+ * The SQL is in `packages/db/migrations-ext`.
+ */
+import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { newId } from "../../id.ts";
+import { blobs } from "../blobs.ts";
+import { spaces } from "../spaces.ts";
+import { workspaceMembers, workspaces } from "../workspaces.ts";
+
+export const SOURCE_DOCUMENT_KINDS = [
+  "strategy",
+  "sub_strategy",
+  "previous_plan",
+  "report",
+] as const;
+
+export const SOURCE_DOCUMENT_STATUSES = ["pending", "ready", "failed"] as const;
+
+/** Why a document could not be read, in a word a screen can translate. */
+export const SOURCE_DOCUMENT_FAILURES = [
+  "no_text",
+  "unreadable",
+  "missing",
+] as const;
+
+/** An uploaded file a sector plans from. The file itself is a blob. */
+export const sourceDocuments = pgTable("source_documents", {
+  id: uuid("id").primaryKey().$defaultFn(newId),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  spaceId: uuid("space_id")
+    .notNull()
+    .references(() => spaces.id, { onDelete: "cascade" }),
+  blobId: uuid("blob_id")
+    .notNull()
+    .references(() => blobs.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  kind: text("kind", { enum: SOURCE_DOCUMENT_KINDS }).notNull(),
+  year: integer("year").notNull(),
+  processingStatus: text("processing_status", {
+    enum: SOURCE_DOCUMENT_STATUSES,
+  })
+    .notNull()
+    .default("pending"),
+  failureReason: text("failure_reason", { enum: SOURCE_DOCUMENT_FAILURES }),
+  pageCount: integer("page_count"),
+  /** Counted when the file was read. Null until then, and on a failure. */
+  arabicWords: integer("arabic_words"),
+  suspectWords: integer("suspect_words"),
+  uploadedBy: uuid("uploaded_by").references(() => workspaceMembers.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+});
+
+/** One page of a source document, as text. Pages are counted from 1. */
+export const sourceDocumentPages = pgTable("source_document_pages", {
+  id: uuid("id").primaryKey().$defaultFn(newId),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  documentId: uuid("document_id")
+    .notNull()
+    .references(() => sourceDocuments.id, { onDelete: "cascade" }),
+  page: integer("page").notNull(),
+  text: text("text").notNull(),
+  textNormalised: text("text_normalised").notNull(),
+  /** Null only on a page read before the counts existed. */
+  arabicWords: integer("arabic_words"),
+  suspectWords: integer("suspect_words"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+});
+
+const EVIDENCE_SUBJECTS = ["gap", "goal"] as const;
+export const EVIDENCE_VERIFICATIONS = ["verified", "unverified"] as const;
+export const EVIDENCE_UNVERIFIED_REASONS = [
+  "too_short",
+  "not_on_page",
+] as const;
+
+/**
+ * A quotation, its document and its page (migration 0007 in the extension
+ * stream). `verification` is what the check found when the row was written.
+ */
+export const evidence = pgTable("evidence", {
+  id: uuid("id").primaryKey().$defaultFn(newId),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  /** What the evidence supports. No foreign key: a gap or a goal. */
+  subjectType: text("subject_type", { enum: EVIDENCE_SUBJECTS }).notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  documentId: uuid("document_id")
+    .notNull()
+    .references(() => sourceDocuments.id, { onDelete: "cascade" }),
+  page: integer("page").notNull(),
+  quote: text("quote").notNull(),
+  verification: text("verification", {
+    enum: EVIDENCE_VERIFICATIONS,
+  }).notNull(),
+  unverifiedReason: text("unverified_reason", {
+    enum: EVIDENCE_UNVERIFIED_REASONS,
+  }),
+  createdBy: uuid("created_by").references(() => workspaceMembers.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+});

@@ -50,6 +50,38 @@ type Reason =
   | { readonly apiOnly: true; readonly why: string };
 
 const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
+  // The planning extension's first actions. The sector screens that will call
+  // them are later changes of the same phase
+  // (docs/extension/design/b0-vertical-slice.md §8), and the staleness test
+  // below removes these two lines the moment one does.
+  "strategy.listSectorPlan": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; no screen shows a sector's whole plan, hand-written objectives included, yet",
+  },
+  "strategy.setGoalProfile": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; no screen shows a sector's whole plan, hand-written objectives included, yet",
+  },
+  "knowledge.listEvidence": {
+    answeredBy: "knowledge.listSectorEvidence",
+    why: "one gap's quotations. The gaps screen reads every gap's in one call, which is the same rows; this one stays for an agent or a script that holds a single gap",
+  },
+  "strategy.updateGap": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
+  },
+  "strategy.setSector": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the setup screen that arranges sectors is not built yet",
+  },
+  "strategy.setAgency": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the setup screen that arranges sectors is not built yet",
+  },
+  "strategy.createDomain": {
+    apiOnly: true,
+    why: "offered on REST, the command line and the agent endpoint; the setup screen that adds a domain is not built yet",
+  },
   "kpis.deleteRecord": {
     apiOnly: true,
     why: "used only by the copilot's undo, which calls it through the server; no screen removes a KPI value",

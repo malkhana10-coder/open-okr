@@ -15,6 +15,7 @@
  * no reminder and no staleness sweep reaches it, and its rhythm starts from
  * the moment it goes live, as a reopened objective's does.
  */
+
 import { activeOnly, goals, workspaceMembers } from "@openokr/db";
 import { draftOnPublish } from "@openokr/method";
 import { eq } from "drizzle-orm";
@@ -29,6 +30,7 @@ import { OperationError, type OperationTx } from "../operations/operation.ts";
 import { requirePolicy } from "../practice/policy.ts";
 import { practiceFromRow } from "../practice/settings.ts";
 import { defineWriteAction } from "./define.ts";
+import { refuseIfHeldForApproval } from "./extension/held-for-approval.ts";
 import { treeGoal, treeNode } from "./goal-tree.ts";
 
 /** Resolves the acting member, refusing the way every other read does. */
@@ -104,7 +106,7 @@ async function waitingGoal(
 }
 
 /** Moves the draft on, and starts its rhythm when it goes live. */
-async function moveDraft(
+export async function moveDraft(
   tx: OperationTx,
   workspaceId: string,
   goalId: string,
@@ -150,6 +152,12 @@ export const publishDraft = defineWriteAction({
         context.actor.userId,
       );
       const goal = await waitingGoal(tx, workspaceId, memberId, input.id);
+      // The planning extension: an objective an agent drafted goes live
+      // through its approval request and no other way
+      // (docs/extension/UPSTREAM-DIFF.md).
+      if (goal.draftState === "draft") {
+        await refuseIfHeldForApproval(tx, workspaceId, input.id);
+      }
       if (goal.draftState !== "draft") {
         throw new OperationError(
           "conflict",

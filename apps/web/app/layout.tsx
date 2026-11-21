@@ -1,6 +1,7 @@
 import { loadEnv } from "@openokr/config";
 import {
   CATALOGUES,
+  directionOf,
   QueryProvider,
   ThemeProvider,
   ToastProvider,
@@ -81,6 +82,44 @@ const geistSans = localFont({
   ],
 });
 
+/**
+ * IBM Plex Sans Arabic, committed beside Geist, which has no Arabic glyphs
+ * (docs/extension/design/b0-vertical-slice.md §7). It leads the stack in
+ * tokens.css and is limited to the Arabic blocks, so Arabic text is Plex and
+ * everything else stays Geist.
+ *
+ * Not preloaded. A browser fetches a face when a glyph needs it, so an English
+ * page downloads none of these four files, and preloading would make every
+ * page pay for a language most of them are not in.
+ */
+const plexArabic = localFont({
+  src: [
+    { path: "./fonts/IBMPlexSansArabic-Regular.woff2", weight: "400" },
+    { path: "./fonts/IBMPlexSansArabic-Medium.woff2", weight: "500" },
+    { path: "./fonts/IBMPlexSansArabic-SemiBold.woff2", weight: "600" },
+    { path: "./fonts/IBMPlexSansArabic-Bold.woff2", weight: "700" },
+  ],
+  style: "normal",
+  display: "swap",
+  preload: false,
+  // First in the stack, and asked for Arabic only. Next expands Geist's
+  // variable into the face and its fallbacks, which end in Arial, and Arial
+  // has Arabic glyphs on Windows and macOS: listed after Geist, this face was
+  // never reached there. With the range it can lead the stack without
+  // drawing a single Latin letter.
+  declarations: [
+    {
+      prop: "unicode-range",
+      value:
+        "U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC",
+    },
+  ],
+  // No size-adjusted fallback face, which would be a second Latin-capable
+  // family ahead of Geist.
+  adjustFontFallback: false,
+  variable: "--font-arabic-face",
+});
+
 export default async function RootLayout({
   children,
 }: {
@@ -113,7 +152,8 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={geistSans.variable}
+      dir={directionOf(locale)}
+      className={`${geistSans.variable} ${plexArabic.variable}`}
       data-theme="light"
       data-density="comfortable"
       data-width="compact"

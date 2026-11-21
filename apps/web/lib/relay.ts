@@ -63,6 +63,7 @@ import { relayMode } from "./background-work";
 import { getBilling } from "./billing";
 import { drafterFor } from "./drafter";
 import { embedFor } from "./embedder";
+import { getDocumentReader } from "./extension/document-reader";
 import { getInstanceName } from "./instance-name";
 import { getMailSettings, mailerFrom } from "./mail";
 import { postWebhook } from "./outbound";
@@ -169,6 +170,8 @@ async function relayDeps(delivery: OutboxDelivery): Promise<OutboxHandlerDeps> {
     // reading the setting. Null means no scanner, and the handler keeps the
     // file held rather than releasing it unscanned.
     scanner: getFileScanner,
+    // The planning extension's document reader (docs/extension/UPSTREAM-DIFF.md).
+    extractPages: (body) => getDocumentReader().extract(body),
     // A webhook's secret is opened with the ring at the moment it signs, and
     // the body goes out through the outbound guard (outbound-webhooks.md W6,
     // W7). Both always present: neither needs a service.

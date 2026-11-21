@@ -54,14 +54,37 @@
  * emptying it possible.
  */
 import type { TerminologyOverrides } from "@openokr/method";
+import arPartial from "./messages/ar.partial.json";
 import en from "./messages/en.json";
 import ms from "./messages/ms.json";
 import { fillTermHole, isTermHole } from "./terms.ts";
 
 export type Catalogue = Readonly<Record<string, string>>;
-export type Locale = "en" | "ms";
+export type Locale = "en" | "ms" | "ar";
 
-export const CATALOGUES: Readonly<Record<Locale, Catalogue>> = { en, ms };
+/**
+ * Locales translated in part, completed from the English source
+ * (docs/extension/design/b0-vertical-slice.md §6 row 5).
+ *
+ * `translate` throws on a missing key, which is right for a locale that
+ * claims every screen and wrong for one that is arriving screen by screen.
+ * A partial locale reads its own word where it has one and the English where
+ * it does not, so a screen nobody has translated yet is in English rather
+ * than broken. The list only shrinks: a locale leaves it when its file holds
+ * every key.
+ */
+export const PARTIAL_LOCALES: readonly Locale[] = ["ar"];
+
+export const CATALOGUES: Readonly<Record<Locale, Catalogue>> = {
+  en,
+  ms,
+  ar: { ...en, ...arPartial },
+};
+
+/** The direction a locale is written in, for the `dir` of the page. */
+export function directionOf(locale: Locale): "ltr" | "rtl" {
+  return locale === "ar" ? "rtl" : "ltr";
+}
 
 export const SOURCE_LOCALE: Locale = "en";
 

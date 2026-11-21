@@ -14,6 +14,11 @@ export {
 // the reader a sign-in uses (completeness review L-11).
 export { sealAccountTokens } from "./data-changes/0011_seal_account_tokens.ts";
 export {
+  EXTENSION_LEDGER,
+  extensionMigrationsDir,
+  runExtensionMigrations,
+} from "./extension/migrate.ts";
+export {
   APPEND_ONLY_TABLES,
   type GrantOptions,
   grantAppPrivileges,
@@ -344,6 +349,7 @@ export {
   type ExportRunState,
   exportRuns,
 } from "./schema/exports.ts";
+export * from "./schema/extension/index.ts";
 export {
   CAPACITY_VERDICTS,
   type CapacityVerdict,

@@ -2,6 +2,14 @@ packages:
   - apps/*
   - packages/*
 
+# pdfjs-dist names @napi-rs/canvas as an optional dependency: prebuilt native
+# binaries, one package per platform, that it uses to draw a page. The
+# planning extension reads the text of a page and never draws one
+# (docs/extension/DEPENDENCIES.md), so the binaries are left out: no native
+# code enters the image for a feature nothing uses.
+ignoredOptionalDependencies:
+  - '@napi-rs/canvas'
+
 allowBuilds:
   # Google's own SDK (P2-T13). Its `prepare` script targets a file the
   # published tarball does not ship, so it is a no-op in this install; the

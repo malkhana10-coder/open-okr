@@ -113,6 +113,9 @@ describe("navigation blocks", () => {
       "goals",
       "initiatives",
       "spaces",
+      // The planning extension's one entry, a sixth row beside the five
+      // areas (navigation-five-areas.md §6, UPSTREAM-DIFF.md §11).
+      "planning",
       "cycle",
     ]);
     expect(sidebar.map((item) => item.label)).toEqual([
@@ -121,6 +124,7 @@ describe("navigation blocks", () => {
       "Goals",
       "Work",
       "Spaces",
+      "Planning",
       "Cycle",
     ]);
     const inside = new Map(

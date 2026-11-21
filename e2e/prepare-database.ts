@@ -21,6 +21,7 @@
 import {
   ensureRoles,
   grantAppPrivileges,
+  runExtensionMigrations,
   runMigrations,
 } from "@openokr/db";
 import { connectionOptions, testDbEnv } from "@openokr/test-support/db";
@@ -94,6 +95,7 @@ export async function prepareDatabase(): Promise<void> {
     // accidental superuser assumption fails here rather than on a customer's
     // first deploy.
     await runMigrations(owner, { dirs: [MIGRATIONS] });
+    await runExtensionMigrations(owner);
     await grantAppPrivileges(owner, { appRole: testDbEnv.appRole });
 
     // Mark setup finished (P1-T09). An unconfigured instance sends every

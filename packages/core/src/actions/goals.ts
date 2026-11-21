@@ -291,7 +291,7 @@ async function activeManagerOf(
  * line repeated eleven times, so a write added later cannot leave the cascade
  * stale above it.
  */
-async function recompute(
+export async function recompute(
   tx: OperationTx,
   workspaceId: string,
   goalId: string,
@@ -313,7 +313,7 @@ async function recompute(
  * so it runs in the writing transaction, which is the same call P3-T05 made and
  * the stronger guarantee besides.
  */
-async function realign(
+export async function realign(
   tx: OperationTx,
   workspaceId: string,
   goalId: string,

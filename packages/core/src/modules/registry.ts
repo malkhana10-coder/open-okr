@@ -312,6 +312,23 @@ export const MODULE_REGISTRY: readonly ModuleDefinition[] = [
     ],
   },
   {
+    // The planning extension's screens (docs/extension/UPSTREAM-DIFF.md
+    // §11). One entry: documents, gaps, objectives, approvals and alignment
+    // are tabs inside it. Every member sees it, as they see spaces, and each
+    // screen answers for the sector it shows.
+    name: "planning",
+    navigation: [
+      {
+        id: "planning",
+        label: "Planning",
+        href: "/planning",
+        section: "sidebar",
+        group: "primary",
+        minLevel: ACCESS_LEVELS.view,
+      },
+    ],
+  },
+  {
     name: "cycle",
     navigation: [
       {

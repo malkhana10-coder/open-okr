@@ -325,7 +325,8 @@ describe("a role an administrator adds", () => {
     const auditor = roles.find((role) => role.id === created.id);
     expect(auditor?.builtinKey).toBeNull();
     expect(auditor?.editable).toBe(true);
-    expect(auditor?.permissions).toHaveLength(7);
+    // Eight since the planning extension added the approval domain.
+    expect(auditor?.permissions).toHaveLength(8);
     expect(
       auditor?.permissions.find((entry) => entry.domain === "goal")?.level,
     ).toBe(40);

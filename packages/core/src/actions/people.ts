@@ -198,7 +198,7 @@ export const updateOwnProfile = defineWriteAction({
      * set, because a locale with no catalogue would make `translate()` raise
      * on the first key it met.
      */
-    language: z.enum(["en", "ms"]).nullable().optional(),
+    language: z.enum(["en", "ms", "ar"]).nullable().optional(),
     /**
      * When not to be messaged, in the member's own timezone.
      *
@@ -1094,7 +1094,7 @@ const memberProfile = z.object({
    * the locale on the server, which is the only place it can be decided: the
    * text is rendered there.
    */
-  language: z.enum(["en", "ms"]).nullable(),
+  language: z.enum(["en", "ms", "ar"]).nullable(),
   /**
    * The name of this member's workspace role: Owner, Admin, Member, Viewer or
    * one the workspace made (plan 0.8.0 Y1). Null for a guest, an agent and a

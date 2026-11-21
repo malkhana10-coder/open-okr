@@ -491,6 +491,10 @@ const SUBJECT_RESOLVERS: Record<string, SubjectResolver> = {
   // and nothing else. TECHNICAL-PLAN §4.9: assignment grants edit access
   // through the member's group.
   task: ownContextResolver("task"),
+  // The planning extension. A request for approval owns a context, so who
+  // may decide it is the role matrix's `approval` domain
+  // (docs/extension/design/b0-vertical-slice.md §13).
+  approval: ownContextResolver("approval"),
   // P5-T12. A document has no context of its own: it is readable by whoever
   // reads its subject, and the draft rule in `actions/documents.ts` is the only
   // thing that narrows it further. Registered so a comment on a document
