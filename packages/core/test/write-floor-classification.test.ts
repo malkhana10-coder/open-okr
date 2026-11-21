@@ -60,6 +60,8 @@ const OWN_CHECK = new Set([
   // `edit` (docs/extension/design/b0-vertical-slice.md §5).
   "knowledge.addEvidence",
   "knowledge.removeEvidence",
+  // Measured on the sector at `edit` before the provider is asked.
+  "planning.runGapAgent",
   "strategy.createGap",
   // Measured on the goal at `edit`, like any change to it (§12.2).
   "strategy.setGoalProfile",

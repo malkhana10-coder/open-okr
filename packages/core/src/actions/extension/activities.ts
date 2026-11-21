@@ -7,6 +7,11 @@ import { z } from "zod";
 
 export const EXTENSION_ACTIVITY_PAYLOAD_SCHEMAS = {
   "strategy.domain_created": z.object({ name: z.string() }),
+  "planning.agent_run": z.object({
+    agent: z.string(),
+    status: z.string(),
+    drafted: z.number().int(),
+  }),
   "strategy.gap_created": z.object({ title: z.string() }),
   "strategy.gap_updated": z.object({ title: z.string() }),
   "strategy.gap_dismissed": z.object({ title: z.string() }),
@@ -38,6 +43,10 @@ export const EXTENSION_ACTIVITY_RENDERERS: Record<
   ExtensionActivityKind,
   (payload: Record<string, unknown>) => string
 > = {
+  "planning.agent_run": (p) =>
+    p.status === "succeeded"
+      ? `The gap agent ran and drafted ${String(p.drafted ?? 0)}`
+      : "The gap agent ran and drafted nothing",
   "strategy.domain_created": (p) =>
     `A strategic domain "${String(p.name ?? "")}" was added`,
   "strategy.gap_created": (p) =>

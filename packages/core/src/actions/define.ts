@@ -11,6 +11,7 @@
  */
 
 import { type RoleDomain, type WorkspaceTx, withWorkspace } from "@openokr/db";
+import type { PlanningProvider } from "@openokr/planning-agents";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
 import type { ZodType } from "zod";
@@ -109,6 +110,12 @@ export interface ActionCallContext {
    * and never decides that the proposal should exist.
    */
   readonly drafter?: AgentDrafter;
+  /**
+   * What drafts for the planning extension's agents, when the host has one to
+   * give (docs/extension/UPSTREAM-DIFF.md). Absent means no provider, and the
+   * agents' actions refuse while everything written by hand works.
+   */
+  readonly planner?: PlanningProvider;
   /**
    * Why the host could build no drafter, when it tried and could not (plan
    * 0.8.0 O1, `ai/off-reason.ts`).

@@ -87,6 +87,9 @@
 | `packages/db/migrations-ext/0008_goal_strategy_profiles.sql` | `goal_strategy_profiles`: نوع الهدف في الخطة وأولويته وحالته ومصدره وخط الأساس غير المحدد |
 | `packages/core/src/actions/extension/sector-plan.ts` | `strategy.setGoalProfile` (يُقاس على الهدف) و`strategy.listSectorPlan` (يُقاس على القطاع ويجمع أهداف وكالاته ومؤشراتها التشغيلية) |
 | `packages/core/test/extension/sector-plan.test.ts` | اختباراتها |
+| `packages/db/migrations-ext/0009_planning_agent_runs.sql` | جدول `planning_agent_runs`، وعمود `agent_run_id` على `strategic_gaps` |
+| `packages/core/src/actions/extension/agent-runs.ts` | `planning.runGapAgent` و`planning.listRuns` |
+| `packages/core/test/extension/gap-agent-run.test.ts` | اختباراتها |
 
 ## 3. العربية لغة جزئية، واتجاه الصفحة
 
@@ -166,6 +169,8 @@
 |---|---|---|
 | `packages/core/src/outbox/handlers.ts` | سطرا استيراد، وحقل `extractPages` في اعتماديات المعالجات، وسطر `...EXTENSION_OUTBOX_HANDLERS` في آخر جدول المعالجات | متوسط: آخر الجدول هو حيث يضيف الأصل مواضيعه |
 | `packages/core/package.json` | الاعتماد على `@openokr/knowledge` | منخفض |
+| `packages/core/package.json` | الاعتماد على `@openokr/planning-agents` | منخفض |
+| `packages/core/src/actions/define.ts` | سطر استيراد نوع، وحقل اختياري `planner` في سياق الإجراء، بجانب `drafter` الموجود. به يصل مزوّد وكلاء التخطيط إلى الإجراء | منخفض إلى متوسط |
 | `packages/core/test/write-floor-classification.test.ts`، `apps/web/test/action-coverage.test.ts` | تصنيف الإجراءات الثلاثة الجديدة | منخفض |
 
 ملفات جديدة في مجلدات `extension/`:
@@ -216,6 +221,7 @@
 | الحزمة | المحتوى | تعتمد على |
 |---|---|---|
 | `packages/knowledge` | `normaliseArabic` (توحيد النص العربي) و`verifyCitation` (التحقق من اقتباس أمام نص صفحته) و`extractionQuality` و`isLowQuality` (جودة الاستخراج دون مرجع). منطق صرف، واختبار يفرض ألا تستورد شيئاً من خارجها | لا شيء |
+| `packages/planning-agents` | عقد وكيل الفجوات: ما يُعطاه وشكل ما يعيده بمخطط صارم، وواجهة المزوّد، والمزوّد الثابت `FixedPlanningProvider`. منطق صرف، واختبار يفرض ألا تستورد إلا `zod` | `zod` (موجودة في المشروع) |
 
 الأثر الوحيد على ملف من ملفات الأصل: إدخال للحزمة في `pnpm-lock.yaml`، وهو ملف مولَّد يُعاد بـ`pnpm install` عند أي تعارض.
 

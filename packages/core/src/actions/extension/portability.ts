@@ -32,6 +32,13 @@ export const EXTENSION_TABLE_POLICY = [
     reason: "Which spaces are agencies, and the sector each one is under.",
   },
   {
+    table: "planning_agent_runs",
+    decision: "export",
+    // Before the gaps, which name the run that drafted them.
+    reason:
+      "Each run of a planning agent: what it was shown, what it said it read and left out, and which drafts came from it.",
+  },
+  {
     table: "strategic_gaps",
     decision: "export",
     reason:

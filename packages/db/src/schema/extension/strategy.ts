@@ -8,6 +8,8 @@
 import {
   boolean,
   integer,
+  jsonb,
+  numeric,
   pgTable,
   smallint,
   text,
@@ -29,6 +31,53 @@ export const strategyDomains = pgTable("strategy_domains", {
   name: text("name").notNull(),
   description: text("description"),
   position: integer("position").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+});
+
+export const PLANNING_AGENTS = ["gaps", "objectives"] as const;
+export const PLANNING_RUN_STATUSES = ["succeeded", "failed"] as const;
+
+/** What an agent read and what was left out. */
+export interface PlanningRunReport {
+  readonly read: readonly string[];
+  readonly excluded: readonly string[];
+}
+
+/** One run of a planning agent (migration 0009 in the extension stream). */
+export const planningAgentRuns = pgTable("planning_agent_runs", {
+  id: uuid("id").primaryKey().$defaultFn(newId),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  spaceId: uuid("space_id")
+    .notNull()
+    .references(() => spaces.id, { onDelete: "cascade" }),
+  agent: text("agent", { enum: PLANNING_AGENTS }).notNull(),
+  /** "fixed" for drafts written in advance. */
+  provider: text("provider").notNull(),
+  model: text("model").notNull(),
+  promptVersion: text("prompt_version"),
+  status: text("status", { enum: PLANNING_RUN_STATUSES }).notNull(),
+  failure: text("failure"),
+  /** A summary of what the agent was shown. Never the pages' text. */
+  input: jsonb("input").$type<Record<string, unknown>>().notNull(),
+  output: jsonb("output").$type<Record<string, unknown>>(),
+  report: jsonb("report").$type<PlanningRunReport>().notNull(),
+  documentsUsed: jsonb("documents_used")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  durationMs: integer("duration_ms").notNull(),
+  costUsd: numeric("cost_usd"),
+  startedBy: uuid("started_by").references(() => workspaceMembers.id, {
+    onDelete: "set null",
+  }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -71,6 +120,10 @@ export const strategicGaps = pgTable("strategic_gaps", {
   confidence: smallint("confidence"),
   status: text("status", { enum: GAP_STATUSES }).notNull().default("draft"),
   createdBy: uuid("created_by").references(() => workspaceMembers.id, {
+    onDelete: "set null",
+  }),
+  /** The run that drafted it. Null for one a person wrote. */
+  agentRunId: uuid("agent_run_id").references(() => planningAgentRuns.id, {
     onDelete: "set null",
   }),
   createdAt: timestamp("created_at", { withTimezone: true })

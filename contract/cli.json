@@ -12474,6 +12474,40 @@
       "pages": false
     },
     {
+      "name": "planning listRuns",
+      "action": "planning.listRuns",
+      "method": "GET",
+      "path": "/planning/listRuns",
+      "scope": "read",
+      "summary": "The planning agents' runs on a sector, newest first, each with what the agent read and what was left out.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
+      "name": "planning runGapAgent",
+      "action": "planning.runGapAgent",
+      "method": "POST",
+      "path": "/planning/runGapAgent",
+      "scope": "write",
+      "summary": "Runs the gap agent on a sector's source documents. What it drafts is stored as drafts for a person to review, each with its quotations checked against their pages.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
       "name": "strategy listGaps",
       "action": "strategy.listGaps",
       "method": "GET",

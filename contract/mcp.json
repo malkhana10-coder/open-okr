@@ -15135,6 +15135,58 @@
       }
     },
     {
+      "name": "planning.listRuns",
+      "description": "The planning agents' runs on a sector, newest first, each with what the agent read and what was left out.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
+      "name": "planning.runGapAgent",
+      "description": "Runs the gap agent on a sector's source documents. What it drafts is stored as drafts for a person to review, each with its quotations checked against their pages.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "write",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
       "name": "strategy.listGaps",
       "description": "A sector's strategic gaps, with where each one stands.",
       "inputSchema": {
