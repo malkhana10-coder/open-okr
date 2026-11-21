@@ -693,7 +693,9 @@ export const INITIATIVES: readonly Initiative[] = [
     description: "تصنيف بيانات الجهة وتحديد مالك لكل مجموعة منها.",
     agencyKey: "strategicPlanning",
     ownerKey: "pmo",
-    objectiveKey: "s5",
+    // The sub-strategy has it serve its data objective, which is not
+    // one of the plan's sector objectives.
+    objectiveKey: null,
     carried: true,
   },
   {

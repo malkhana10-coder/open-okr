@@ -313,3 +313,13 @@ git push origin --tags
 الكود نفسه في مجلدات الامتداد: `packages/core/src/extension/trial-entity/` (البيانات والباني)، و`packages/core/src/bin/extension/seed-trial-entity.ts` (الأمر)، و`deploy/extension/seed-trial-entity.sh` (تشغيله على نسخة Compose). الباني يستورد من الأصل دالتين كما هما: `accountFor` و`passwordProblem`، وهما المسار الذي تسلكه `prepareUatPersonas`. لم يتغير في الأصل سلوك تسجيل ولا صلاحية.
 
 الأمر غير مذكور في قائمة الأوامر في `CLAUDE.md` لأنه ملف الأصل. مكانه: [`PREVIEW-DEPLOY.md`](PREVIEW-DEPLOY.md) الخطوة 6.
+
+## 10. المزوّد الثابت للجهة التجريبية (2026-11-21)
+
+| الملف | التعديل | احتمال التعارض عند الجلب |
+|---|---|---|
+| `packages/core/src/index.ts` | سطر تصدير واحد بتعليقه، في موضعه من الترتيب الأبجدي الذي يفرضه المنسّق: `trialEntityPlanner` | منخفض |
+| `apps/web/package.json` | حزمتا الامتداد `@openokr/knowledge` و`@openokr/planning-agents` في `devDependencies`، لاختبار يقرأ الوثيقتين بقارئ المنتج | منخفض |
+| `pnpm-lock.yaml` | سطرا الربط للحزمتين | يُعاد توليده |
+
+الحزمتان من المستودع نفسه، فلا تبعية خارجية جديدة.
