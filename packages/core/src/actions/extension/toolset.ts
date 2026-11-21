@@ -28,6 +28,7 @@ export const PLANNING_TOOLSET: ReadonlySet<string> = new Set([
   "knowledge.listDocuments",
   "knowledge.readPage",
   "knowledge.listEvidence",
+  "knowledge.listSectorEvidence",
   "knowledge.addEvidence",
   "knowledge.removeEvidence",
 ]);

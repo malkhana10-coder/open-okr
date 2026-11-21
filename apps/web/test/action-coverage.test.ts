@@ -54,22 +54,6 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
   // them are later changes of the same phase
   // (docs/extension/design/b0-vertical-slice.md §8), and the staleness test
   // below removes these two lines the moment one does.
-  "strategy.listDomains": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector screens that read domains are not built yet",
-  },
-  "knowledge.listEvidence": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sources panel on the gaps screen is not built yet",
-  },
-  "knowledge.addEvidence": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sources panel on the gaps screen is not built yet",
-  },
-  "knowledge.removeEvidence": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sources panel on the gaps screen is not built yet",
-  },
   "strategy.listSectorPlan": {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the sector's objectives screen is not built yet",
@@ -77,14 +61,6 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
   "strategy.setGoalProfile": {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the sector's objectives screen is not built yet",
-  },
-  "planning.listRuns": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen that runs the agent is not built yet",
-  },
-  "planning.runGapAgent": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen that runs the agent is not built yet",
   },
   "planning.runObjectiveAgent": {
     apiOnly: true,
@@ -106,19 +82,11 @@ const NO_BROWSER_PATH: Readonly<Record<string, Reason>> = {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the approvals screen is not built yet",
   },
-  "strategy.listGaps": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
-  },
-  "strategy.createGap": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
+  "knowledge.listEvidence": {
+    answeredBy: "knowledge.listSectorEvidence",
+    why: "one gap's quotations. The gaps screen reads every gap's in one call, which is the same rows; this one stays for an agent or a script that holds a single gap",
   },
   "strategy.updateGap": {
-    apiOnly: true,
-    why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
-  },
-  "strategy.dismissGap": {
     apiOnly: true,
     why: "offered on REST, the command line and the agent endpoint; the sector's gaps screen is not built yet",
   },

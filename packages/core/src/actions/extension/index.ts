@@ -10,7 +10,12 @@
  * above this one.
  */
 import { listRuns, runGapAgent } from "./agent-runs.ts";
-import { addEvidence, listEvidence, removeEvidence } from "./evidence.ts";
+import {
+  addEvidence,
+  listEvidence,
+  listSectorEvidence,
+  removeEvidence,
+} from "./evidence.ts";
 import { createGap, dismissGap, listGaps, updateGap } from "./gaps.ts";
 import {
   confirmGoalOwner,
@@ -51,6 +56,7 @@ export const EXTENSION_ACTION_MAP = {
   "knowledge.listDocuments": listSourceDocuments,
   "knowledge.readPage": readSourceDocumentPage,
   "knowledge.listEvidence": listEvidence,
+  "knowledge.listSectorEvidence": listSectorEvidence,
   "knowledge.addEvidence": addEvidence,
   "knowledge.removeEvidence": removeEvidence,
 } as const;

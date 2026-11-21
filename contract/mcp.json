@@ -15822,6 +15822,32 @@
       }
     },
     {
+      "name": "knowledge.listSectorEvidence",
+      "description": "The quotations every gap of a sector rests on, each naming its gap, its document, its page and whether it was found there.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The space's id, from spaces.list."
+          }
+        },
+        "required": [
+          "spaceId"
+        ]
+      },
+      "scope": "read",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "example": {
+        "spaceId": "00000000-0000-4000-8000-000000000000"
+      }
+    },
+    {
       "name": "knowledge.addEvidence",
       "description": "Attaches a quotation from a page of a source document to a gap, and records whether the quotation is really on that page.",
       "inputSchema": {

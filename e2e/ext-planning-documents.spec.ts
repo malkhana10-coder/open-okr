@@ -1,6 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { join } from "node:path";
-import type { APIRequestContext, Page } from "@playwright/test";
+import { apiFor, LICENSING_PDF, makeSector } from "./ext-planning.ts";
 import { expect, test } from "./fixtures.ts";
 import { goTo, signIn } from "./instance-account.ts";
 
@@ -13,42 +12,6 @@ import { goTo, signIn } from "./instance-account.ts";
  * instance. No screen names a space as a sector yet, so that one step goes
  * through the REST surface with a token minted on the account screen.
  */
-
-const PDF = join(
-  import.meta.dirname,
-  "../packages/core/src/extension/trial-entity/documents/licensing-compliance.pdf",
-);
-
-async function makeSector(
-  page: Page,
-  playwright: { request: { newContext(o: object): Promise<APIRequestContext> } },
-  baseURL: string | undefined,
-  name: string,
-): Promise<string> {
-  await goTo(page, "/account/api-tokens");
-  await page.getByLabel("Name").fill(`Planning e2e ${name}`);
-  await page.getByRole("checkbox", { name: "Write" }).check();
-  await page.getByRole("button", { name: "Create token" }).click();
-  const shown = page.getByTestId("minted-token");
-  await expect(shown).toBeVisible({ timeout: 10_000 });
-  const token = ((await shown.textContent()) ?? "").trim();
-  const api = await playwright.request.newContext({ baseURL });
-  const headers = { authorization: `Bearer ${token}` };
-
-  const space = await api.post("/api/v1/spaces/create", {
-    headers,
-    data: { name },
-  });
-  expect(space.status(), await space.text()).toBe(200);
-  const spaceId = ((await space.json()).data as { id: string }).id;
-  const sector = await api.post("/api/v1/strategy/setSector", {
-    headers,
-    data: { spaceId },
-  });
-  expect(sector.status(), await sector.text()).toBe(200);
-  await api.dispose();
-  return spaceId;
-}
 
 test("a sector's strategy is uploaded, read and opened page by page", async ({
   page,
@@ -92,7 +55,7 @@ test("a sector's strategy is uploaded, read and opened page by page", async ({
   await expect(page.getByText("This file is not a PDF.")).toBeVisible();
 
   // A year that is not one is refused before anything is stored.
-  await page.getByLabel("PDF file").setInputFiles(PDF);
+  await page.getByLabel("PDF file").setInputFiles(LICENSING_PDF);
   await page.getByLabel("Year").fill("0027");
   await page.getByRole("button", { name: "Upload" }).click();
   await expect(
@@ -100,7 +63,7 @@ test("a sector's strategy is uploaded, read and opened page by page", async ({
   ).toBeVisible();
   await expect(page.getByText("No documents yet.")).toBeVisible();
 
-  await page.getByLabel("PDF file").setInputFiles(PDF);
+  await page.getByLabel("PDF file").setInputFiles(LICENSING_PDF);
   await page.getByLabel("Kind").selectOption("strategy");
   await page.getByLabel("Year").fill("2027");
   await page.getByRole("button", { name: "Upload" }).click();
@@ -149,16 +112,14 @@ test("a space that is not a sector is not opened as one", async ({
 }) => {
   await signIn(page);
   // The owner may edit this space, and that does not make it a sector.
-  await goTo(page, "/account/api-tokens");
-  await page.getByLabel("Name").fill(`Plain space ${randomUUID().slice(0, 8)}`);
-  await page.getByRole("checkbox", { name: "Write" }).check();
-  await page.getByRole("button", { name: "Create token" }).click();
-  const shown = page.getByTestId("minted-token");
-  await expect(shown).toBeVisible({ timeout: 10_000 });
-  const token = ((await shown.textContent()) ?? "").trim();
-  const api = await playwright.request.newContext({ baseURL });
+  const { api, headers } = await apiFor(
+    page,
+    playwright,
+    baseURL,
+    `Plain space ${randomUUID().slice(0, 8)}`,
+  );
   const space = await api.post("/api/v1/spaces/create", {
-    headers: { authorization: `Bearer ${token}` },
+    headers,
     data: { name: `Plain space ${randomUUID().slice(0, 8)}` },
   });
   expect(space.status(), await space.text()).toBe(200);

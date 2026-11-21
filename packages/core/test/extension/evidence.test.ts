@@ -306,3 +306,59 @@ describe("knowledge.removeEvidence and access", () => {
     expect(stored.rows).toEqual([{ verification: "unverified" }]);
   });
 });
+
+describe("knowledge.listSectorEvidence", () => {
+  const ofSector = async (who = owner()) =>
+    (
+      await callAction(await who, "knowledge.listSectorEvidence", {
+        spaceId: sectorId,
+      })
+    ).evidence;
+
+  it("answers every gap's quotations in one read, each naming its gap", async () => {
+    await add("إنجاز طلبات التراخيص خلال خمسة أيام عمل");
+    await add("كلمات ليست في الصفحة على الإطلاق");
+    const other = await callAction(await owner(), "strategy.createGap", {
+      spaceId: sectorId,
+      title: "فجوة ثانية",
+    });
+    await callAction(await owner(), "knowledge.addEvidence", {
+      subjectType: "gap",
+      subjectId: other.id,
+      documentId,
+      page: 1,
+      quote: "إنجاز طلبات التراخيص خلال خمسة أيام عمل",
+    });
+
+    const all = await ofSector();
+    expect(all).toHaveLength(3);
+    expect(all.filter((one) => one.gapId === gapId)).toHaveLength(2);
+    expect(all.filter((one) => one.gapId === other.id)).toHaveLength(1);
+    // The same rows the per-gap read answers, in the same order.
+    expect(
+      all
+        .filter((one) => one.gapId === gapId)
+        .map(({ gapId: _, ...row }) => row),
+    ).toEqual(await listed());
+  });
+
+  it("leaves out a quotation that was removed", async () => {
+    const added = await add("إنجاز طلبات التراخيص خلال خمسة أيام عمل");
+    await callAction(await owner(), "knowledge.removeEvidence", {
+      id: added.id,
+    });
+    expect(await ofSector()).toEqual([]);
+  });
+
+  it("answers not found to somebody who is not in the sector", async () => {
+    const wb = await workerDb();
+    await add("إنجاز طلبات التراخيص خلال خمسة أيام عمل");
+    await expect(
+      callAction(
+        { pool: wb.appPool, ...as(OUTSIDER) },
+        "knowledge.listSectorEvidence",
+        { spaceId: sectorId },
+      ),
+    ).rejects.toMatchObject({ code: "not_found" });
+  });
+});

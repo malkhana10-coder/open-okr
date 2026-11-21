@@ -49,7 +49,7 @@ const OPEN_TO_CHANGE: ReadonlySet<GapStatus> = new Set([
 const title = z.string().trim().min(1).max(300);
 const prose = z.string().trim().min(1).max(4000);
 
-async function inSector(
+export async function inSector(
   tx: OperationTx,
   workspaceId: string,
   memberId: string,

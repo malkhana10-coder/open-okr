@@ -2,13 +2,13 @@ import { callAction } from "@openokr/core";
 import { Card, CardBody, CardHeader, Chip } from "@openokr/ui";
 import Link from "next/link";
 import {
+  openSector,
   planningContext,
   refusedSector,
-  sectorsFor,
 } from "../../../../lib/extension/planning.ts";
 import { pageTitle } from "../../../../lib/page-title.ts";
 import { getTranslations } from "../../../../lib/translations";
-import { SectorPicker } from "../sector-picker.tsx";
+import { PlanningTop } from "../planning-top.tsx";
 import { PendingRefresh } from "./pending-refresh.tsx";
 import { UploadForm } from "./upload-form.tsx";
 
@@ -54,66 +54,26 @@ export default async function PlanningDocumentsPage({
   const { t, locale } = await getTranslations();
   const search = await searchParams;
   const context = await planningContext();
-  const { sectors, named, unknown } = await sectorsFor(context, search.sector);
-
-  const heading = (
-    <CardHeader>
-      <h1 className="text-lg font-bold text-ink">
-        {t("planning.documents.title")}
-      </h1>
-      <p className="text-sm text-ink-3">{t("planning.documents.intro")}</p>
-    </CardHeader>
+  const opened = await openSector(
+    context,
+    search.sector,
+    async (spaceId) =>
+      (await callAction(context, "knowledge.listDocuments", { spaceId }))
+        .documents,
   );
-  const only = (message: string, picker: boolean) => (
-    <div className="stagger flex flex-col gap-4.5">
-      <Card>
-        {heading}
-        <CardBody className="flex flex-col gap-3">
-          {picker ? (
-            <SectorPicker action={HERE} sectors={sectors} sectorId={named} />
-          ) : null}
-          <p className="text-sm text-ink-2">{message}</p>
-        </CardBody>
-      </Card>
-    </div>
-  );
-
-  if (sectors.length === 0) {
-    return only(t("planning.sector.none"), false);
-  }
-  if (unknown) {
-    return only(t("planning.sector.denied"), true);
-  }
-
-  // The sector named, or the first one this member may open. The list holds
-  // every sector, and a member is often in one of them and not the first.
-  const read = async (spaceId: string) => {
-    try {
-      return (await callAction(context, "knowledge.listDocuments", { spaceId }))
-        .documents;
-    } catch (error) {
-      if (!refusedSector(error)) {
-        throw error;
-      }
-      return null;
-    }
-  };
-  let sectorId: string | null = null;
-  let documents: NonNullable<Awaited<ReturnType<typeof read>>> = [];
-  for (const candidate of named ? [named] : sectors.map((s) => s.spaceId)) {
-    const found = await read(candidate);
-    if (found !== null) {
-      sectorId = candidate;
-      documents = found;
-      break;
-    }
-  }
-  if (sectorId === null) {
-    return only(
-      named ? t("planning.sector.denied") : t("planning.sector.noneOpen"),
-      true,
+  if (opened.state !== "open") {
+    return (
+      <div className="stagger flex flex-col gap-4.5">
+        <PlanningTop
+          tab="documents"
+          title={t("planning.documents.title")}
+          intro={t("planning.documents.intro")}
+          opened={opened}
+        />
+      </div>
     );
   }
+  const { sectorId, data: documents } = opened;
 
   const open = documents.find((document) => document.id === search.document);
   const pageNumber = Math.max(1, Number.parseInt(search.page ?? "1", 10) || 1);
@@ -149,74 +109,71 @@ export default async function PlanningDocumentsPage({
   return (
     <div className="stagger flex flex-col gap-4.5">
       {pending ? <PendingRefresh /> : null}
-      <Card>
-        {heading}
-        <CardBody className="flex flex-col gap-4">
-          <SectorPicker action={HERE} sectors={sectors} sectorId={sectorId} />
-          {documents.length === 0 ? (
-            <p className="text-sm text-ink-3">
-              {t("planning.documents.empty")}
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {documents.map((document) => (
-                <li
-                  key={document.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line px-3 py-2"
-                >
-                  <span className="flex min-w-0 flex-col">
-                    {/* A title is in its own language, whatever the screen's. */}
-                    <bdi className="font-medium text-ink">{document.title}</bdi>
-                    <span className="flex gap-2 text-sm text-ink-3">
-                      <span>{t(KIND_KEYS[document.kind])}</span>
-                      <span className="tabular">{document.year}</span>
+      <PlanningTop
+        tab="documents"
+        title={t("planning.documents.title")}
+        intro={t("planning.documents.intro")}
+        opened={opened}
+      >
+        {documents.length === 0 ? (
+          <p className="text-sm text-ink-3">{t("planning.documents.empty")}</p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {documents.map((document) => (
+              <li
+                key={document.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line px-3 py-2"
+              >
+                <span className="flex min-w-0 flex-col">
+                  {/* A title is in its own language, whatever the screen's. */}
+                  <bdi className="font-medium text-ink">{document.title}</bdi>
+                  <span className="flex gap-2 text-sm text-ink-3">
+                    <span>{t(KIND_KEYS[document.kind])}</span>
+                    <span className="tabular">{document.year}</span>
+                  </span>
+                  {document.quality?.low ? (
+                    <span className="text-sm text-ink-2">
+                      {t("planning.documents.lowPages", {
+                        pages: list.format(
+                          document.quality.lowPages.map(String),
+                        ),
+                      })}
                     </span>
-                    {document.quality?.low ? (
-                      <span className="text-sm text-ink-2">
-                        {t("planning.documents.lowPages", {
-                          pages: list.format(
-                            document.quality.lowPages.map(String),
-                          ),
-                        })}
+                  ) : null}
+                </span>
+                <span className="flex items-center gap-2">
+                  {document.quality?.low ? (
+                    <Chip tone="warn">
+                      {t("planning.documents.lowQuality")}
+                    </Chip>
+                  ) : null}
+                  {document.processingStatus === "pending" ? (
+                    <Chip tone="neutral">
+                      {t("planning.documents.status.pending")}
+                    </Chip>
+                  ) : document.processingStatus === "failed" ? (
+                    <Chip tone="bad">
+                      {t(FAILURE_KEYS[document.failureReason ?? "unreadable"])}
+                    </Chip>
+                  ) : (
+                    <>
+                      <span className="tabular text-sm text-ink-3">
+                        {pages(document.pageCount ?? 0)}
                       </span>
-                    ) : null}
-                  </span>
-                  <span className="flex items-center gap-2">
-                    {document.quality?.low ? (
-                      <Chip tone="warn">
-                        {t("planning.documents.lowQuality")}
-                      </Chip>
-                    ) : null}
-                    {document.processingStatus === "pending" ? (
-                      <Chip tone="neutral">
-                        {t("planning.documents.status.pending")}
-                      </Chip>
-                    ) : document.processingStatus === "failed" ? (
-                      <Chip tone="bad">
-                        {t(
-                          FAILURE_KEYS[document.failureReason ?? "unreadable"],
-                        )}
-                      </Chip>
-                    ) : (
-                      <>
-                        <span className="tabular text-sm text-ink-3">
-                          {pages(document.pageCount ?? 0)}
-                        </span>
-                        <Link
-                          href={pageHref(document.id, 1)}
-                          className="text-sm font-medium text-brand hover:underline"
-                        >
-                          {t("planning.documents.read")}
-                        </Link>
-                      </>
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardBody>
-      </Card>
+                      <Link
+                        href={pageHref(document.id, 1)}
+                        className="text-sm font-medium text-brand hover:underline"
+                      >
+                        {t("planning.documents.read")}
+                      </Link>
+                    </>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </PlanningTop>
 
       {open && reading ? (
         <Card>

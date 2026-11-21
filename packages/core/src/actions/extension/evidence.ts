@@ -25,6 +25,7 @@ import {
   newId,
   sourceDocumentPages,
   sourceDocuments,
+  strategicGaps,
   withContext,
 } from "@openokr/db";
 import { isLowQuality, verifyCitation } from "@openokr/knowledge";
@@ -38,7 +39,7 @@ import {
 } from "../../operations/operation.ts";
 import { defineReadAction, defineWriteAction } from "../define.ts";
 import { actingMemberId } from "./acting-member.ts";
-import { gapForChange, refuseUnlessOpen } from "./gaps.ts";
+import { gapForChange, inSector, refuseUnlessOpen } from "./gaps.ts";
 
 /**
  * What evidence can support today. A drafted objective joins when objectives
@@ -222,6 +223,104 @@ export const removeEvidence = defineWriteAction({
       };
     },
   }),
+});
+
+const evidenceRow = {
+  id: z.uuid(),
+  documentId: z.uuid(),
+  documentTitle: z.string(),
+  page: z.number().int(),
+  quote: z.string(),
+  verification: z.enum(EVIDENCE_VERIFICATIONS),
+  unverifiedReason: z.enum(EVIDENCE_UNVERIFIED_REASONS).nullable(),
+  /** The page it comes from was read poorly, so a miss may be the file's. */
+  weakPage: z.boolean(),
+};
+
+/**
+ * Every gap's quotations in a sector, in one read.
+ *
+ * A screen that lists a sector's gaps needs the quotations of all of them.
+ * Asking gap by gap is a transaction and an access check for each, all at
+ * once, which is more connections than the pool holds for a sector with
+ * forty gaps. This asks once, for somebody who may edit the sector.
+ */
+export const listSectorEvidence = defineReadAction({
+  name: "knowledge.listSectorEvidence",
+  summary:
+    "The quotations every gap of a sector rests on, each naming its gap, its document, its page and whether it was found there.",
+  input: z.object({ spaceId: z.uuid() }),
+  output: z.object({
+    evidence: z.array(z.object({ gapId: z.uuid(), ...evidenceRow })),
+  }),
+  access: ACCESS_LEVELS.view,
+  async handler(context, input) {
+    const userId = context.actor.userId;
+    if (!userId) {
+      throw new OperationError("not_found", "No such workspace.");
+    }
+    return withContext(
+      drizzle(context.pool),
+      { workspaceId: context.workspaceId, userId },
+      async (rawTx) => {
+        const tx = rawTx as OperationTx;
+        const memberId = await actingMemberId(tx, context.workspaceId, userId);
+        // Decides access: not found unless the caller may edit the sector.
+        await inSector(tx, context.workspaceId, memberId, input.spaceId);
+        const rows = await tx
+          .select({
+            gapId: strategicGaps.id,
+            id: evidence.id,
+            documentId: evidence.documentId,
+            documentTitle: sourceDocuments.title,
+            page: evidence.page,
+            quote: evidence.quote,
+            verification: evidence.verification,
+            unverifiedReason: evidence.unverifiedReason,
+            arabicWords: sourceDocumentPages.arabicWords,
+            suspectWords: sourceDocumentPages.suspectWords,
+          })
+          .from(evidence)
+          .innerJoin(
+            strategicGaps,
+            and(
+              eq(strategicGaps.id, evidence.subjectId),
+              activeOnly(strategicGaps),
+            ),
+          )
+          .innerJoin(
+            sourceDocuments,
+            eq(sourceDocuments.id, evidence.documentId),
+          )
+          .leftJoin(
+            sourceDocumentPages,
+            and(
+              eq(sourceDocumentPages.documentId, evidence.documentId),
+              eq(sourceDocumentPages.page, evidence.page),
+            ),
+          )
+          .where(
+            activeOnly(
+              evidence,
+              eq(evidence.workspaceId, context.workspaceId),
+              eq(evidence.subjectType, "gap"),
+              eq(strategicGaps.workspaceId, context.workspaceId),
+              eq(strategicGaps.spaceId, input.spaceId),
+            ),
+          )
+          .orderBy(asc(evidence.createdAt), asc(evidence.id));
+        return {
+          evidence: rows.map(({ arabicWords, suspectWords, ...row }) => ({
+            ...row,
+            weakPage:
+              arabicWords !== null &&
+              suspectWords !== null &&
+              isLowQuality({ arabicWords, suspectWords }),
+          })),
+        };
+      },
+    );
+  },
 });
 
 export const listEvidence = defineReadAction({

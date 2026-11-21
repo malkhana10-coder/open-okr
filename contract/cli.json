@@ -12981,6 +12981,23 @@
       "pages": false
     },
     {
+      "name": "knowledge listSectorEvidence",
+      "action": "knowledge.listSectorEvidence",
+      "method": "GET",
+      "path": "/knowledge/listSectorEvidence",
+      "scope": "read",
+      "summary": "The quotations every gap of a sector rests on, each naming its gap, its document, its page and whether it was found there.",
+      "flags": [
+        {
+          "name": "space-id",
+          "field": "spaceId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "pages": false
+    },
+    {
       "name": "knowledge addEvidence",
       "action": "knowledge.addEvidence",
       "method": "POST",
