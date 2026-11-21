@@ -21,7 +21,7 @@ test("a sector's strategy is uploaded, read and opened page by page", async ({
   test.setTimeout(120_000);
   await signIn(page);
   const name = `Licensing sector ${randomUUID().slice(0, 8)}`;
-  const sectorId = await makeSector(page, playwright, baseURL, name);
+  const { sectorId } = await makeSector(page, playwright, baseURL, name);
 
   // The sidebar leads to it, and it opens on the documents.
   await goTo(page, "/spaces");

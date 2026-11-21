@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { makeSector, uploadLicensing } from "./ext-planning.ts";
+import {
+  draftObjectivesInto,
+  makeSector,
+  uploadLicensing,
+} from "./ext-planning.ts";
 import { expect, test } from "./fixtures.ts";
 import {
   inviteByEmail,
@@ -39,7 +43,7 @@ test("one person sends a sector's request, another returns it, then approves it"
 
   // The owner makes the sector and brings the drafter in as an administrator.
   await signIn(page);
-  const sectorId = await makeSector(page, playwright, baseURL, sector);
+  const { sectorId, cycleId } = await makeSector(page, playwright, baseURL, sector);
   const joinPath = await inviteByEmail(page, drafter.email);
   const theirs = await personContext(browser);
   const drafting = await theirs.newPage();
@@ -67,7 +71,7 @@ test("one person sends a sector's request, another returns it, then approves it"
   await weak.getByRole("button", { name: "Set aside" }).click();
   await expect(weak.getByText("Set aside", { exact: true })).toBeVisible();
   await drafting.getByRole("link", { name: "Objectives", exact: true }).click();
-  await drafting.getByRole("button", { name: "Draft objectives" }).click();
+  await draftObjectivesInto(drafting, cycleId);
   await expect(drafting.getByText("AI draft", { exact: true })).toHaveCount(5, {
     timeout: 30_000,
   });

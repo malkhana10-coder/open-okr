@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { makeSector, uploadLicensing } from "./ext-planning.ts";
+import {
+  draftObjectivesInto,
+  makeSector,
+  uploadLicensing,
+} from "./ext-planning.ts";
 import { expect, test } from "./fixtures.ts";
 import { goTo, signIn } from "./instance-account.ts";
 
@@ -16,7 +20,7 @@ test("objectives are drafted from the gaps, and a person confirms an owner", asy
 }) => {
   test.setTimeout(180_000);
   await signIn(page);
-  const sectorId = await makeSector(
+  const { sectorId, cycleId } = await makeSector(
     page,
     playwright,
     baseURL,
@@ -30,7 +34,7 @@ test("objectives are drafted from the gaps, and a person confirms an owner", asy
     new RegExp(`/planning/objectives\\?sector=${sectorId}`),
   );
   await expect(page.getByText("No proposed objectives yet.")).toBeVisible();
-  await page.getByRole("button", { name: "Draft objectives" }).click();
+  await draftObjectivesInto(page, cycleId);
   await expect(page.getByRole("alert").filter({ hasText: /gap/i })).toBeVisible(
     { timeout: 30_000 },
   );
@@ -45,16 +49,14 @@ test("objectives are drafted from the gaps, and a person confirms an owner", asy
   await page.getByRole("link", { name: "Objectives", exact: true }).click();
   // The cycle chosen is the one drafted into, and it stays chosen.
   const cycle = page.getByLabel("Plan cycle");
-  const offered = await cycle.inputValue();
-  expect(offered).toMatch(/^[0-9a-f-]{36}$/);
-  await page.getByRole("button", { name: "Draft objectives" }).click();
+  await draftObjectivesInto(page, cycleId);
   // Five: the sixth gap rests on a quotation that is not on its page, and
   // the drafts hold no objective for it.
   await expect(page.getByText("AI draft", { exact: true })).toHaveCount(5, {
     timeout: 30_000,
   });
   await expect(page.getByText("Owner not confirmed")).toHaveCount(5);
-  await expect(cycle).toHaveValue(offered);
+  await expect(cycle).toHaveValue(cycleId);
 
   const objective = page
     .getByRole("listitem")
@@ -85,7 +87,7 @@ test("objectives are drafted from the gaps, and a person confirms an owner", asy
   await expect(page.getByText("Owner not confirmed")).toHaveCount(4);
 
   // A second run drafts nothing more.
-  await page.getByRole("button", { name: "Draft objectives" }).click();
+  await draftObjectivesInto(page, cycleId);
   await expect(
     page.getByRole("region", { name: "Last run" }),
   ).toContainText("Runs so far: 2", { timeout: 30_000 });

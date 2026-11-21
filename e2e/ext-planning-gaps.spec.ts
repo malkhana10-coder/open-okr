@@ -30,7 +30,7 @@ test("a gap is written by hand, quoted, and the agent drafts the rest", async ({
 }) => {
   test.setTimeout(180_000);
   await signIn(page);
-  const sectorId = await makeSector(
+  const { sectorId } = await makeSector(
     page,
     playwright,
     baseURL,

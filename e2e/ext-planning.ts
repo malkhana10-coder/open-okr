@@ -42,27 +42,61 @@ export async function apiFor(
   };
 }
 
-/** A new space named as a sector. Returns the space's id. */
+/**
+ * A new space named as a sector, and an annual cycle of its own to draft a
+ * plan into.
+ *
+ * **The cycle is the spec's own on purpose.** A drafted objective is a goal,
+ * and in the instance's current cycle it is counted by every spec on the
+ * same shard that counts that cycle's goals: a quarterly review once listed
+ * seven objectives where it expected two. A year far ahead holds nothing
+ * anybody else reads.
+ */
 export async function makeSector(
   page: Page,
   playwright: Requests,
   baseURL: string | undefined,
   name: string,
-): Promise<string> {
+): Promise<{ readonly sectorId: string; readonly cycleId: string }> {
   const { api, headers } = await apiFor(page, playwright, baseURL, name);
   const space = await api.post("/api/v1/spaces/create", {
     headers,
     data: { name },
   });
   expect(space.status(), await space.text()).toBe(200);
-  const spaceId = ((await space.json()).data as { id: string }).id;
+  const sectorId = ((await space.json()).data as { id: string }).id;
   const sector = await api.post("/api/v1/strategy/setSector", {
     headers,
-    data: { spaceId },
+    data: { spaceId: sectorId },
   });
   expect(sector.status(), await sector.text()).toBe(200);
+
+  // Another spec on the shard may hold a year already, so a taken one is
+  // tried again with another.
+  let cycleId: string | null = null;
+  for (let attempt = 0; attempt < 8 && cycleId === null; attempt += 1) {
+    const year =
+      new Date().getUTCFullYear() + 20 + Math.floor(Math.random() * 150);
+    const cycle = await api.post("/api/v1/cycles/create", {
+      headers,
+      data: { on: `${year}-06-15`, mode: "annual" },
+    });
+    if (cycle.status() === 200) {
+      cycleId = ((await cycle.json()).data as { id: string }).id;
+    }
+  }
+  expect(cycleId, "no free year for the spec's own plan cycle").not.toBeNull();
   await api.dispose();
-  return spaceId;
+  return { sectorId, cycleId: cycleId as string };
+}
+
+/** Drafts objectives into the spec's own cycle, never the instance's. */
+export async function draftObjectivesInto(
+  page: Page,
+  cycleId: string,
+): Promise<void> {
+  await page.getByLabel("Plan cycle").selectOption(cycleId);
+  await page.getByRole("button", { name: "Draft objectives" }).click();
 }
 
 /** Uploads the licensing sub-strategy to a sector and waits until it is read. */

@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { makeSector, uploadLicensing } from "./ext-planning.ts";
+import {
+  draftObjectivesInto,
+  makeSector,
+  uploadLicensing,
+} from "./ext-planning.ts";
 import { expect, test } from "./fixtures.ts";
 import { goTo, signIn } from "./instance-account.ts";
 
@@ -19,7 +23,7 @@ test("a sector's drafts are linked, held back while unfit, then sent", async ({
 }) => {
   test.setTimeout(240_000);
   await signIn(page);
-  const sectorId = await makeSector(
+  const { sectorId, cycleId } = await makeSector(
     page,
     playwright,
     baseURL,
@@ -32,7 +36,7 @@ test("a sector's drafts are linked, held back while unfit, then sent", async ({
     timeout: 30_000,
   });
   await page.getByRole("link", { name: "Objectives", exact: true }).click();
-  await page.getByRole("button", { name: "Draft objectives" }).click();
+  await draftObjectivesInto(page, cycleId);
   await expect(page.getByText("AI draft", { exact: true })).toHaveCount(5, {
     timeout: 30_000,
   });
