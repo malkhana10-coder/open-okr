@@ -205,6 +205,59 @@ describe("strategy.setGoalProfile", () => {
   });
 });
 
+/**
+ * KNOWN LIMIT, PINNED ON PURPOSE. Not the behaviour the product is meant to
+ * keep.
+ *
+ * In the shipped access model the Member role holds `edit` on every objective
+ * in the workspace, whichever space owns it. So objectives are NOT isolated
+ * between sectors: somebody who is in no sector at all can change an
+ * objective of any agency. What the extension measures on the space (source
+ * documents, gaps, evidence, the sector's plan) is isolated; objectives are
+ * not.
+ *
+ * The product owner accepted this for the slice on 21 November 2026, as a
+ * blocking condition before any trial at a customer
+ * (docs/extension/EXECUTION-PLAN.md, "شروط مانعة قبل أي تجربة عند عميل").
+ * Narrowing it is part of the access design in phase B.
+ *
+ * When phase B lands, this test FAILS. That is the point: turn each
+ * expectation here into a refusal, and remove the condition from the plan.
+ */
+describe("objectives are not yet isolated between sectors (blocking condition)", () => {
+  it("lets a Member who is in no sector change an objective of an agency", async () => {
+    const wb = await workerDb();
+    const outsider = { pool: wb.appPool, ...as(OUTSIDER) };
+    const id = await goal("هدف وكالة لا ينتمي إليها الغريب", agencyId);
+
+    // The outsider is not in the sector: its plan is closed to them.
+    await expect(
+      callAction(outsider, "strategy.listSectorPlan", { spaceId: sectorId }),
+    ).rejects.toMatchObject({ code: "not_found" });
+
+    // And yet they can change the objective itself, through the product's
+    // own action and through the extension's.
+    await expect(
+      callAction(outsider, "goals.update", {
+        id,
+        title: "عنوان غيّره من ليس في القطاع",
+      }),
+    ).resolves.toBeDefined();
+    await expect(
+      callAction(outsider, "strategy.setGoalProfile", {
+        goalId: id,
+        ...PROFILE,
+      }),
+    ).resolves.toEqual({ goalId: id });
+
+    const stored = await wb.admin.query<{ title: string }>(
+      "select title from goals where id = $1",
+      [id],
+    );
+    expect(stored.rows[0]?.title).toBe("عنوان غيّره من ليس في القطاع");
+  });
+});
+
 describe("strategy.listSectorPlan", () => {
   it("gathers the sector's own objectives and its agencies', and nothing from another sector", async () => {
     const other = (
